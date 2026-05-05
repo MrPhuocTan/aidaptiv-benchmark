@@ -47,3 +47,9 @@ package-lock.json
 *.db-wal
 reports_output/
 generate_9_reports.py
+
+# Guides and Skills (Do not upload to Github)
+DEPLOYMENT_GUIDE.md
+Skill.md
+skills/
+.cursorrules
