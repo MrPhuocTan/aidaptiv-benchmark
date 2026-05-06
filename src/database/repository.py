@@ -18,6 +18,7 @@ from src.database.tables import (
     PromptEntry,
     PromptLog,
     BenchmarkEvidence,
+    RunStatus,
 )
 
 
@@ -200,8 +201,9 @@ class AsyncRepository:
         run = await self.get_run(run_id)
         if run:
             run.status = status
-            run.error_message = error_message
-            run.ended_at = get_local_time()
+            run.finished_at = get_local_time()
+            if run.started_at:
+                run.duration_seconds = (run.finished_at - run.started_at).total_seconds()
             await self.session.commit()
             return True
         return False

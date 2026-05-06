@@ -1021,7 +1021,6 @@ async def api_run_detail(
                 "s2_ttft_ms": c.s2_ttft_ms,
                 "delta_ttft_pct": c.delta_ttft_pct,
                 "overall_winner": c.overall_winner,
-                "cost_savings_pct": c.cost_savings_pct,
             }
             for c in comparisons
         ],
