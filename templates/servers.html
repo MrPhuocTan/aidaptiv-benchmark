@@ -70,7 +70,7 @@
                     {% set status = item.status %}
                     <tr class="hover:bg-slate-50/50 transition-colors server-row align-middle">
                         <td class="px-6 py-4 align-middle">
-                            <div class="font-medium text-slate-800 server-name-cell">{{ profile.name }}</div>
+                            <div class="font-medium text-slate-900 server-name-cell">{{ profile.name }}</div>
                         </td>
                         <td class="px-6 py-4 font-mono text-sm text-slate-600 server-ip-cell align-middle">{{ profile.ip_address or profile.server_id }}</td>
                         <td class="px-6 py-4 align-middle">
@@ -86,8 +86,8 @@
                                 <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full mr-1.5"></span> Online
                             </span>
                             {% else %}
-                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#B8B8B8] text-[#B8B8B8]">
-                                <span class="w-1.5 h-1.5 bg-[#B8B8B8] rounded-full mr-1.5"></span> Offline
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#94A3B8] text-[#94A3B8]">
+                                <span class="w-1.5 h-1.5 bg-[#94A3B8] rounded-full mr-1.5"></span> Offline
                             </span>
                             {% endif %}
                         </td>
@@ -96,7 +96,7 @@
                         </td>
                         <td class="px-6 py-4 text-right space-x-2 align-middle">
                             <button onclick="editServer('{{ profile.server_id }}', '{{ profile.name }}', this)" class="text-violet-600 hover:text-violet-800 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Edit</button>
-                            <button onclick="deleteServer('{{ profile.server_id }}', this)" class="text-[#B8B8B8] hover:text-[#B8B8B8] text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Delete</button>
+                            <button onclick="deleteServer('{{ profile.server_id }}', this)" class="text-[#94A3B8] hover:text-[#94A3B8] text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Delete</button>
                         </td>
                     </tr>
                     {% else %}
@@ -120,7 +120,7 @@ async function verifyServer() {
     const btn = document.getElementById('verifyServerBtn');
     
     if (!ip) {
-        resultDiv.className = "mt-4 text-sm text-[#B8B8B8]";
+        resultDiv.className = "mt-4 text-sm text-[#94A3B8]";
         resultDiv.textContent = "Please enter an IP address.";
         resultDiv.classList.remove('hidden');
         return;
@@ -143,11 +143,11 @@ async function verifyServer() {
         
         if (response.ok) {
             if (data.agent_ok && data.ollama_ok) {
-                resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-white text-[#C5A55A] border border-[#C5A55A]";
+                resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-white text-[#D4AF37] border border-[#D4AF37]";
                 resultDiv.innerHTML = "<strong>Success:</strong> Ollama and Agent are reachable. You can add this server.";
                 document.getElementById('addServerBtn').disabled = false;
             } else {
-                resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-[#F8F9FA] text-[#C5A55A] border border-[#C5A55A]";
+                resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-[#F8F9FA] text-[#D4AF37] border border-[#D4AF37]";
                 resultDiv.innerHTML = `<strong>Warning:</strong> Reachability issues detected:<br>` +
                     `Ollama (11434): ${data.ollama_ok ? 'OK' : 'Unreachable'}<br>` +
                     `Agent (9100): ${data.agent_ok ? 'OK' : 'Unreachable'}<br>` + 
@@ -155,13 +155,13 @@ async function verifyServer() {
                 document.getElementById('addServerBtn').disabled = false;
             }
         } else {
-            resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-[#F8F9FA] text-[#B8B8B8] border border-[#B8B8B8]";
+            resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-[#F8F9FA] text-[#94A3B8] border border-[#94A3B8]";
             resultDiv.textContent = "Error: " + (data.error || "Verification failed");
         }
     } catch (e) {
         btn.innerHTML = 'Verify Ports';
         btn.disabled = false;
-        resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-[#F8F9FA] text-[#B8B8B8] border border-[#B8B8B8]";
+        resultDiv.className = "mt-4 text-sm p-3 rounded-lg bg-[#F8F9FA] text-[#94A3B8] border border-[#94A3B8]";
         resultDiv.textContent = "Network error while verifying.";
         resultDiv.classList.remove('hidden');
     }

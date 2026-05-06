@@ -72,7 +72,7 @@
         <div class="flex flex-col lg:flex-row">
             <!-- Chart Side -->
             <div class="w-full lg:w-[60%] p-4 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white">
-                <h4 class="text-center font-semibold text-slate-800 mb-4">{{ title }}</h4>
+                <h4 class="text-center font-semibold text-slate-900 mb-4">{{ title }}</h4>
                 <div class="relative h-80 w-full">
                     <canvas id="{{ canvas_id }}"></canvas>
                 </div>
@@ -158,7 +158,7 @@
     {% if report_data.hardware_summary and report_data.hardware_summary|length > 0 %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
         <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-800">{{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}</h4>
+            <h4 class="font-semibold text-slate-900">{{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}</h4>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -174,7 +174,7 @@
                 </thead>
                 <tbody class="text-sm">
                     <tr class="border-b border-slate-100 bg-[#F8F9FA]">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
+                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
                     </tr>
                     {% for label, key in [("GPU Model", "gpu_name"), ("GPU Util (avg)", "gpu_util_avg"), ("GPU Util (max)", "gpu_util_max"), ("VRAM Used (avg)", "vram_used_avg_gb"), ("VRAM Total", "vram_total_gb"), ("Power (avg)", "gpu_power_avg_w"), ("Power (max)", "gpu_power_max_w"), ("Temp (avg)", "gpu_temp_avg_c"), ("Temp (max)", "gpu_temp_max_c")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -193,7 +193,7 @@
                     </tr>
                     {% endfor %}
                     <tr class="border-b border-slate-100 bg-white">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
+                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
                     </tr>
                     {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -209,7 +209,7 @@
                     </tr>
                     {% endfor %}
                     <tr class="border-b border-slate-100 bg-amber-50">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}</td>
+                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}</td>
                     </tr>
                     {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -237,7 +237,7 @@
     {% if timeline_chart and timeline_chart|length > 0 %}
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
-            <h4 class="text-lg font-semibold text-slate-800">{{ t("run_detail.hardware_timeline") }}</h4>
+            <h4 class="text-lg font-semibold text-slate-900">{{ t("run_detail.hardware_timeline") }}</h4>
             <span class="text-xs text-slate-400 font-mono">{{ t("report_details.resource_monitoring") if t else "Real-time Resource Monitoring" }}</span>
         </div>
 
@@ -298,7 +298,7 @@
     <!-- Breakdown Table — Dynamic N-Server -->
     <div class="card p-0 overflow-hidden">
         <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-            <h4 class="font-semibold text-slate-800">{{ t("report_details.table_title") }}</h4>
+            <h4 class="font-semibold text-slate-900">{{ t("report_details.table_title") }}</h4>
         </div>
         
         <div class="overflow-x-auto">
@@ -325,7 +325,7 @@
                     {% for tool, scen_dict in report_data.breakdown.items() %}
                         {% for scenario, srv_dict in scen_dict.items() %}
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
-                            <td class="p-3 font-medium text-slate-800">{{ tool }}</td>
+                            <td class="p-3 font-medium text-slate-900">{{ tool }}</td>
                             <td class="p-3 text-slate-600 border-r border-slate-200">{{ scenario }}</td>
                             
                             {% for srv_key in server_labels %}
@@ -333,7 +333,7 @@
                             <td class="p-3 text-right font-mono">{{ s.get('tps', '--') if s.get('tps') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('ttft_ms', '--') if s.get('ttft_ms') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('latency_p99_ms', '--') if s.get('latency_p99_ms') is not none else '--' }}</td>
-                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#B8B8B8] font-semibold' if s.get('error_rate', 0) > 0 else 'text-slate-500' }}">{{ s.get('error_rate', '0') }}%</td>
+                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#94A3B8] font-semibold' if s.get('error_rate', 0) > 0 else 'text-slate-500' }}">{{ s.get('error_rate', '0') }}%</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -365,7 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const serverKeys = Object.keys(serverLabels);
     
     // Bach Lap Kim color palette
-    const serverColors = ['#C5A55A', '#2D2D2D', '#B8B8B8', '#A68B3C', '#6B6B6B'];
+    const serverColors = ['#D4AF37', '#0F172A', '#94A3B8', '#A68B3C', '#6B6B6B'];
     const percentileStyles = {
         'p50': { dash: [], width: 2.5 },
         'p95': { dash: [6, 3], width: 2 },
@@ -486,9 +486,9 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Bach Lap Kim color palette
     const serverPalette = [
-        { line: "#C5A55A", fill: "rgba(197, 165, 90, 0.12)", glow: "rgba(197, 165, 90, 0.3)" },   // Gold
-        { line: "#2D2D2D", fill: "rgba(45, 45, 45, 0.12)", glow: "rgba(45, 45, 45, 0.3)" },       // Charcoal
-        { line: "#B8B8B8", fill: "rgba(184, 184, 184, 0.12)", glow: "rgba(184, 184, 184, 0.3)" }, // Silver
+        { line: "#D4AF37", fill: "rgba(197, 165, 90, 0.12)", glow: "rgba(197, 165, 90, 0.3)" },   // Gold
+        { line: "#0F172A", fill: "rgba(45, 45, 45, 0.12)", glow: "rgba(45, 45, 45, 0.3)" },       // Charcoal
+        { line: "#94A3B8", fill: "rgba(184, 184, 184, 0.12)", glow: "rgba(184, 184, 184, 0.3)" }, // Silver
         { line: "#A68B3C", fill: "rgba(166, 139, 60, 0.12)", glow: "rgba(166, 139, 60, 0.3)" },   // Dark Gold
         { line: "#6B6B6B", fill: "rgba(107, 107, 107, 0.12)",  glow: "rgba(107, 107, 107, 0.3)" },// Ash
     ];
@@ -513,7 +513,7 @@ document.addEventListener("DOMContentLoaded", function() {
             },
             tooltip: {
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                titleColor: '#2D2D2D',
+                titleColor: '#0F172A',
                 bodyColor: '#6B6B6B',
                 borderColor: '#E8D5A3',
                 borderWidth: 1,
@@ -530,7 +530,7 @@ document.addEventListener("DOMContentLoaded", function() {
             x: {
                 type: 'category',
                 ticks: {
-                    color: '#B8B8B8',
+                    color: '#94A3B8',
                     maxTicksLimit: 12,
                     font: { size: 9, family: "'JetBrains Mono', 'Courier New', monospace" },
                     callback: function(value) {
@@ -543,14 +543,14 @@ document.addEventListener("DOMContentLoaded", function() {
             },
             y: {
                 ticks: {
-                    color: '#B8B8B8',
+                    color: '#94A3B8',
                     font: { size: 9, family: "'JetBrains Mono', 'Courier New', monospace" },
                     callback: function(v) { return v + unit; }
                 },
                 grid: { color: 'rgba(232, 213, 163, 0.3)', lineWidth: 0.5 },
                 border: { color: '#E8D5A3' },
                 ...(yMax ? { max: yMax } : {}),
-                title: { display: true, text: yLabel, color: '#B8B8B8', font: { size: 10 } }
+                title: { display: true, text: yLabel, color: '#94A3B8', font: { size: 10 } }
             }
         }
     });
@@ -575,7 +575,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const stats = computeStats(srv, metricKey);
             const color = serverPalette[i % serverPalette.length].line;
             html += `<span style="color:${color};">●</span> `;
-            html += `<span style="color:#2D2D2D;">Avg: ${stats.avg}${unit}</span> `;
+            html += `<span style="color:#0F172A;">Avg: ${stats.avg}${unit}</span> `;
             html += `<span style="color:#6B6B6B;">Peak: ${stats.max}${unit}</span>`;
             if (i < servers.length - 1) html += '<span style="color:#E8D5A3;"> │ </span>';
         });

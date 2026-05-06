@@ -21,19 +21,19 @@ import numpy as np
 COLORS = {
     "bg":         "#ffffff",
     "bg_dark":    "#ffffff", # No dark mode in PDF
-    "text":       "#2D2D2D",
+    "text":       "#0F172A",
     "text_muted": "#6B6B6B",
     "grid":       "#E8D5A3",
     "grid_dark":  "#E8D5A3",
     # Server palette (Bach Lap Kim)
-    "server1":    "#C5A55A",  # Gold
-    "server2":    "#2D2D2D",  # Charcoal
-    "server3":    "#B8B8B8",  # Silver
+    "server1":    "#D4AF37",  # Gold
+    "server2":    "#0F172A",  # Charcoal
+    "server3":    "#94A3B8",  # Silver
     "server4":    "#A68B3C",  # Dark Gold
     # Semantic
     "up":         "#0ECB81",  # Green
     "down":       "#F6465D",  # Red
-    "accent":     "#C5A55A",  # Gold accent
+    "accent":     "#D4AF37",  # Gold accent
 }
 
 SERVER_COLORS = [COLORS["server1"], COLORS["server2"], COLORS["server3"], COLORS["server4"]]

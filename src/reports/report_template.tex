@@ -28,18 +28,18 @@
 \SetWatermarkScale{0.4}
 \SetWatermarkColor{medgray!15}
 % ── Color Definitions (Bach Lap Kim Theme) ────────────────
-\definecolor{navy}{HTML}{2D2D2D}       % Charcoal (was Navy)
-\definecolor{violet}{HTML}{C5A55A}     % Gold (was Violet)
-\definecolor{darkbg}{HTML}{FFFFFF}     % White
-\definecolor{lightgray}{HTML}{F8FAFC}
-\definecolor{medgray}{HTML}{B8B8B8}    % Silver
-\definecolor{textprimary}{HTML}{2D2D2D}% Charcoal
-\definecolor{textsecondary}{HTML}{6B6B6B}% Ash
-\definecolor{gridline}{HTML}{E8D5A3}   % Soft Gold
-\definecolor{greenup}{HTML}{0ECB81}
-\definecolor{reddown}{HTML}{F6465D}
-\definecolor{accentblue}{HTML}{C5A55A} % Gold
-\definecolor{covergold}{HTML}{C5A55A}  % Gold
+\definecolor{navy}{HTML}{0F172A}       % Slate 900 (Modern Charcoal)
+\definecolor{violet}{HTML}{D4AF37}     % Modern Gold
+\definecolor{darkbg}{HTML}{FFFFFF}     % Pure White
+\definecolor{lightgray}{HTML}{F8FAFC}  % Slate 50
+\definecolor{medgray}{HTML}{94A3B8}    % Slate 400 (Silver)
+\definecolor{textprimary}{HTML}{0F172A}% Slate 900
+\definecolor{textsecondary}{HTML}{475569}% Slate 600
+\definecolor{gridline}{HTML}{E2E8F0}   % Slate 200
+\definecolor{greenup}{HTML}{10B981}
+\definecolor{reddown}{HTML}{EF4444}
+\definecolor{accentblue}{HTML}{D4AF37} % Modern Gold
+\definecolor{covergold}{HTML}{D4AF37}  % Modern Gold
 
 % ── Header & Footer ──────────────────────────────────────
 \pagestyle{fancy}
@@ -340,8 +340,9 @@ test configuration. Green indicates improvement, red indicates degradation.
 \BLOCK{if comparison_table}
 \subsection{Detailed Comparison Table}
 
-\begin{small}
-\begin{longtable}{llr|rrrr|rrrr|r}
+\begin{scriptsize}
+\setlength{\tabcolsep}{3pt}
+\begin{longtable}{p{2.5cm}p{2cm}r|rrrr|rrrr|p{1.5cm}}
   \toprule
   \textbf{Tool} & \textbf{Scenario} & \textbf{C} &
   \multicolumn{4}{c|}{\textbf{Server 1}} &
@@ -358,7 +359,7 @@ test configuration. Green indicates improvement, red indicates degradation.
   \BLOCK{endfor}
   \bottomrule
 \end{longtable}
-\end{small}
+\end{scriptsize}
 \BLOCK{endif}
 \BLOCK{endif}
 
@@ -440,8 +441,9 @@ test configuration. Green indicates improvement, red indicates degradation.
 
 Performance metrics grouped by tool and test scenario.
 
-\begin{small}
-\begin{longtable}{ll\BLOCK{for s in hw_servers}|rrrr\BLOCK{endfor}}
+\begin{scriptsize}
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{p{2.5cm}p{2.5cm}\BLOCK{for s in hw_servers}|rrrr\BLOCK{endfor}}
   \toprule
   \textbf{Tool} & \textbf{Scenario}
   \BLOCK{for s in hw_servers} & \multicolumn{4}{c\BLOCK{if not loop.last}|\BLOCK{endif}}{\textbf{\VAR{s}}} \BLOCK{endfor} \\
@@ -453,7 +455,7 @@ Performance metrics grouped by tool and test scenario.
   \BLOCK{endfor}
   \bottomrule
 \end{longtable}
-\end{small}
+\end{scriptsize}
 \BLOCK{endif}
 
 % ══════════════════════════════════════════════════════════

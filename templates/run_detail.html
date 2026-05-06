@@ -26,8 +26,8 @@
         <div class="card text-center">
             <div class="card-header">{{ t("common.status") }}</div>
             <div class="text-lg font-semibold
-                {% if run.status == 'completed' %}text-[#C5A55A]
-                {% elif run.status == 'failed' %}text-[#B8B8B8]
+                {% if run.status == 'completed' %}text-[#D4AF37]
+                {% elif run.status == 'failed' %}text-[#94A3B8]
                 {% else %}text-amber-600{% endif %}">
                 {% if run.status == 'completed' %}{{ t("common.completed") }}
                 {% elif run.status == 'running' %}{{ t("common.running") }}
@@ -217,9 +217,9 @@
                         <td>
                             {% if r.error_rate is not none %}
                                 {% if r.error_rate > 0.05 %}
-                                <span class="text-[#B8B8B8]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
+                                <span class="text-[#94A3B8]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
                                 {% else %}
-                                <span class="text-[#C5A55A]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
+                                <span class="text-[#D4AF37]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
                                 {% endif %}
                             {% else %}--{% endif %}
                         </td>

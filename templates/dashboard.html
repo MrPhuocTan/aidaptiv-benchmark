@@ -116,11 +116,11 @@
                         <td class="font-mono text-xs text-primary-400">{{ run.run_id }}</td>
                         <td>
                             {% if run.status == 'completed' %}
-                            <span class="text-[#C5A55A]">{{ t("common.completed") }}</span>
+                            <span class="text-[#D4AF37]">{{ t("common.completed") }}</span>
                             {% elif run.status == 'running' %}
-                            <span class="text-[#C5A55A]">{{ t("common.running") }}</span>
+                            <span class="text-[#D4AF37]">{{ t("common.running") }}</span>
                             {% elif run.status == 'failed' %}
-                            <span class="text-[#B8B8B8]">{{ t("common.failed") }}</span>
+                            <span class="text-[#94A3B8]">{{ t("common.failed") }}</span>
                             {% else %}
                             <span class="text-slate-400">{{ run.status }}</span>
                             {% endif %}
@@ -173,14 +173,14 @@
                     {
                         label: "{{ t('dashboard.chart_server1') }}",
                         data: trendData.map(item => item.server1_tps),
-                        borderColor: "#2D2D2D",
+                        borderColor: "#0F172A",
                         backgroundColor: "rgba(45, 45, 45, 0.15)",
                         tension: 0.25,
                     },
                     {
                         label: "{{ t('dashboard.chart_server2') }}",
                         data: trendData.map(item => item.server2_tps),
-                        borderColor: "#C5A55A",
+                        borderColor: "#D4AF37",
                         backgroundColor: "rgba(197, 165, 90, 0.15)",
                         tension: 0.25,
                     }
@@ -194,11 +194,11 @@
                 },
                 scales: {
                     x: {
-                        ticks: { color: "#B8B8B8", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
+                        ticks: { color: "#94A3B8", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
                         grid: { color: "rgba(232, 213, 163, 0.3)" }
                     },
                     y: {
-                        ticks: { color: "#B8B8B8", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
+                        ticks: { color: "#94A3B8", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
                         grid: { color: "rgba(232, 213, 163, 0.3)" }
                     }
                 }

@@ -25,7 +25,7 @@
         .bg-violet-50 { background-color: #f5f3ff; }
         .text-sky-800 { color: #075985; }
         .bg-sky-50 { background-color: #f0f9ff; }
-        .text-[#B8B8B8] { color: #ef4444; }
+        .text-[#94A3B8] { color: #ef4444; }
         .print-btn { display: inline-block; padding: 0.5rem 1rem; background-color: #4f46e5; color: white; border-radius: 0.375rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; }
         .print-btn:hover { background-color: #4338ca; }
         @media print {
@@ -111,7 +111,7 @@
         <div class="flex flex-col lg:flex-row">
             <!-- Chart Side -->
             <div class="w-full lg:w-[60%] p-4 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white">
-                <h4 class="text-center font-semibold text-slate-800 mb-4">{{ title }}</h4>
+                <h4 class="text-center font-semibold text-slate-900 mb-4">{{ title }}</h4>
                 <div class="relative h-80 w-full">
                     <canvas id="{{ canvas_id }}"></canvas>
                 </div>
@@ -192,7 +192,7 @@
     {% if report_data.hardware_summary and report_data.hardware_summary|length > 0 %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
         <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-800">Hardware Specifications</h4>
+            <h4 class="font-semibold text-slate-900">Hardware Specifications</h4>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -209,7 +209,7 @@
                 <tbody class="text-sm">
                     <!-- GPU Info -->
                     <tr class="border-b border-slate-100 bg-[#F8F9FA]">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">GPU</td>
+                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">GPU</td>
                     </tr>
                     {% for label, key in [("GPU Model", "gpu_name"), ("GPU Util (avg)", "gpu_util_avg"), ("GPU Util (max)", "gpu_util_max"), ("VRAM Used (avg)", "vram_used_avg_gb"), ("VRAM Total", "vram_total_gb"), ("Power (avg)", "gpu_power_avg_w"), ("Power (max)", "gpu_power_max_w"), ("Temp (avg)", "gpu_temp_avg_c"), ("Temp (max)", "gpu_temp_max_c")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -229,7 +229,7 @@
                     {% endfor %}
                     <!-- CPU / RAM -->
                     <tr class="border-b border-slate-100 bg-white">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">CPU / RAM</td>
+                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">CPU / RAM</td>
                     </tr>
                     {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -246,7 +246,7 @@
                     {% endfor %}
                     <!-- Disk I/O -->
                     <tr class="border-b border-slate-100 bg-amber-50">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">Disk / Network I/O</td>
+                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">Disk / Network I/O</td>
                     </tr>
                     {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -274,7 +274,7 @@
     <!-- Environment & Integrity Snapshot -->
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
         <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-800">Environment & Integrity Snapshot</h4>
+            <h4 class="font-semibold text-slate-900">Environment & Integrity Snapshot</h4>
         </div>
         <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white">
             <div>
@@ -294,7 +294,7 @@
                     <li><span class="font-semibold text-slate-700">Audit Package:</span> Available in ZIP format via web interface</li>
                     <li><span class="font-semibold text-slate-700">Cryptographic Hash:</span> SHA-256 validation enabled</li>
                 </ul>
-                <div class="mt-4 p-3 bg-[#F8F9FA] border border-[#B8B8B8] rounded-md text-xs text-[#2D2D2D]">
+                <div class="mt-4 p-3 bg-[#F8F9FA] border border-[#94A3B8] rounded-md text-xs text-[#0F172A]">
                     <strong>Note:</strong> This report is generated from raw tool outputs directly. To verify the cryptographic integrity of these results, download the "Evidence Package" from the dashboard which includes the MANIFEST.json signature.
                 </div>
             </div>
@@ -305,7 +305,7 @@
     {% if timeline_chart and timeline_chart|length > 0 %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
         <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-800">{{ t("run_detail.hardware_timeline") }}</h4>
+            <h4 class="font-semibold text-slate-900">{{ t("run_detail.hardware_timeline") }}</h4>
         </div>
         <div class="p-4 bg-white grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -331,7 +331,7 @@
     <!-- Breakdown Table — Dynamic N-Server -->
     <div class="card p-0 overflow-hidden">
         <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-800">{{ t("report_details.table_title") }}</h4>
+            <h4 class="font-semibold text-slate-900">{{ t("report_details.table_title") }}</h4>
         </div>
         
         <div class="overflow-x-auto">
@@ -358,7 +358,7 @@
                     {% for tool, scen_dict in report_data.breakdown.items() %}
                         {% for scenario, srv_dict in scen_dict.items() %}
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
-                            <td class="p-3 font-medium text-slate-800">{{ tool }}</td>
+                            <td class="p-3 font-medium text-slate-900">{{ tool }}</td>
                             <td class="p-3 text-slate-600 border-r border-slate-200">{{ scenario }}</td>
                             
                             {% for srv_key in server_labels %}
@@ -366,7 +366,7 @@
                             <td class="p-3 text-right font-mono">{{ s.get('tps', '--') if s.get('tps') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('ttft_ms', '--') if s.get('ttft_ms') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('latency_p99_ms', '--') if s.get('latency_p99_ms') is not none else '--' }}</td>
-                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#B8B8B8] font-semibold' if s.get('error_rate', 0) > 0 else 'text-slate-500' }}">{{ s.get('error_rate', '0') }}%</td>
+                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#94A3B8] font-semibold' if s.get('error_rate', 0) > 0 else 'text-slate-500' }}">{{ s.get('error_rate', '0') }}%</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
