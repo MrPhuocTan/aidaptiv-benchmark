@@ -23,7 +23,10 @@
 \usepackage{amsmath}
 \usepackage{lastpage}
 \usepackage{array}
-
+\usepackage{draftwatermark}
+\SetWatermarkText{\VAR{test_suite}}
+\SetWatermarkScale{0.4}
+\SetWatermarkColor{medgray!15}
 % ── Color Definitions (Bach Lap Kim Theme) ────────────────
 \definecolor{navy}{HTML}{2D2D2D}       % Charcoal (was Navy)
 \definecolor{violet}{HTML}{C5A55A}     % Gold (was Violet)
@@ -104,7 +107,7 @@
 
 \vspace{1.5cm}
 
-{\fontsize{28}{34}\selectfont\bfseries\color{navy} AI Server Benchmark\\[8pt] Performance Report}
+{\fontsize{28}{34}\selectfont\bfseries\color{navy} Benchmark Result}
 
 \vspace{1cm}
 
@@ -202,6 +205,23 @@ Lower values indicate faster initial response.
   \includegraphics[width=\textwidth]{\VAR{charts.perf_ttft}}
   \caption{TTFT by Concurrency Level (p50/p95/p99)}
 \end{figure}
+
+\BLOCK{if chart_data}
+\begin{small}
+\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+  \toprule
+  \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
+  \midrule
+  \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
+  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  p50 \BLOCK{for val in chart_data.ttft[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  p95 \BLOCK{for val in chart_data.ttft[srv_key]['p95']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  p99 \BLOCK{for val in chart_data.ttft[srv_key]['p99']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  \BLOCK{endfor}
+  \bottomrule
+\end{tabularx}
+\end{small}
+\BLOCK{endif}
 \BLOCK{endif}
 
 \BLOCK{if charts.perf_itl}
@@ -214,6 +234,21 @@ Lower values indicate smoother streaming.
   \includegraphics[width=\textwidth]{\VAR{charts.perf_itl}}
   \caption{Inter-Token Latency by Concurrency Level}
 \end{figure}
+
+\BLOCK{if chart_data}
+\begin{small}
+\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+  \toprule
+  \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
+  \midrule
+  \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
+  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  p50 \BLOCK{for val in chart_data.itl[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  \BLOCK{endfor}
+  \bottomrule
+\end{tabularx}
+\end{small}
+\BLOCK{endif}
 \BLOCK{endif}
 
 \BLOCK{if charts.perf_tps}
@@ -226,6 +261,23 @@ Higher values indicate better throughput efficiency.
   \includegraphics[width=\textwidth]{\VAR{charts.perf_tps}}
   \caption{Tokens/sec/user by Concurrency Level}
 \end{figure}
+
+\BLOCK{if chart_data}
+\begin{small}
+\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+  \toprule
+  \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
+  \midrule
+  \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
+  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  p50 \BLOCK{for val in chart_data.tps[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  p95 \BLOCK{for val in chart_data.tps[srv_key]['p95']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  p99 \BLOCK{for val in chart_data.tps[srv_key]['p99']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  \BLOCK{endfor}
+  \bottomrule
+\end{tabularx}
+\end{small}
+\BLOCK{endif}
 \BLOCK{endif}
 
 \BLOCK{if charts.perf_latency}
@@ -237,6 +289,23 @@ End-to-end request latency from submission to completion.
   \includegraphics[width=\textwidth]{\VAR{charts.perf_latency}}
   \caption{Request Latency by Concurrency Level (p50/p95/p99)}
 \end{figure}
+
+\BLOCK{if chart_data}
+\begin{small}
+\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+  \toprule
+  \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
+  \midrule
+  \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
+  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  p50 \BLOCK{for val in chart_data.latency[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  p95 \BLOCK{for val in chart_data.latency[srv_key]['p95']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  p99 \BLOCK{for val in chart_data.latency[srv_key]['p99']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
+  \BLOCK{endfor}
+  \bottomrule
+\end{tabularx}
+\end{small}
+\BLOCK{endif}
 \BLOCK{endif}
 
 % ══════════════════════════════════════════════════════════

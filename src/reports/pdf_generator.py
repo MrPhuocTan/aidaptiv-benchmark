@@ -93,6 +93,7 @@ def _build_template_context(
             run.config_snapshot.get("prompt_set", "Default") if run.config_snapshot else "Default"
         ),
         "charts": charts,
+        "chart_data": chart_data,
     }
     
     # Winner

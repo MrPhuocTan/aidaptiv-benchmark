@@ -173,7 +173,7 @@
                     </tr>
                 </thead>
                 <tbody class="text-sm">
-                    <tr class="border-b border-slate-100 bg-blue-50">
+                    <tr class="border-b border-slate-100 bg-[#F8F9FA]">
                         <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
                     </tr>
                     {% for label, key in [("GPU Model", "gpu_name"), ("GPU Util (avg)", "gpu_util_avg"), ("GPU Util (max)", "gpu_util_max"), ("VRAM Used (avg)", "vram_used_avg_gb"), ("VRAM Total", "vram_total_gb"), ("Power (avg)", "gpu_power_avg_w"), ("Power (max)", "gpu_power_max_w"), ("Temp (avg)", "gpu_temp_avg_c"), ("Temp (max)", "gpu_temp_max_c")] %}
@@ -192,7 +192,7 @@
                         {% endfor %}
                     </tr>
                     {% endfor %}
-                    <tr class="border-b border-slate-100 bg-green-50">
+                    <tr class="border-b border-slate-100 bg-white">
                         <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
                     </tr>
                     {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
@@ -333,7 +333,7 @@
                             <td class="p-3 text-right font-mono">{{ s.get('tps', '--') if s.get('tps') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('ttft_ms', '--') if s.get('ttft_ms') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('latency_p99_ms', '--') if s.get('latency_p99_ms') is not none else '--' }}</td>
-                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-red-500 font-semibold' if s.get('error_rate', 0) > 0 else 'text-slate-500' }}">{{ s.get('error_rate', '0') }}%</td>
+                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#B8B8B8] font-semibold' if s.get('error_rate', 0) > 0 else 'text-slate-500' }}">{{ s.get('error_rate', '0') }}%</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
