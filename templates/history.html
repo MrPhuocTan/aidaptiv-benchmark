@@ -77,7 +77,7 @@
                             {% elif run.status == 'failed' %}
                             <div class="bg-[#d2d2d7] h-1.5 rounded-full" {{ pct_style|safe }}></div>
                             {% elif run.status == 'running' %}
-                            <div class="bg-gold-400 h-1.5 rounded-full run-progress-bar" data-run-id="{{ run.run_id }}" {{ pct_style|safe }}></div>
+                            <div class="bg-apple-primary h-1.5 rounded-full run-progress-bar" data-run-id="{{ run.run_id }}" {{ pct_style|safe }}></div>
                             {% else %}
                             <div class="bg-slate-400 h-1.5 rounded-full" {{ pct_style|safe }}></div>
                             {% endif %}

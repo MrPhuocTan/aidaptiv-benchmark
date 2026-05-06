@@ -12,8 +12,8 @@
             <p class="text-sm text-[#7a7a7a] mt-2">{{ t("common.date") }}: {{ run.started_at.strftime('%Y-%m-%d %H:%M') }} | Run ID: <span class="font-mono text-[#1d1d1f]">{{ run.run_id }}</span></p>
         </div>
         <div class="flex gap-2">
-            <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary" style="background: var(--silver); color: var(--charcoal);">{{ t("report_details.download_evidence") if t else "Download Evidence" }}</a>
-            <a href="/reports/{{ run.run_id }}/export/excel" class="btn-primary" style="background: var(--silver); color: var(--charcoal);">{{ t("report_details.export_excel") if t else "Export Excel" }}</a>
+            <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary" >{{ t("report_details.download_evidence") if t else "Download Evidence" }}</a>
+            <a href="/reports/{{ run.run_id }}/export/excel" class="btn-primary" >{{ t("report_details.export_excel") if t else "Export Excel" }}</a>
             <a href="/reports/{{ run.run_id }}/download" class="btn-primary">{{ t("report_details.download_pdf") if t else "Download PDF" }}</a>
             <button onclick="window.print()" class="btn-secondary">{{ t("report_details.print") }}</button>
         </div>
@@ -64,14 +64,14 @@
     {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
     
     {# Color palette for N servers #}
-    {% set server_bg_colors = ['bg-gold-50', 'bg-[#f5f5f7]', 'bg-gold-50'] %}
+    {% set server_bg_colors = ['bg-apple-parchment', 'bg-[#f5f5f7]', 'bg-apple-parchment'] %}
     {% set server_text_colors = ['text-[#1d1d1f]', 'text-[#1d1d1f]', 'text-[#1d1d1f]'] %}
 
     {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
         <div class="flex flex-col lg:flex-row">
             <!-- Chart Side -->
-            <div class="w-full lg:w-[60%] p-4 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white">
+            <div class="w-full lg:w-[60%] p-4 border-b lg:border-b-0 lg:border-r border-slate-200 bg-apple-canvas">
                 <h4 class="text-center font-semibold text-[#1d1d1f] mb-4">{{ title }}</h4>
                 <div class="relative h-80 w-full">
                     <canvas id="{{ canvas_id }}"></canvas>
@@ -79,24 +79,24 @@
             </div>
             
             <!-- Table Side -->
-            <div class="w-full lg:w-[40%] flex flex-col justify-start bg-white p-4 overflow-x-auto">
+            <div class="w-full lg:w-[40%] flex flex-col justify-start bg-apple-canvas p-4 overflow-x-auto">
                 <table class="w-full text-center border-collapse">
                     <thead>
                         <tr>
-                            <th class="p-2 text-white bg-[#2b4c80] border border-[#1e3a63]">{{ t("report_details.concurrency") }}</th>
+                            <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">{{ t("report_details.concurrency") }}</th>
                             {% for srv_key, srv_name in server_labels.items() %}
-                            <th class="p-2 text-white bg-[#2b4c80] border border-[#1e3a63]">{{ srv_name }}<br><span class="text-xs font-normal opacity-80">({{ t("report_details.avg_tokens") if is_tps_per_user else t("report_details.avg_ms") }})</span></th>
+                            <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">{{ srv_name }}<br><span class="text-xs font-normal opacity-80">({{ t("report_details.avg_tokens") if is_tps_per_user else t("report_details.avg_ms") }})</span></th>
                             {% endfor %}
                             {% if server_count >= 2 %}
-                            <th class="p-2 text-white bg-[#2b4c80] border border-[#1e3a63]">{{ t("report_details.improvement") }}</th>
+                            <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">{{ t("report_details.improvement") }}</th>
                             {% endif %}
                         </tr>
                     </thead>
-                    <tbody class="bg-white font-sans">
+                    <tbody class="bg-apple-canvas font-sans">
                         {% for i in range(chart_data.concurrencies | length) %}
                         {% set c = chart_data.concurrencies[i] %}
                         <tr>
-                            <td class="p-2 font-semibold bg-[#0066cc] border border-slate-400 text-[#1d1d1f]">{{ c }}</td>
+                            <td class="p-2 font-semibold bg-apple-canvas border border-apple-hairline text-apple-ink">{{ c }}</td>
                             
                             {# Render value for each server #}
                             {% for srv_key in server_labels %}
@@ -106,7 +106,7 @@
                             {% else %}
                                 {% set val = raw_val %}
                             {% endif %}
-                            <td class="p-2 font-mono border border-slate-300 text-slate-700">{{ "%.3f"|format(val) if val else '--' }}</td>
+                            <td class="p-2 font-mono border border-slate-300 text-apple-muted">{{ "%.3f"|format(val) if val else '--' }}</td>
                             {% endfor %}
                             
                             {# Improvement column (only for ≥2 servers: compare first vs second) #}
@@ -117,7 +117,7 @@
                                 {% set val_s1 = val_s1 / c if val_s1 else none %}
                                 {% set val_s2 = val_s2 / c if val_s2 else none %}
                             {% endif %}
-                            <td class="p-2 font-mono border border-slate-300 text-slate-700">
+                            <td class="p-2 font-mono border border-slate-300 text-apple-muted">
                                 {% if val_s1 and val_s2 and val_s1 > 0 and val_s2 > 0 %}
                                     {% if is_tps_per_user %}
                                         {% set imp = ((val_s2 - val_s1) / val_s2) * 100 %}
@@ -164,9 +164,9 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#f5f5f7] border-b border-slate-200">
-                        <th class="p-3 text-sm font-semibold text-slate-700">Metric</th>
+                        <th class="p-3 text-sm font-semibold text-apple-muted">Metric</th>
                         {% for srv_key in report_data.hardware_summary|sort %}
-                        <th class="p-3 text-sm font-semibold text-center text-[#1d1d1f] bg-gold-50">
+                        <th class="p-3 text-sm font-semibold text-center text-[#1d1d1f] bg-apple-parchment">
                             {{ report_data.metadata.server_labels.get(srv_key, srv_key) }}
                         </th>
                         {% endfor %}
@@ -192,7 +192,7 @@
                         {% endfor %}
                     </tr>
                     {% endfor %}
-                    <tr class="border-b border-slate-100 bg-white">
+                    <tr class="border-b border-slate-100 bg-apple-canvas">
                         <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
                     </tr>
                     {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
@@ -208,7 +208,7 @@
                         {% endfor %}
                     </tr>
                     {% endfor %}
-                    <tr class="border-b border-slate-100 bg-gold-50">
+                    <tr class="border-b border-slate-100 bg-apple-parchment">
                         <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}</td>
                     </tr>
                     {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
@@ -242,10 +242,10 @@
         </div>
 
         <!-- GPU Utilization - Full Width -->
-        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
-            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
+            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
                 <div class="flex items-center gap-3">
-                    <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.gpu_utilization") if t else "GPU Utilization" }}</h5>
+                    <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.gpu_utilization") if t else "GPU Utilization" }}</h5>
                 </div>
                 <div id="gpu-stats" class="flex gap-4 text-xs font-mono"></div>
             </div>
@@ -255,10 +255,10 @@
         </div>
 
         <!-- CPU Utilization - Full Width -->
-        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
-            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
+            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
                 <div class="flex items-center gap-3">
-                    <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.cpu_utilization") if t else "CPU Utilization" }}</h5>
+                    <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.cpu_utilization") if t else "CPU Utilization" }}</h5>
                 </div>
                 <div id="cpu-stats" class="flex gap-4 text-xs font-mono"></div>
             </div>
@@ -269,10 +269,10 @@
 
         <!-- RAM & Disk - Side by Side -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
-                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
+                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
                     <div class="flex items-center gap-3">
-                        <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.ram_usage") if t else "RAM Usage" }}</h5>
+                        <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.ram_usage") if t else "RAM Usage" }}</h5>
                     </div>
                     <div id="ram-stats" class="flex gap-4 text-xs font-mono"></div>
                 </div>
@@ -280,10 +280,10 @@
                     <canvas id="timeline-chart-ram"></canvas>
                 </div>
             </div>
-            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
-                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
+                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
                     <div class="flex items-center gap-3">
-                        <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.disk_io_title") if t else "Disk I/O" }}</h5>
+                        <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.disk_io_title") if t else "Disk I/O" }}</h5>
                     </div>
                     <div id="disk-stats" class="flex gap-4 text-xs font-mono"></div>
                 </div>
@@ -305,8 +305,8 @@
             <table class="data-table w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-[#f5f5f7] border-b border-slate-200">
-                        <th class="p-3 text-sm font-semibold text-slate-700">{{ t("report_details.tool") }}</th>
-                        <th class="p-3 text-sm font-semibold text-slate-700 border-r border-slate-200">{{ t("report_details.scenario") }}</th>
+                        <th class="p-3 text-sm font-semibold text-apple-muted">{{ t("report_details.tool") }}</th>
+                        <th class="p-3 text-sm font-semibold text-apple-muted border-r border-slate-200">{{ t("report_details.scenario") }}</th>
                         {% for srv_key, srv_name in server_labels.items() %}
                         <th colspan="4" class="p-3 text-center text-sm font-semibold {{ server_text_colors[loop.index0 % 3] }} {{ server_bg_colors[loop.index0 % 3] }} {{ 'border-r border-slate-200' if not loop.last else '' }}">{{ srv_name }}</th>
                         {% endfor %}

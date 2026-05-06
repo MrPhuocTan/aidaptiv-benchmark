@@ -21,11 +21,11 @@
         <h3 class="text-lg font-semibold text-[#1d1d1f] mb-4">{{ t("servers.add_new_server") }}</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">{{ t("servers.server_name") }}</label>
+                <label class="block text-sm font-medium text-apple-muted mb-1">{{ t("servers.server_name") }}</label>
                 <input type="text" id="newServerName" placeholder="e.g. GPU Worker 1" class="input">
             </div>
             <div>
-                <label class="block text-sm font-medium text-slate-700 mb-1">{{ t("servers.ip_address") }}</label>
+                <label class="block text-sm font-medium text-apple-muted mb-1">{{ t("servers.ip_address") }}</label>
                 <input type="text" id="newServerIp" placeholder="e.g. 192.168.1.100" class="input">
             </div>
             <div>
@@ -83,7 +83,7 @@
                         <td class="px-6 py-4 align-middle">
                             {% if status.ollama_online and status.agent_online %}
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-[#1d1d1f]">
-                                <span class="w-1.5 h-1.5 bg-gold-400 rounded-full mr-1.5"></span> Online
+                                <span class="w-1.5 h-1.5 bg-apple-primary rounded-full mr-1.5"></span> Online
                             </span>
                             {% else %}
                             <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[#d2d2d7] text-[#d2d2d7]">
@@ -143,7 +143,7 @@ async function verifyServer() {
         
         if (response.ok) {
             if (data.agent_ok && data.ollama_ok) {
-                resultDiv.className = "mt-4 text-sm p-3 rounded-full bg-white text-[#0066cc] border border-[#0066cc]";
+                resultDiv.className = "mt-4 text-sm p-3 rounded-full bg-apple-canvas text-[#0066cc] border border-[#0066cc]";
                 resultDiv.innerHTML = "<strong>Success:</strong> Ollama and Agent are reachable. You can add this server.";
                 document.getElementById('addServerBtn').disabled = false;
             } else {
