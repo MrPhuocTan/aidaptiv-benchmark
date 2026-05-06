@@ -12,9 +12,9 @@
             <p class="text-sm text-slate-500 mt-2">{{ t("common.date") }}: {{ run.started_at.strftime('%Y-%m-%d %H:%M') }} | Run ID: <span class="font-mono text-violet-700">{{ run.run_id }}</span></p>
         </div>
         <div class="flex gap-2">
-            <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary bg-indigo-600 hover:bg-indigo-700">📦 Download Evidence</a>
-            <a href="/reports/{{ run.run_id }}/export/excel" class="btn-primary">📥 Export Excel</a>
-            <a href="/reports/{{ run.run_id }}/download" class="btn-primary">{{ t("report_details.download") | default("Download HTML") }}</a>
+            <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary" style="background: var(--silver); color: var(--charcoal);">{{ t("report_details.download_evidence") if t else "Download Evidence" }}</a>
+            <a href="/reports/{{ run.run_id }}/export/excel" class="btn-primary" style="background: var(--silver); color: var(--charcoal);">{{ t("report_details.export_excel") if t else "Export Excel" }}</a>
+            <a href="/reports/{{ run.run_id }}/download" class="btn-primary">{{ t("report_details.download_pdf") if t else "Download PDF" }}</a>
             <button onclick="window.print()" class="btn-secondary">{{ t("report_details.print") }}</button>
         </div>
     </div>
@@ -158,7 +158,7 @@
     {% if report_data.hardware_summary and report_data.hardware_summary|length > 0 %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
         <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-800">🖥️ {{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}</h4>
+            <h4 class="font-semibold text-slate-800">{{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}</h4>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -174,7 +174,7 @@
                 </thead>
                 <tbody class="text-sm">
                     <tr class="border-b border-slate-100 bg-blue-50">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">🎮 GPU</td>
+                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
                     </tr>
                     {% for label, key in [("GPU Model", "gpu_name"), ("GPU Util (avg)", "gpu_util_avg"), ("GPU Util (max)", "gpu_util_max"), ("VRAM Used (avg)", "vram_used_avg_gb"), ("VRAM Total", "vram_total_gb"), ("Power (avg)", "gpu_power_avg_w"), ("Power (max)", "gpu_power_max_w"), ("Temp (avg)", "gpu_temp_avg_c"), ("Temp (max)", "gpu_temp_max_c")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -193,7 +193,7 @@
                     </tr>
                     {% endfor %}
                     <tr class="border-b border-slate-100 bg-green-50">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">💻 CPU / RAM</td>
+                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
                     </tr>
                     {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -209,7 +209,7 @@
                     </tr>
                     {% endfor %}
                     <tr class="border-b border-slate-100 bg-amber-50">
-                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">💾 Disk / Network I/O</td>
+                        <td class="p-3 font-semibold text-slate-800" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}</td>
                     </tr>
                     {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -221,10 +221,10 @@
                     </tr>
                     {% endfor %}
                     <tr class="bg-slate-50">
-                        <td class="p-3 text-slate-500 text-xs">Data Points</td>
+                        <td class="p-3 text-slate-500 text-xs">{{ t("report_details.data_points") if t else "Data Points" }}</td>
                         {% for srv_key in report_data.hardware_summary|sort %}
                         {% set hw = report_data.hardware_summary[srv_key] %}
-                        <td class="p-3 text-center text-xs text-slate-400">{{ hw.get("snapshot_count", 0) }} snapshots</td>
+                        <td class="p-3 text-center text-xs text-slate-400">{{ hw.get("snapshot_count", 0) }} {{ t("report_details.snapshots") if t else "snapshots" }}</td>
                         {% endfor %}
                     </tr>
                 </tbody>
@@ -233,28 +233,63 @@
     </div>
     {% endif %}
 
-    <!-- Hardware Timeline Charts -->
+    <!-- Hardware Timeline Charts (Redesigned - Financial Grade) -->
     {% if timeline_chart and timeline_chart|length > 0 %}
-    <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
-        <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-800">{{ t("run_detail.hardware_timeline") }}</h4>
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h4 class="text-lg font-semibold text-slate-800">{{ t("run_detail.hardware_timeline") }}</h4>
+            <span class="text-xs text-slate-400 font-mono">{{ t("report_details.resource_monitoring") if t else "Real-time Resource Monitoring" }}</span>
         </div>
-        <div class="p-4 bg-white grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <h4 class="text-sm font-semibold text-slate-700 mb-2">GPU Utilization (%)</h4>
-                <div class="h-60"><canvas id="timeline-chart-gpu"></canvas></div>
+
+        <!-- GPU Utilization - Full Width -->
+        <div class="mb-4 rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+                <div class="flex items-center gap-3">
+                    <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.gpu_utilization") if t else "GPU Utilization" }}</h5>
+                </div>
+                <div id="gpu-stats" class="flex gap-4 text-xs font-mono"></div>
             </div>
-            <div>
-                <h4 class="text-sm font-semibold text-slate-700 mb-2">CPU Utilization (%)</h4>
-                <div class="h-60"><canvas id="timeline-chart-cpu"></canvas></div>
+            <div class="px-5 pb-4" style="height: 280px; background: var(--white);">
+                <canvas id="timeline-chart-gpu"></canvas>
             </div>
-            <div>
-                <h4 class="text-sm font-semibold text-slate-700 mb-2">RAM Usage (GB)</h4>
-                <div class="h-60"><canvas id="timeline-chart-ram"></canvas></div>
+        </div>
+
+        <!-- CPU Utilization - Full Width -->
+        <div class="mb-4 rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+                <div class="flex items-center gap-3">
+                    <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.cpu_utilization") if t else "CPU Utilization" }}</h5>
+                </div>
+                <div id="cpu-stats" class="flex gap-4 text-xs font-mono"></div>
             </div>
-            <div>
-                <h4 class="text-sm font-semibold text-slate-700 mb-2">Disk Read/Write (MB/s)</h4>
-                <div class="h-60"><canvas id="timeline-chart-disk"></canvas></div>
+            <div class="px-5 pb-4" style="height: 280px; background: var(--white);">
+                <canvas id="timeline-chart-cpu"></canvas>
+            </div>
+        </div>
+
+        <!-- RAM & Disk - Side by Side -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+            <div class="rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+                    <div class="flex items-center gap-3">
+                        <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.ram_usage") if t else "RAM Usage" }}</h5>
+                    </div>
+                    <div id="ram-stats" class="flex gap-4 text-xs font-mono"></div>
+                </div>
+                <div class="px-5 pb-4" style="height: 240px; background: var(--white);">
+                    <canvas id="timeline-chart-ram"></canvas>
+                </div>
+            </div>
+            <div class="rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
+                    <div class="flex items-center gap-3">
+                        <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.disk_io_title") if t else "Disk I/O" }}</h5>
+                    </div>
+                    <div id="disk-stats" class="flex gap-4 text-xs font-mono"></div>
+                </div>
+                <div class="px-5 pb-4" style="height: 240px; background: var(--white);">
+                    <canvas id="timeline-chart-disk"></canvas>
+                </div>
             </div>
         </div>
     </div>
@@ -329,8 +364,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const serverLabels = chartData.server_labels || {};
     const serverKeys = Object.keys(serverLabels);
     
-    // N-server color palette (solid colors, one per server)
-    const serverColors = ['#7c3aed', '#16a34a', '#dc2626', '#2563eb', '#d97706', '#0d9488'];
+    // Bach Lap Kim color palette
+    const serverColors = ['#C5A55A', '#2D2D2D', '#B8B8B8', '#A68B3C', '#6B6B6B'];
     const percentileStyles = {
         'p50': { dash: [], width: 2.5 },
         'p95': { dash: [6, 3], width: 2 },
@@ -448,76 +483,181 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!timelineData || Object.keys(timelineData).length === 0) return;
     
     const servers = Object.keys(timelineData).filter(k => k !== "timestamps");
-    const colors = ["#a855f7", "#9ca3af", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
     
-    const commonOptions = {
+    // Bach Lap Kim color palette
+    const serverPalette = [
+        { line: "#C5A55A", fill: "rgba(197, 165, 90, 0.12)", glow: "rgba(197, 165, 90, 0.3)" },   // Gold
+        { line: "#2D2D2D", fill: "rgba(45, 45, 45, 0.12)", glow: "rgba(45, 45, 45, 0.3)" },       // Charcoal
+        { line: "#B8B8B8", fill: "rgba(184, 184, 184, 0.12)", glow: "rgba(184, 184, 184, 0.3)" }, // Silver
+        { line: "#A68B3C", fill: "rgba(166, 139, 60, 0.12)", glow: "rgba(166, 139, 60, 0.3)" },   // Dark Gold
+        { line: "#6B6B6B", fill: "rgba(107, 107, 107, 0.12)",  glow: "rgba(107, 107, 107, 0.3)" },// Ash
+    ];
+    
+    // Light theme chart options (Bach Lap Kim)
+    const lightChartOptions = (yLabel, unit = '', yMax = null) => ({
         responsive: true,
         maintainAspectRatio: false,
         parsing: false,
-        plugins: { legend: { labels: { color: "#475569", boxWidth: 12, padding: 8 } } },
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#6B6B6B',
+                    boxWidth: 10,
+                    padding: 16,
+                    font: { size: 11, family: "'JetBrains Mono', 'Courier New', monospace" },
+                    usePointStyle: true,
+                    pointStyle: 'circle',
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#2D2D2D',
+                bodyColor: '#6B6B6B',
+                borderColor: '#E8D5A3',
+                borderWidth: 1,
+                padding: 12,
+                bodyFont: { family: "'JetBrains Mono', 'Courier New', monospace", size: 11 },
+                callbacks: {
+                    label: function(ctx) {
+                        return `${ctx.dataset.label}: ${ctx.parsed.y != null ? ctx.parsed.y.toFixed(1) : '--'}${unit}`;
+                    }
+                }
+            }
+        },
         scales: {
             x: {
-                type: "category",
+                type: 'category',
                 ticks: {
-                    color: "#64748b",
-                    maxTicksLimit: 10,
+                    color: '#B8B8B8',
+                    maxTicksLimit: 12,
+                    font: { size: 9, family: "'JetBrains Mono', 'Courier New', monospace" },
                     callback: function(value) {
                         const label = this.getLabelForValue(value);
-                        return label ? label.slice(11, 19) : "";
+                        return label ? label.slice(11, 19) : '';
                     }
                 },
-                grid: { color: "rgba(148,163,184,0.18)" }
+                grid: { color: 'rgba(232, 213, 163, 0.3)', lineWidth: 0.5 },
+                border: { color: '#E8D5A3' }
             },
-            y: { ticks: { color: "#64748b" }, grid: { color: "rgba(148,163,184,0.18)" } }
+            y: {
+                ticks: {
+                    color: '#B8B8B8',
+                    font: { size: 9, family: "'JetBrains Mono', 'Courier New', monospace" },
+                    callback: function(v) { return v + unit; }
+                },
+                grid: { color: 'rgba(232, 213, 163, 0.3)', lineWidth: 0.5 },
+                border: { color: '#E8D5A3' },
+                ...(yMax ? { max: yMax } : {}),
+                title: { display: true, text: yLabel, color: '#B8B8B8', font: { size: 10 } }
+            }
         }
-    };
-
-    function createChart(canvasId, datasets) {
-        const canvas = document.getElementById(canvasId);
-        if (canvas) {
-            new Chart(canvas, { type: "line", data: { labels: timelineData.timestamps, datasets }, options: commonOptions });
-        }
+    });
+    
+    // Helper: compute stats for a metric
+    function computeStats(srvKey, metricKey) {
+        const vals = (timelineData[srvKey] || {})[metricKey] || [];
+        const valid = vals.filter(v => v != null && !isNaN(v));
+        if (valid.length === 0) return { avg: '--', max: '--', last: '--' };
+        const avg = (valid.reduce((a, b) => a + b, 0) / valid.length).toFixed(1);
+        const max = Math.max(...valid).toFixed(1);
+        const last = valid[valid.length - 1].toFixed(1);
+        return { avg, max, last };
     }
-
-    createChart("timeline-chart-gpu", servers.map((srv, i) => ({
-        label: `${srv}`,
-        data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].gpu_util_pct[idx] })),
-        borderColor: colors[i % colors.length],
-        backgroundColor: "transparent",
-        tension: 0.2, borderWidth: 2, pointRadius: 4
-    })));
-
-    createChart("timeline-chart-cpu", servers.map((srv, i) => ({
-        label: `${srv}`,
-        data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].cpu_pct[idx] })),
-        borderColor: colors[i % colors.length],
-        backgroundColor: "transparent",
-        tension: 0.2, borderWidth: 2, pointRadius: 4
-    })));
-
-    createChart("timeline-chart-ram", servers.map((srv, i) => ({
-        label: `${srv}`,
-        data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].ram_used_gb[idx] })),
-        borderColor: colors[i % colors.length],
-        backgroundColor: "transparent",
-        tension: 0.2, borderWidth: 2, pointRadius: 4
-    })));
-
+    
+    // Render stat badges
+    function renderStats(containerId, metricKey, unit) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        let html = '';
+        servers.forEach((srv, i) => {
+            const stats = computeStats(srv, metricKey);
+            const color = serverPalette[i % serverPalette.length].line;
+            html += `<span style="color:${color};">●</span> `;
+            html += `<span style="color:#2D2D2D;">Avg: ${stats.avg}${unit}</span> `;
+            html += `<span style="color:#6B6B6B;">Peak: ${stats.max}${unit}</span>`;
+            if (i < servers.length - 1) html += '<span style="color:#E8D5A3;"> │ </span>';
+        });
+        container.innerHTML = html;
+    }
+    
+    // Create light-themed chart
+    function createLightChart(canvasId, datasets, options) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        new Chart(canvas, { type: 'line', data: { labels: timelineData.timestamps, datasets }, options });
+    }
+    
+    // GPU Chart
+    renderStats('gpu-stats', 'gpu_util_pct', '%');
+    createLightChart('timeline-chart-gpu',
+        servers.map((srv, i) => {
+            const p = serverPalette[i % serverPalette.length];
+            return {
+                label: srv,
+                data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].gpu_util_pct[idx] })),
+                borderColor: p.line, backgroundColor: p.fill,
+                fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0,
+                pointHoverRadius: 5, pointHoverBackgroundColor: p.line,
+            };
+        }),
+        lightChartOptions('GPU (%)', '%', 100)
+    );
+    
+    // CPU Chart
+    renderStats('cpu-stats', 'cpu_pct', '%');
+    createLightChart('timeline-chart-cpu',
+        servers.map((srv, i) => {
+            const p = serverPalette[i % serverPalette.length];
+            return {
+                label: srv,
+                data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].cpu_pct[idx] })),
+                borderColor: p.line, backgroundColor: p.fill,
+                fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0,
+                pointHoverRadius: 5, pointHoverBackgroundColor: p.line,
+            };
+        }),
+        lightChartOptions('CPU (%)', '%', 100)
+    );
+    
+    // RAM Chart
+    renderStats('ram-stats', 'ram_used_gb', ' GB');
+    createLightChart('timeline-chart-ram',
+        servers.map((srv, i) => {
+            const p = serverPalette[i % serverPalette.length];
+            return {
+                label: srv,
+                data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].ram_used_gb[idx] })),
+                borderColor: p.line, backgroundColor: p.fill,
+                fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0,
+                pointHoverRadius: 5, pointHoverBackgroundColor: p.line,
+            };
+        }),
+        lightChartOptions('RAM (GB)', ' GB')
+    );
+    
+    // Disk I/O Chart
+    renderStats('disk-stats', 'disk_read_mbps', ' MB/s');
     const diskDatasets = [];
     servers.forEach((srv, i) => {
-        const c = colors[i % colors.length];
+        const p = serverPalette[i % serverPalette.length];
         diskDatasets.push({
             label: `${srv} (Read)`,
             data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].disk_read_mbps[idx] })),
-            borderColor: c, backgroundColor: "transparent", tension: 0.2, borderWidth: 2, pointRadius: 4
+            borderColor: p.line, backgroundColor: p.fill,
+            fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0,
+            pointHoverRadius: 5, pointHoverBackgroundColor: p.line,
         });
         diskDatasets.push({
             label: `${srv} (Write)`,
             data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].disk_write_mbps[idx] })),
-            borderColor: c, borderDash: [5, 5], backgroundColor: "transparent", tension: 0.2, borderWidth: 2, pointRadius: 4
+            borderColor: p.line, backgroundColor: 'transparent',
+            borderDash: [4, 3], tension: 0.3, borderWidth: 1.5, pointRadius: 0,
+            pointHoverRadius: 4, pointHoverBackgroundColor: p.line,
         });
     });
-    createChart("timeline-chart-disk", diskDatasets);
+    createLightChart('timeline-chart-disk', diskDatasets, lightChartOptions('Disk (MB/s)', ' MB/s'));
 });
 </script>
 {% endif %}

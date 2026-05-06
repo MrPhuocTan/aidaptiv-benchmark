@@ -173,15 +173,15 @@
                     {
                         label: "{{ t('dashboard.chart_server1') }}",
                         data: trendData.map(item => item.server1_tps),
-                        borderColor: "#9ca3af",
-                        backgroundColor: "rgba(156, 163, 175, 0.15)",
+                        borderColor: "#2D2D2D",
+                        backgroundColor: "rgba(45, 45, 45, 0.15)",
                         tension: 0.25,
                     },
                     {
                         label: "{{ t('dashboard.chart_server2') }}",
                         data: trendData.map(item => item.server2_tps),
-                        borderColor: "#a855f7",
-                        backgroundColor: "rgba(168, 85, 247, 0.15)",
+                        borderColor: "#C5A55A",
+                        backgroundColor: "rgba(197, 165, 90, 0.15)",
                         tension: 0.25,
                     }
                 ]
@@ -190,16 +190,16 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: { labels: { color: "#475569" } }
+                    legend: { labels: { color: "#6B6B6B", font: { family: "'JetBrains Mono', 'Courier New', monospace" } } }
                 },
                 scales: {
                     x: {
-                        ticks: { color: "#64748b" },
-                        grid: { color: "rgba(148,163,184,0.18)" }
+                        ticks: { color: "#B8B8B8", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
+                        grid: { color: "rgba(232, 213, 163, 0.3)" }
                     },
                     y: {
-                        ticks: { color: "#64748b" },
-                        grid: { color: "rgba(148,163,184,0.18)" }
+                        ticks: { color: "#B8B8B8", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
+                        grid: { color: "rgba(232, 213, 163, 0.3)" }
                     }
                 }
             }

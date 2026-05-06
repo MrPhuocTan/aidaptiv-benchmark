@@ -6,25 +6,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Benchmark AI Server System - AI Server Performance Comparison Tool">
     <title>{{ config.app.name }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        primary: {
-                            50: '#faf5ff',
-                            100: '#f3e8ff',
-                            200: '#e9d5ff',
-                            300: '#d8b4fe',
-                            400: '#c084fc',
-                            500: '#a855f7',
-                            600: '#9333ea',
-                            700: '#7e22ce',
-                            800: '#6b21a8',
-                            900: '#581c87',
-                            950: '#3b0764',
+                        gold: {
+                            50: '#FBF8F0',
+                            100: '#F5EDD8',
+                            200: '#E8D5A3',
+                            300: '#D4BC7E',
+                            400: '#C5A55A',
+                            500: '#A68B3C',
+                            600: '#8A7332',
+                            700: '#6B5A27',
+                            800: '#4D401C',
+                            900: '#2E2611',
                         }
+                    },
+                    fontFamily: {
+                        serif: ['Noto Serif', 'Noto Serif TC', 'Georgia', 'serif'],
+                        mono: ['JetBrains Mono', 'Courier New', 'monospace'],
                     }
                 }
             }
@@ -42,7 +47,7 @@
     </script>
 </head>
 
-<body class="min-h-screen bg-slate-50 text-slate-900">
+<body class="min-h-screen bg-white text-slate-900">
 
     <div id="notifications"></div>
 
@@ -53,10 +58,11 @@
 
         <!-- Sidebar -->
         <aside id="sidebar" class="w-72 app-sidebar flex flex-col fixed h-full z-40 transition-transform duration-300 transform -translate-x-full md:translate-x-0 bg-slate-50/95 md:bg-transparent backdrop-blur">
-            <div class="p-7 border-b border-violet-100/80">
+            <div class="p-7 border-b" style="border-color: var(--border-soft);">
                 <div class="flex items-center gap-3">
                     <div
-                        class="h-11 w-11 rounded-2xl bg-gradient-to-br from-indigo-600 via-violet-500 to-emerald-400 shadow-lg shadow-violet-200 flex items-center justify-center text-white text-lg font-bold">
+                        class="h-11 w-11 rounded-lg flex items-center justify-center text-white text-lg font-bold"
+                        style="background: var(--gold);">
                         B
                     </div>
                     <div>
@@ -90,7 +96,7 @@
                 </a>
             </nav>
 
-            <div class="p-4 border-t border-violet-100/80 text-xs text-slate-500 space-y-2">
+            <div class="p-4 border-t text-xs text-slate-500 space-y-2" style="border-color: var(--border-soft);">
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-gray-600" id="pg-status"></span>
                     PostgreSQL
@@ -101,26 +107,25 @@
         <!-- Main -->
         <main class="flex-1 md:ml-72 ml-0 overflow-auto w-full transition-all duration-300">
             <header
-                class="h-16 border-b border-violet-100/80 flex items-center px-4 md:px-8 bg-white/80 backdrop-blur sticky top-0 z-10">
+                class="h-16 border-b flex items-center px-4 md:px-8 bg-white/80 backdrop-blur sticky top-0 z-10" style="border-color: var(--border-soft);">
                 <button id="mobile-menu-btn" class="md:hidden mr-4 text-slate-500 hover:text-slate-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 <div class="truncate">
-                    <div class="text-[0.7rem] uppercase tracking-[0.22em] text-violet-500 font-semibold">{{
-                        t("header.control_center") }}</div>
+                    <div class="text-[0.7rem] uppercase tracking-[0.22em] font-semibold" style="color: var(--gold);">{{ t("header.control_center") }}</div>
                     <h2 class="text-sm font-medium text-slate-700 mt-1">
                         {% block page_title %}{% endblock %}
                     </h2>
                 </div>
                 <div class="ml-auto flex items-center gap-2 md:gap-4 shrink-0">
                     <div
-                        class="flex items-center gap-2 rounded-full border border-violet-100 bg-white px-3 py-2 text-xs text-slate-600 shadow-sm">
+                        class="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-xs text-slate-600" style="border-color: var(--border-soft);">
                         <span>Light</span>
                         <button class="theme-switch" id="theme-toggle" aria-label="Toggle dark mode"></button>
                         <span>Dark</span>
                     </div>
                     <label
-                        class="flex items-center gap-2 rounded-full border border-violet-100 bg-white px-3 py-2 text-xs text-slate-600 shadow-sm">
+                        class="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-xs text-slate-600" style="border-color: var(--border-soft);">
                         <span>{{ t("header.language") }}</span>
                         <select id="language-switcher" class="bg-transparent outline-none"
                             onchange="switchLanguage(this.value)">
@@ -129,7 +134,7 @@
                             {% endfor %}
                         </select>
                     </label>
-                    <div class="rounded-full border border-violet-100 bg-violet-50 px-4 py-2 text-xs text-violet-700 font-mono font-medium shadow-sm min-w-[120px] text-center"
+                    <div class="rounded-lg border px-4 py-2 text-xs font-mono font-medium min-w-[120px] text-center" style="border-color: var(--border-soft); background: var(--accent-soft); color: var(--accent-dark);"
                         id="clock"></div>
                 </div>
             </header>
@@ -143,32 +148,32 @@
 
                 <!-- Global floating progress bar (shown by JS when benchmark is running) -->
                 <div id="global-progress-banner" style="display:none;"
-                    class="mb-6 rounded-2xl border border-violet-200 bg-gradient-to-r from-violet-50 to-indigo-50 shadow-lg p-5 transition-all duration-300">
+                    class="mb-6 rounded-lg border p-5 transition-all duration-300" style="border-color: var(--gold-light); background: var(--accent-soft);">
                     <div class="flex justify-between items-center mb-3">
                         <div class="flex items-center gap-3">
                             <div class="relative flex h-3 w-3">
                                 <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3 bg-violet-600"></span>
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background: var(--gold);"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3" style="background: var(--accent-dark);"></span>
                             </div>
-                            <span class="text-sm font-semibold text-violet-800">Benchmark Running</span>
-                            <span class="font-mono text-xs text-violet-600" id="gp-runid"></span>
+                            <span class="text-sm font-semibold" style="color: var(--accent-dark);">{{ t("base.benchmark_running") }}</span>
+                            <span class="font-mono text-xs" style="color: var(--gold);" id="gp-runid"></span>
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="text-xs text-slate-500" id="gp-phase"></span>
-                            <span class="font-mono text-xs font-medium text-violet-700" id="gp-percent-label">0%</span>
+                            <span class="font-mono text-xs font-medium" style="color: var(--accent-dark);" id="gp-percent-label">0%</span>
                         </div>
                     </div>
-                    <div class="w-full bg-violet-100 rounded-full h-2.5 overflow-hidden">
+                    <div class="w-full rounded h-2.5 overflow-hidden" style="background: var(--gold-light);">
                         <div id="gp-fill"
-                            class="bg-gradient-to-r from-violet-500 to-indigo-500 h-2.5 rounded-full transition-all duration-500 ease-out"
-                            style="width:0%"></div>
+                            class="h-2.5 rounded transition-all duration-500 ease-out"
+                            style="width:0%; background: var(--gold);"></div>
                     </div>
                     <div class="flex justify-between items-center mt-3 text-xs text-slate-500">
                         <div><span id="gp-current-test" class="font-mono"></span></div>
                         <div class="flex gap-4">
-                            <span>Elapsed: <span id="gp-elapsed" class="font-mono text-slate-700">--:--</span></span>
-                            <span>ETA: <span id="gp-eta" class="font-mono text-slate-700">--:--</span></span>
+                            <span>{{ t("base.elapsed") }}: <span id="gp-elapsed" class="font-mono text-slate-700">--:--</span></span>
+                            <span>{{ t("base.eta") }}: <span id="gp-eta" class="font-mono text-slate-700">--:--</span></span>
                         </div>
                     </div>
                 </div>
