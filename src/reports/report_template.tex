@@ -322,17 +322,17 @@ test configuration. Green indicates improvement, red indicates degradation.
   \midrule
   \rowcolor{lightgray} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{GPU}} \\
   \BLOCK{for row in hardware_specs_table.gpu}
-  \VAR{row.label} \BLOCK{for val in row.values} & \VAR{val} \BLOCK{endfor} \\
+  \VAR{row.label} \BLOCK{for val in row['values']} & \VAR{val} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \midrule
   \rowcolor{lightgray} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{CPU / RAM}} \\
   \BLOCK{for row in hardware_specs_table.cpu}
-  \VAR{row.label} \BLOCK{for val in row.values} & \VAR{val} \BLOCK{endfor} \\
+  \VAR{row.label} \BLOCK{for val in row['values']} & \VAR{val} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \midrule
   \rowcolor{lightgray} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{Disk / Network}} \\
   \BLOCK{for row in hardware_specs_table.disk}
-  \VAR{row.label} \BLOCK{for val in row.values} & \VAR{val} \BLOCK{endfor} \\
+  \VAR{row.label} \BLOCK{for val in row['values']} & \VAR{val} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \bottomrule
 \end{tabularx}
