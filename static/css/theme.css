@@ -66,14 +66,14 @@ a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 11px 22px;
+    padding: 8px 16px;
     border-radius: 9999px;
-    font-size: 17px;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 500;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
     border: none;
     cursor: pointer;
-    transition: transform 0.1s ease;
+    transition: transform 0.1s ease, opacity 0.2s ease;
     text-decoration: none;
 }
 
@@ -86,10 +86,18 @@ a {
     color: #ffffff;
 }
 
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
 .btn-secondary {
     background-color: var(--canvas);
     color: var(--primary);
     border: 1px solid var(--primary);
+}
+
+.btn-secondary:hover {
+    background-color: rgba(0, 102, 204, 0.05);
 }
 
 .btn-danger {
@@ -99,8 +107,8 @@ a {
 }
 
 .btn-sm {
-    padding: 8px 15px;
-    font-size: 14px;
+    padding: 6px 12px;
+    font-size: 13px;
     border-radius: 8px;
 }
 
@@ -123,9 +131,9 @@ a {
 .input, .select, select, input[type="text"] {
     border: 1px solid var(--hairline);
     background: var(--canvas);
-    padding: 12px 20px;
+    padding: 8px 16px;
     border-radius: 9999px;
-    font-size: 17px;
+    font-size: 14px;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
     outline: none;
     color: var(--ink);
@@ -162,12 +170,17 @@ tr:last-child td {
 
 /* Navigation overrides */
 .app-sidebar {
-    background-color: var(--surface-black);
-    color: #ffffff;
+    background-color: var(--canvas-parchment);
+    color: var(--ink);
+    border-right: 1px solid var(--hairline);
 }
 
-.app-sidebar h1, .app-sidebar p, .app-sidebar a {
-    color: #ffffff;
+.app-sidebar h1 {
+    color: var(--ink);
+}
+
+.app-sidebar p {
+    color: var(--ink-muted-48);
 }
 
 .app-sidebar .nav-link {
@@ -176,16 +189,19 @@ tr:last-child td {
     padding: 10px 16px;
     border-radius: 8px;
     font-size: 14px;
-    transition: background 0.2s ease;
-    color: #ffffff;
+    transition: background 0.2s ease, color 0.2s ease;
+    color: var(--ink-muted-80);
+    font-weight: 500;
 }
 
 .app-sidebar .nav-link:hover {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--ink);
 }
 
 .app-sidebar .nav-link.active {
-    background-color: rgba(255,255,255,0.2);
+    background-color: var(--primary);
+    color: #ffffff;
 }
 
 /* Scrollbar */
