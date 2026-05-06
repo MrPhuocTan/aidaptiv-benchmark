@@ -1,6 +1,6 @@
 \documentclass[a4paper,11pt]{article}
 
-%% ── Packages ──────────────────────────────────────────────
+% ── Packages ──────────────────────────────────────────────
 \usepackage{fontspec}
 \usepackage{xeCJK}
 
@@ -36,7 +36,7 @@
 \usepackage{lastpage}
 \usepackage{array}
 
-%% ── Color Definitions (Bach Lap Kim Theme) ────────────────
+% ── Color Definitions (Bach Lap Kim Theme) ────────────────
 \definecolor{navy}{HTML}{2D2D2D}       % Charcoal (was Navy)
 \definecolor{violet}{HTML}{C5A55A}     % Gold (was Violet)
 \definecolor{darkbg}{HTML}{FFFFFF}     % White
@@ -50,7 +50,7 @@
 \definecolor{accentblue}{HTML}{C5A55A} % Gold
 \definecolor{covergold}{HTML}{C5A55A}  % Gold
 
-%% ── Header & Footer ──────────────────────────────────────
+% ── Header & Footer ──────────────────────────────────────
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small\color{medgray} aiDaptive Benchmark Suite}
@@ -63,7 +63,7 @@
 \renewcommand{\headrule}{\hbox to\headwidth{\color{gridline}\leaders\hrule height \headrulewidth\hfill}}
 \renewcommand{\footrule}{\hbox to\headwidth{\color{gridline}\leaders\hrule height \footrulewidth\hfill}}
 
-%% ── Section Styling ──────────────────────────────────────
+% ── Section Styling ──────────────────────────────────────
 \titleformat{\section}
   {\Large\bfseries\color{navy}}
   {\thesection}{1em}{}
@@ -77,7 +77,7 @@
   {\normalsize\bfseries\color{textsecondary}}
   {\thesubsubsection}{1em}{}
 
-%% ── Hyperlinks ───────────────────────────────────────────
+% ── Hyperlinks ───────────────────────────────────────────
 \hypersetup{
     colorlinks=true,
     linkcolor=navy,
@@ -87,7 +87,7 @@
     pdftitle={AI Server Benchmark Report -- \VAR{run_id}},
 }
 
-%% ── Custom Commands ──────────────────────────────────────
+% ── Custom Commands ──────────────────────────────────────
 \newcommand{\metricbox}[2]{%
   \begin{minipage}[t]{0.3\textwidth}
     \centering
@@ -104,9 +104,9 @@
 
 \begin{document}
 
-%% ══════════════════════════════════════════════════════════
-%% COVER PAGE
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% COVER PAGE
+% ══════════════════════════════════════════════════════════
 \thispagestyle{empty}
 \begin{center}
 
@@ -153,15 +153,15 @@
 \end{center}
 \clearpage
 
-%% ══════════════════════════════════════════════════════════
-%% TABLE OF CONTENTS
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% TABLE OF CONTENTS
+% ══════════════════════════════════════════════════════════
 \tableofcontents
 \clearpage
 
-%% ══════════════════════════════════════════════════════════
-%% 1. EXECUTIVE SUMMARY
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% 1. EXECUTIVE SUMMARY
+% ══════════════════════════════════════════════════════════
 \section{Executive Summary}
 
 This report presents the benchmark performance analysis for run \texttt{\VAR{run_id}}, 
@@ -194,9 +194,9 @@ Based on aggregate performance metrics across all test scenarios,
 \textbf{\color{greenup}\VAR{winner}} demonstrated superior performance.
 \BLOCK{endif}
 
-%% ══════════════════════════════════════════════════════════
-%% 2. PERFORMANCE ANALYSIS
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% 2. PERFORMANCE ANALYSIS
+% ══════════════════════════════════════════════════════════
 \clearpage
 \section{Performance Analysis}
 
@@ -251,9 +251,9 @@ End-to-end request latency from submission to completion.
 \end{figure}
 \BLOCK{endif}
 
-%% ══════════════════════════════════════════════════════════
-%% 3. SERVER COMPARISON
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% 3. SERVER COMPARISON
+% ══════════════════════════════════════════════════════════
 \BLOCK{if has_comparison}
 \clearpage
 \section{Server Comparison}
@@ -305,9 +305,9 @@ test configuration. Green indicates improvement, red indicates degradation.
 \BLOCK{endif}
 \BLOCK{endif}
 
-%% ══════════════════════════════════════════════════════════
-%% 4. HARDWARE UTILIZATION
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% 4. HARDWARE UTILIZATION
+% ══════════════════════════════════════════════════════════
 \BLOCK{if has_hardware}
 \clearpage
 \section{Hardware Utilization}
@@ -374,9 +374,9 @@ test configuration. Green indicates improvement, red indicates degradation.
 \BLOCK{endif}
 \BLOCK{endif}
 
-%% ══════════════════════════════════════════════════════════
-%% 5. DETAILED BREAKDOWN
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% 5. DETAILED BREAKDOWN
+% ══════════════════════════════════════════════════════════
 \BLOCK{if breakdown_table}
 \clearpage
 \section{Detailed Breakdown}
@@ -399,9 +399,9 @@ Performance metrics grouped by tool and test scenario.
 \end{small}
 \BLOCK{endif}
 
-%% ══════════════════════════════════════════════════════════
-%% 6. ENVIRONMENT & INTEGRITY
-%% ══════════════════════════════════════════════════════════
+% ══════════════════════════════════════════════════════════
+% 6. ENVIRONMENT & INTEGRITY
+% ══════════════════════════════════════════════════════════
 \clearpage
 \section{Environment \& Integrity}
 
