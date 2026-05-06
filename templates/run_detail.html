@@ -7,9 +7,9 @@
     <div class="card">
         <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
             <div>
-                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-gold-400 font-semibold">{{ t("run_detail.eyebrow") }}</div>
-                <h3 class="mt-3 text-3xl font-semibold text-slate-900 font-mono">{{ run.run_id }}</h3>
-                <p class="mt-2 text-sm text-slate-500">
+                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-[#1d1d1f] font-semibold">{{ t("run_detail.eyebrow") }}</div>
+                <h3 class="mt-3 text-3xl font-semibold text-[#1d1d1f] font-mono">{{ run.run_id }}</h3>
+                <p class="mt-2 text-sm text-[#7a7a7a]">
                     {% if run.started_at %}{{ run.started_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}{% endif %}
                     {% if run.duration_seconds %} | {{ "%.1f"|format(run.duration_seconds) }}s{% endif %}
                 </p>
@@ -26,9 +26,9 @@
         <div class="card text-center">
             <div class="card-header">{{ t("common.status") }}</div>
             <div class="text-lg font-semibold
-                {% if run.status == 'completed' %}text-[#D4AF37]
-                {% elif run.status == 'failed' %}text-[#94A3B8]
-                {% else %}text-gold-400{% endif %}">
+                {% if run.status == 'completed' %}text-[#0066cc]
+                {% elif run.status == 'failed' %}text-[#d2d2d7]
+                {% else %}text-[#1d1d1f]{% endif %}">
                 {% if run.status == 'completed' %}{{ t("common.completed") }}
                 {% elif run.status == 'running' %}{{ t("common.running") }}
                 {% elif run.status == 'failed' %}{{ t("common.failed") }}
@@ -38,25 +38,25 @@
         </div>
         <div class="card text-center">
             <div class="card-header">{{ t("benchmark.suite") }}</div>
-            <div class="text-lg font-semibold text-slate-900">{{ run.suite or '--' }}</div>
+            <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.suite or '--' }}</div>
         </div>
         <div class="card text-center">
             <div class="card-header">{{ t("common.environment") }}</div>
-            <div class="text-lg font-semibold text-slate-900">{{ run.environment or '--' }}</div>
+            <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.environment or '--' }}</div>
         </div>
         <div class="card text-center">
             <div class="card-header">{{ t("common.model") }}</div>
-            <div class="text-lg font-semibold text-slate-900">{{ run.model or '--' }}</div>
+            <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.model or '--' }}</div>
         </div>
         <div class="card text-center">
             <div class="card-header">{{ t("nav.prompts") }}</div>
-            <div class="text-lg font-semibold text-slate-900 truncate" title="{{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}">
+            <div class="text-lg font-semibold text-[#1d1d1f] truncate" title="{{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}">
                 {{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}
             </div>
         </div>
         <div class="card text-center">
             <div class="card-header">{{ t("history.tests") }}</div>
-            <div class="text-lg font-semibold text-slate-900 run-progress-text" data-run-id="{{ run.run_id }}">
+            <div class="text-lg font-semibold text-[#1d1d1f] run-progress-text" data-run-id="{{ run.run_id }}">
                 {{ run.completed_tests or 0 }} / {{ run.total_tests or 0 }}
             </div>
         </div>
@@ -66,7 +66,7 @@
     {% if run.notes or run.tags %}
     <div class="card">
         {% if run.notes %}
-        <div class="text-sm text-slate-600 mb-2">{{ run.notes }}</div>
+        <div class="text-sm text-[#7a7a7a] mb-2">{{ run.notes }}</div>
         {% endif %}
         {% if run.tags %}
         <div class="flex gap-2">
@@ -111,7 +111,7 @@
                     <tr>
                         <td class="font-medium">{{ label }}</td>
                         <td>{% if v1 %}{{ "%.2f"|format(v1) }}{% else %}--{% endif %}</td>
-                        <td class="text-gold-400">{% if v2 %}{{ "%.2f"|format(v2) }}{% else %}--{% endif %}</td>
+                        <td class="text-[#1d1d1f]">{% if v2 %}{{ "%.2f"|format(v2) }}{% else %}--{% endif %}</td>
                         <td>
                             {% if v1 and v2 and v1 != 0 %}
                                 {% set delta = ((v2 - v1) / v1) * 100 %}
@@ -125,19 +125,19 @@
                             {% if v1 and v2 %}
                                 {% if lower_better %}
                                     {% if v2 < v1 %}
-                                    <span class="text-gold-400 text-xs">{{ t("run_detail.server2") }}</span>
+                                    <span class="text-[#1d1d1f] text-xs">{{ t("run_detail.server2") }}</span>
                                     {% elif v1 < v2 %}
-                                    <span class="text-slate-500 text-xs">{{ t("run_detail.server1") }}</span>
+                                    <span class="text-[#7a7a7a] text-xs">{{ t("run_detail.server1") }}</span>
                                     {% else %}
-                                    <span class="text-slate-400 text-xs">{{ t("common.tie") }}</span>
+                                    <span class="text-[#cccccc] text-xs">{{ t("common.tie") }}</span>
                                     {% endif %}
                                 {% else %}
                                     {% if v2 > v1 %}
-                                    <span class="text-gold-400 text-xs">{{ t("run_detail.server2") }}</span>
+                                    <span class="text-[#1d1d1f] text-xs">{{ t("run_detail.server2") }}</span>
                                     {% elif v1 > v2 %}
-                                    <span class="text-slate-500 text-xs">{{ t("run_detail.server1") }}</span>
+                                    <span class="text-[#7a7a7a] text-xs">{{ t("run_detail.server1") }}</span>
                                     {% else %}
-                                    <span class="text-slate-400 text-xs">{{ t("common.tie") }}</span>
+                                    <span class="text-[#cccccc] text-xs">{{ t("common.tie") }}</span>
                                     {% endif %}
                                 {% endif %}
                             {% else %}--{% endif %}
@@ -203,7 +203,7 @@
                     {% for r in results %}
                     <tr>
                         <td>
-                            <span class="{% if r.server == 'server2' %}text-gold-400{% else %}text-slate-500{% endif %}">
+                            <span class="{% if r.server == 'server2' %}text-[#1d1d1f]{% else %}text-[#7a7a7a]{% endif %}">
                                 {{ r.server }}
                             </span>
                         </td>
@@ -217,9 +217,9 @@
                         <td>
                             {% if r.error_rate is not none %}
                                 {% if r.error_rate > 0.05 %}
-                                <span class="text-[#94A3B8]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
+                                <span class="text-[#d2d2d7]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
                                 {% else %}
-                                <span class="text-[#D4AF37]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
+                                <span class="text-[#0066cc]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
                                 {% endif %}
                             {% else %}--{% endif %}
                         </td>
@@ -261,14 +261,14 @@
                             label: "{{ t('run_detail.chart_label_server1') }}",
                             data: comparisonData.server1,
                             backgroundColor: "rgba(156, 163, 175, 0.75)",
-                            borderColor: "#94A3B8",
+                            borderColor: "#d2d2d7",
                             borderWidth: 1,
                         },
                         {
                             label: "{{ t('run_detail.chart_label_server2') }}",
                             data: comparisonData.server2,
                             backgroundColor: "rgba(168, 85, 247, 0.75)",
-                            borderColor: "#0F172A",
+                            borderColor: "#1d1d1f",
                             borderWidth: 1,
                         }
                     ]
@@ -295,7 +295,7 @@
 
         if (timelineData && Object.keys(timelineData).length > 0) {
             const servers = Object.keys(timelineData).filter(k => k !== "timestamps");
-            const colors = ["#0F172A", "#94A3B8", "#D4AF37", "#10b981", "#f59e0b", "#ef4444"];
+            const colors = ["#1d1d1f", "#d2d2d7", "#0066cc", "#10b981", "#f59e0b", "#ef4444"];
             
             // Shared options for all timeline charts
             const commonOptions = {

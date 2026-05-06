@@ -19,7 +19,7 @@
                             100: '#F5EDD8',
                             200: '#E8D5A3',
                             300: '#D4BC7E',
-                            400: '#D4AF37',
+                            400: '#0066cc',
                             500: '#A68B3C',
                             600: '#8A7332',
                             700: '#6B5A27',
@@ -48,7 +48,7 @@
     </script>
 </head>
 
-<body class="min-h-screen bg-white text-slate-900 font-sans">
+<body class="min-h-screen bg-white text-[#1d1d1f] font-sans">
 
     <div id="notifications"></div>
 
@@ -58,17 +58,17 @@
         <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/50 z-30 hidden md:hidden transition-opacity opacity-0"></div>
 
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-72 app-sidebar flex flex-col fixed h-full z-40 transition-transform duration-300 transform -translate-x-full md:translate-x-0 bg-slate-50/95 md:bg-transparent backdrop-blur">
-            <div class="p-7 border-b" style="border-color: var(--border-soft);">
+        <aside id="sidebar" class="w-72 app-sidebar flex flex-col fixed h-full z-40 transition-transform duration-300 transform -translate-x-full md:translate-x-0 bg-black text-white">
+            <div class="p-7 border-b" >
                 <div class="flex items-center gap-3">
                     <div
-                        class="h-11 w-11 rounded-lg flex items-center justify-center text-white text-lg font-bold"
-                        style="background: var(--gold);">
+                        class="h-11 w-11 rounded-full flex items-center justify-center text-white text-lg font-bold"
+                        >
                         B
                     </div>
                     <div>
-                        <h1 class="text-xl font-semibold text-slate-900 tracking-tight">Benchmark AI</h1>
-                        <p class="text-xs text-slate-500 mt-1">Server System v{{ config.app.version }}</p>
+                        <h1 class="text-xl font-semibold text-[#1d1d1f] tracking-tight">Benchmark AI</h1>
+                        <p class="text-xs text-[#7a7a7a] mt-1">Server System v{{ config.app.version }}</p>
                     </div>
                 </div>
             </div>
@@ -97,7 +97,7 @@
                 </a>
             </nav>
 
-            <div class="p-4 border-t text-xs text-slate-500 space-y-2" style="border-color: var(--border-soft);">
+            <div class="p-4 border-t text-xs text-[#7a7a7a] space-y-2" >
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full bg-slate-600" id="pg-status"></span>
                     PostgreSQL
@@ -108,25 +108,25 @@
         <!-- Main -->
         <main class="flex-1 md:ml-72 ml-0 overflow-auto w-full transition-all duration-300">
             <header
-                class="h-16 border-b flex items-center px-4 md:px-8 bg-white/80 backdrop-blur sticky top-0 z-10" style="border-color: var(--border-soft);">
-                <button id="mobile-menu-btn" class="md:hidden mr-4 text-slate-500 hover:text-slate-700">
+                class="h-16 border-b flex items-center px-4 md:px-8 bg-white/80 backdrop-blur sticky top-0 z-10" >
+                <button id="mobile-menu-btn" class="md:hidden mr-4 text-[#7a7a7a] hover:text-slate-700">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
                 <div class="truncate">
-                    <div class="text-[0.7rem] uppercase tracking-[0.22em] font-semibold" style="color: var(--gold);">{{ t("header.control_center") }}</div>
+                    <div class="text-[0.7rem] uppercase tracking-[0.22em] font-semibold" class="text-[#0066cc]">{{ t("header.control_center") }}</div>
                     <h2 class="text-sm font-medium text-slate-700 mt-1">
                         {% block page_title %}{% endblock %}
                     </h2>
                 </div>
                 <div class="ml-auto flex items-center gap-2 md:gap-4 shrink-0">
                     <div
-                        class="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-xs text-slate-600" style="border-color: var(--border-soft);">
+                        class="flex items-center gap-2 rounded-full border bg-white px-3 py-2 text-xs text-[#7a7a7a]" >
                         <span>Light</span>
                         <button class="theme-switch" id="theme-toggle" aria-label="Toggle dark mode"></button>
                         <span>Dark</span>
                     </div>
                     <label
-                        class="flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-xs text-slate-600" style="border-color: var(--border-soft);">
+                        class="flex items-center gap-2 rounded-full border bg-white px-3 py-2 text-xs text-[#7a7a7a]" >
                         <span>{{ t("header.language") }}</span>
                         <select id="language-switcher" class="bg-transparent outline-none"
                             onchange="switchLanguage(this.value)">
@@ -135,34 +135,34 @@
                             {% endfor %}
                         </select>
                     </label>
-                    <div class="rounded-lg border px-4 py-2 text-xs font-mono font-medium min-w-[120px] text-center" style="border-color: var(--border-soft); background: var(--accent-soft); color: var(--accent-dark);"
+                    <div class="rounded-full border px-4 py-2 text-xs font-mono font-medium min-w-[120px] text-center" 
                         id="clock"></div>
                 </div>
             </header>
 
             <div class="p-8">
                 {% if db_warning %}
-                <div class="mb-6 rounded-2xl border border-amber-200 bg-gold-50 px-4 py-3 text-sm text-amber-800">
+                <div class="mb-6 rounded-[18px] border border-[#e0e0e0] bg-gold-50 px-4 py-3 text-sm text-[#1d1d1f]">
                     {{ db_warning }}
                 </div>
                 {% endif %}
 
                 <!-- Global floating progress bar (shown by JS when benchmark is running) -->
                 <div id="global-progress-banner" style="display:none;"
-                    class="mb-6 rounded-lg border p-5 transition-all duration-300" style="border-color: var(--gold-light); background: var(--accent-soft);">
+                    class="mb-6 rounded-full border p-5 transition-all duration-300" >
                     <div class="flex justify-between items-center mb-3">
                         <div class="flex items-center gap-3">
                             <div class="relative flex h-3 w-3">
                                 <span
-                                    class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background: var(--gold);"></span>
-                                <span class="relative inline-flex rounded-full h-3 w-3" style="background: var(--accent-dark);"></span>
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" ></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3" class="bg-[#0066cc]"></span>
                             </div>
-                            <span class="text-sm font-semibold" style="color: var(--accent-dark);">{{ t("base.benchmark_running") }}</span>
-                            <span class="font-mono text-xs" style="color: var(--gold);" id="gp-runid"></span>
+                            <span class="text-sm font-semibold" class="text-[#1d1d1f]">{{ t("base.benchmark_running") }}</span>
+                            <span class="font-mono text-xs" class="text-[#0066cc]" id="gp-runid"></span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="text-xs text-slate-500" id="gp-phase"></span>
-                            <span class="font-mono text-xs font-medium" style="color: var(--accent-dark);" id="gp-percent-label">0%</span>
+                            <span class="text-xs text-[#7a7a7a]" id="gp-phase"></span>
+                            <span class="font-mono text-xs font-medium" class="text-[#1d1d1f]" id="gp-percent-label">0%</span>
                         </div>
                     </div>
                     <div class="w-full rounded h-2.5 overflow-hidden" style="background: var(--gold-light);">
@@ -170,7 +170,7 @@
                             class="h-2.5 rounded transition-all duration-500 ease-out"
                             style="width:0%; background: var(--gold);"></div>
                     </div>
-                    <div class="flex justify-between items-center mt-3 text-xs text-slate-500">
+                    <div class="flex justify-between items-center mt-3 text-xs text-[#7a7a7a]">
                         <div><span id="gp-current-test" class="font-mono"></span></div>
                         <div class="flex gap-4">
                             <span>{{ t("base.elapsed") }}: <span id="gp-elapsed" class="font-mono text-slate-700">--:--</span></span>

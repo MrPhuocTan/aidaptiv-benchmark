@@ -7,9 +7,9 @@
     <!-- Header Section -->
     <div class="flex items-center justify-between mb-4">
         <div>
-            <a href="/reports" class="text-gold-400 text-sm font-semibold hover:underline mb-2 inline-block">&larr; {{ t("report_details.back") }}</a>
-            <h3 class="text-3xl font-semibold text-slate-900">{{ t("report_details.title") }}</h3>
-            <p class="text-sm text-slate-500 mt-2">{{ t("common.date") }}: {{ run.started_at.strftime('%Y-%m-%d %H:%M') }} | Run ID: <span class="font-mono text-gold-400">{{ run.run_id }}</span></p>
+            <a href="/reports" class="text-[#1d1d1f] text-sm font-semibold hover:underline mb-2 inline-block">&larr; {{ t("report_details.back") }}</a>
+            <h3 class="text-3xl font-semibold text-[#1d1d1f]">{{ t("report_details.title") }}</h3>
+            <p class="text-sm text-[#7a7a7a] mt-2">{{ t("common.date") }}: {{ run.started_at.strftime('%Y-%m-%d %H:%M') }} | Run ID: <span class="font-mono text-[#1d1d1f]">{{ run.run_id }}</span></p>
         </div>
         <div class="flex gap-2">
             <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary" style="background: var(--silver); color: var(--charcoal);">{{ t("report_details.download_evidence") if t else "Download Evidence" }}</a>
@@ -26,12 +26,12 @@
     <!-- Metadata Summary -->
     <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
         <div class="card p-4">
-            <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{{ t("report_details.test_suite") }}</h4>
-            <div class="text-lg font-bold text-gold-400">{{ run.suite | replace('_', ' ') | title }}</div>
-            <p class="text-[10px] text-slate-400 mt-1 leading-tight">{{ config.benchmark.test_suites[run.suite].description if run.suite in config.benchmark.test_suites else '' }}</p>
+            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.test_suite") }}</h4>
+            <div class="text-lg font-bold text-[#1d1d1f]">{{ run.suite | replace('_', ' ') | title }}</div>
+            <p class="text-[10px] text-[#cccccc] mt-1 leading-tight">{{ config.benchmark.test_suites[run.suite].description if run.suite in config.benchmark.test_suites else '' }}</p>
         </div>
         <div class="card p-4">
-            <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{{ t("report_details.servers_evaluated") }}</h4>
+            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.servers_evaluated") }}</h4>
             <div class="flex flex-wrap gap-1">
                 {% for s in report_data.metadata.servers %}
                 <span class="badge">{{ s }}</span>
@@ -39,7 +39,7 @@
             </div>
         </div>
         <div class="card p-4">
-            <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{{ t("report_details.tools_deployed") }}</h4>
+            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.tools_deployed") }}</h4>
             <div class="flex flex-wrap gap-1">
                 {% for t in report_data.metadata.tools %}
                 <span class="badge">{{ t }}</span>
@@ -47,7 +47,7 @@
             </div>
         </div>
         <div class="card p-4">
-            <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{{ t("report_details.scenarios_tested") }}</h4>
+            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.scenarios_tested") }}</h4>
             <div class="flex flex-wrap gap-1">
                 {% for s in report_data.metadata.scenarios %}
                 <span class="badge">{{ s }}</span>
@@ -55,8 +55,8 @@
             </div>
         </div>
         <div class="card p-4">
-            <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{{ t("report_details.total_prompts") }}</h4>
-            <div class="text-2xl font-bold text-slate-900">{{ report_data.metadata.total_requests }}</div>
+            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.total_prompts") }}</h4>
+            <div class="text-2xl font-bold text-[#1d1d1f]">{{ report_data.metadata.total_requests }}</div>
         </div>
     </div>
 
@@ -64,15 +64,15 @@
     {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
     
     {# Color palette for N servers #}
-    {% set server_bg_colors = ['bg-gold-50', 'bg-slate-50', 'bg-gold-50'] %}
-    {% set server_text_colors = ['text-slate-900', 'text-slate-900', 'text-slate-900'] %}
+    {% set server_bg_colors = ['bg-gold-50', 'bg-[#f5f5f7]', 'bg-gold-50'] %}
+    {% set server_text_colors = ['text-[#1d1d1f]', 'text-[#1d1d1f]', 'text-[#1d1d1f]'] %}
 
     {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
         <div class="flex flex-col lg:flex-row">
             <!-- Chart Side -->
             <div class="w-full lg:w-[60%] p-4 border-b lg:border-b-0 lg:border-r border-slate-200 bg-white">
-                <h4 class="text-center font-semibold text-slate-900 mb-4">{{ title }}</h4>
+                <h4 class="text-center font-semibold text-[#1d1d1f] mb-4">{{ title }}</h4>
                 <div class="relative h-80 w-full">
                     <canvas id="{{ canvas_id }}"></canvas>
                 </div>
@@ -96,7 +96,7 @@
                         {% for i in range(chart_data.concurrencies | length) %}
                         {% set c = chart_data.concurrencies[i] %}
                         <tr>
-                            <td class="p-2 font-semibold bg-[#D4AF37] border border-slate-400 text-slate-900">{{ c }}</td>
+                            <td class="p-2 font-semibold bg-[#0066cc] border border-slate-400 text-[#1d1d1f]">{{ c }}</td>
                             
                             {# Render value for each server #}
                             {% for srv_key in server_labels %}
@@ -157,16 +157,16 @@
     <!-- Hardware Specifications Table -->
     {% if report_data.hardware_summary and report_data.hardware_summary|length > 0 %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
-        <div class="p-4 border-b border-slate-200 bg-slate-50">
-            <h4 class="font-semibold text-slate-900">{{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}</h4>
+        <div class="p-4 border-b border-slate-200 bg-[#f5f5f7]">
+            <h4 class="font-semibold text-[#1d1d1f]">{{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}</h4>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-100 border-b border-slate-200">
+                    <tr class="bg-[#f5f5f7] border-b border-slate-200">
                         <th class="p-3 text-sm font-semibold text-slate-700">Metric</th>
                         {% for srv_key in report_data.hardware_summary|sort %}
-                        <th class="p-3 text-sm font-semibold text-center text-slate-900 bg-gold-50">
+                        <th class="p-3 text-sm font-semibold text-center text-[#1d1d1f] bg-gold-50">
                             {{ report_data.metadata.server_labels.get(srv_key, srv_key) }}
                         </th>
                         {% endfor %}
@@ -174,11 +174,11 @@
                 </thead>
                 <tbody class="text-sm font-sans">
                     <tr class="border-b border-slate-100 bg-[#F8F9FA]">
-                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
+                        <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
                     </tr>
                     {% for label, key in [("GPU Model", "gpu_name"), ("GPU Util (avg)", "gpu_util_avg"), ("GPU Util (max)", "gpu_util_max"), ("VRAM Used (avg)", "vram_used_avg_gb"), ("VRAM Total", "vram_total_gb"), ("Power (avg)", "gpu_power_avg_w"), ("Power (max)", "gpu_power_max_w"), ("Temp (avg)", "gpu_temp_avg_c"), ("Temp (max)", "gpu_temp_max_c")] %}
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 text-slate-600">{{ label }}</td>
+                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
                         {% for srv_key in report_data.hardware_summary|sort %}
                         {% set hw = report_data.hardware_summary[srv_key] %}
                         <td class="p-3 text-center font-mono">
@@ -193,11 +193,11 @@
                     </tr>
                     {% endfor %}
                     <tr class="border-b border-slate-100 bg-white">
-                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
+                        <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
                     </tr>
                     {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 text-slate-600">{{ label }}</td>
+                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
                         {% for srv_key in report_data.hardware_summary|sort %}
                         {% set hw = report_data.hardware_summary[srv_key] %}
                         <td class="p-3 text-center font-mono">
@@ -209,22 +209,22 @@
                     </tr>
                     {% endfor %}
                     <tr class="border-b border-slate-100 bg-gold-50">
-                        <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}</td>
+                        <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}</td>
                     </tr>
                     {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
-                        <td class="p-3 text-slate-600">{{ label }}</td>
+                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
                         {% for srv_key in report_data.hardware_summary|sort %}
                         {% set hw = report_data.hardware_summary[srv_key] %}
                         <td class="p-3 text-center font-mono">{{ "%.2f MB/s"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
-                    <tr class="bg-slate-50">
-                        <td class="p-3 text-slate-500 text-xs">{{ t("report_details.data_points") if t else "Data Points" }}</td>
+                    <tr class="bg-[#f5f5f7]">
+                        <td class="p-3 text-[#7a7a7a] text-xs">{{ t("report_details.data_points") if t else "Data Points" }}</td>
                         {% for srv_key in report_data.hardware_summary|sort %}
                         {% set hw = report_data.hardware_summary[srv_key] %}
-                        <td class="p-3 text-center text-xs text-slate-400">{{ hw.get("snapshot_count", 0) }} {{ t("report_details.snapshots") if t else "snapshots" }}</td>
+                        <td class="p-3 text-center text-xs text-[#cccccc]">{{ hw.get("snapshot_count", 0) }} {{ t("report_details.snapshots") if t else "snapshots" }}</td>
                         {% endfor %}
                     </tr>
                 </tbody>
@@ -237,12 +237,12 @@
     {% if timeline_chart and timeline_chart|length > 0 %}
     <div class="mb-8">
         <div class="flex items-center justify-between mb-4">
-            <h4 class="text-lg font-semibold text-slate-900">{{ t("run_detail.hardware_timeline") }}</h4>
-            <span class="text-xs text-slate-400 font-mono">{{ t("report_details.resource_monitoring") if t else "Real-time Resource Monitoring" }}</span>
+            <h4 class="text-lg font-semibold text-[#1d1d1f]">{{ t("run_detail.hardware_timeline") }}</h4>
+            <span class="text-xs text-[#cccccc] font-mono">{{ t("report_details.resource_monitoring") if t else "Real-time Resource Monitoring" }}</span>
         </div>
 
         <!-- GPU Utilization - Full Width -->
-        <div class="mb-4 rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
             <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
                 <div class="flex items-center gap-3">
                     <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.gpu_utilization") if t else "GPU Utilization" }}</h5>
@@ -255,7 +255,7 @@
         </div>
 
         <!-- CPU Utilization - Full Width -->
-        <div class="mb-4 rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
             <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
                 <div class="flex items-center gap-3">
                     <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.cpu_utilization") if t else "CPU Utilization" }}</h5>
@@ -269,7 +269,7 @@
 
         <!-- RAM & Disk - Side by Side -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            <div class="rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
                 <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
                     <div class="flex items-center gap-3">
                         <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.ram_usage") if t else "RAM Usage" }}</h5>
@@ -280,7 +280,7 @@
                     <canvas id="timeline-chart-ram"></canvas>
                 </div>
             </div>
-            <div class="rounded-xl overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
+            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--white); border-color: var(--border-soft);">
                 <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--border-soft); background: var(--ivory);">
                     <div class="flex items-center gap-3">
                         <h5 class="text-sm font-semibold tracking-wide" style="color: var(--charcoal);">{{ t("report_details.disk_io_title") if t else "Disk I/O" }}</h5>
@@ -297,21 +297,21 @@
 
     <!-- Breakdown Table — Dynamic N-Server -->
     <div class="card p-0 overflow-hidden">
-        <div class="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
-            <h4 class="font-semibold text-slate-900">{{ t("report_details.table_title") }}</h4>
+        <div class="p-4 border-b border-slate-200 bg-[#f5f5f7] flex justify-between items-center">
+            <h4 class="font-semibold text-[#1d1d1f]">{{ t("report_details.table_title") }}</h4>
         </div>
         
         <div class="overflow-x-auto">
             <table class="data-table w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-100 border-b border-slate-200">
+                    <tr class="bg-[#f5f5f7] border-b border-slate-200">
                         <th class="p-3 text-sm font-semibold text-slate-700">{{ t("report_details.tool") }}</th>
                         <th class="p-3 text-sm font-semibold text-slate-700 border-r border-slate-200">{{ t("report_details.scenario") }}</th>
                         {% for srv_key, srv_name in server_labels.items() %}
                         <th colspan="4" class="p-3 text-center text-sm font-semibold {{ server_text_colors[loop.index0 % 3] }} {{ server_bg_colors[loop.index0 % 3] }} {{ 'border-r border-slate-200' if not loop.last else '' }}">{{ srv_name }}</th>
                         {% endfor %}
                     </tr>
-                    <tr class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider">
+                    <tr class="bg-[#f5f5f7] border-b border-slate-200 text-xs text-[#7a7a7a] uppercase tracking-wider">
                         <th class="p-2 border-r border-slate-200" colspan="2"></th>
                         {% for srv_key in server_labels %}
                         <th class="p-2 text-right">TPS</th>
@@ -324,16 +324,16 @@
                 <tbody class="text-sm font-sans">
                     {% for tool, scen_dict in report_data.breakdown.items() %}
                         {% for scenario, srv_dict in scen_dict.items() %}
-                        <tr class="border-b border-slate-100 hover:bg-slate-50">
-                            <td class="p-3 font-medium text-slate-900">{{ tool }}</td>
-                            <td class="p-3 text-slate-600 border-r border-slate-200">{{ scenario }}</td>
+                        <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                            <td class="p-3 font-medium text-[#1d1d1f]">{{ tool }}</td>
+                            <td class="p-3 text-[#7a7a7a] border-r border-slate-200">{{ scenario }}</td>
                             
                             {% for srv_key in server_labels %}
                             {% set s = srv_dict.get(srv_key, {}) %}
                             <td class="p-3 text-right font-mono">{{ s.get('tps', '--') if s.get('tps') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('ttft_ms', '--') if s.get('ttft_ms') is not none else '--' }}</td>
                             <td class="p-3 text-right font-mono">{{ s.get('latency_p99_ms', '--') if s.get('latency_p99_ms') is not none else '--' }}</td>
-                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#94A3B8] font-semibold' if s.get('error_rate', 0) > 0 else 'text-slate-500' }}">{{ s.get('error_rate', '0') }}%</td>
+                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#d2d2d7] font-semibold' if s.get('error_rate', 0) > 0 else 'text-[#7a7a7a]' }}">{{ s.get('error_rate', '0') }}%</td>
                             {% endfor %}
                         </tr>
                         {% endfor %}
@@ -343,7 +343,7 @@
         </div>
     </div>
     {% else %}
-    <div class="card p-12 text-center text-slate-500">
+    <div class="card p-12 text-center text-[#7a7a7a]">
         {{ t("report_details.empty") }}
     </div>
     {% endif %}
@@ -365,7 +365,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const serverKeys = Object.keys(serverLabels);
     
     // Bach Lap Kim color palette
-    const serverColors = ['#D4AF37', '#0F172A', '#94A3B8', '#A68B3C', '#6B6B6B'];
+    const serverColors = ['#0066cc', '#1d1d1f', '#d2d2d7', '#A68B3C', '#6B6B6B'];
     const percentileStyles = {
         'p50': { dash: [], width: 2.5 },
         'p95': { dash: [6, 3], width: 2 },
@@ -486,9 +486,9 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Bach Lap Kim color palette
     const serverPalette = [
-        { line: "#D4AF37", fill: "rgba(197, 165, 90, 0.12)", glow: "rgba(197, 165, 90, 0.3)" },   // Gold
-        { line: "#0F172A", fill: "rgba(45, 45, 45, 0.12)", glow: "rgba(45, 45, 45, 0.3)" },       // Charcoal
-        { line: "#94A3B8", fill: "rgba(184, 184, 184, 0.12)", glow: "rgba(184, 184, 184, 0.3)" }, // Silver
+        { line: "#0066cc", fill: "rgba(197, 165, 90, 0.12)", glow: "rgba(197, 165, 90, 0.3)" },   // Gold
+        { line: "#1d1d1f", fill: "rgba(45, 45, 45, 0.12)", glow: "rgba(45, 45, 45, 0.3)" },       // Charcoal
+        { line: "#d2d2d7", fill: "rgba(184, 184, 184, 0.12)", glow: "rgba(184, 184, 184, 0.3)" }, // Silver
         { line: "#A68B3C", fill: "rgba(166, 139, 60, 0.12)", glow: "rgba(166, 139, 60, 0.3)" },   // Dark Gold
         { line: "#6B6B6B", fill: "rgba(107, 107, 107, 0.12)",  glow: "rgba(107, 107, 107, 0.3)" },// Ash
     ];
@@ -513,7 +513,7 @@ document.addEventListener("DOMContentLoaded", function() {
             },
             tooltip: {
                 backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                titleColor: '#0F172A',
+                titleColor: '#1d1d1f',
                 bodyColor: '#6B6B6B',
                 borderColor: '#E8D5A3',
                 borderWidth: 1,
@@ -530,7 +530,7 @@ document.addEventListener("DOMContentLoaded", function() {
             x: {
                 type: 'category',
                 ticks: {
-                    color: '#94A3B8',
+                    color: '#d2d2d7',
                     maxTicksLimit: 12,
                     font: { size: 9, family: "'JetBrains Mono', 'Courier New', monospace" },
                     callback: function(value) {
@@ -543,14 +543,14 @@ document.addEventListener("DOMContentLoaded", function() {
             },
             y: {
                 ticks: {
-                    color: '#94A3B8',
+                    color: '#d2d2d7',
                     font: { size: 9, family: "'JetBrains Mono', 'Courier New', monospace" },
                     callback: function(v) { return v + unit; }
                 },
                 grid: { color: 'rgba(232, 213, 163, 0.3)', lineWidth: 0.5 },
                 border: { color: '#E8D5A3' },
                 ...(yMax ? { max: yMax } : {}),
-                title: { display: true, text: yLabel, color: '#94A3B8', font: { size: 10 } }
+                title: { display: true, text: yLabel, color: '#d2d2d7', font: { size: 10 } }
             }
         }
     });
@@ -575,7 +575,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const stats = computeStats(srv, metricKey);
             const color = serverPalette[i % serverPalette.length].line;
             html += `<span style="color:${color};">●</span> `;
-            html += `<span style="color:#0F172A;">Avg: ${stats.avg}${unit}</span> `;
+            html += `<span style="color:#1d1d1f;">Avg: ${stats.avg}${unit}</span> `;
             html += `<span style="color:#6B6B6B;">Peak: ${stats.max}${unit}</span>`;
             if (i < servers.length - 1) html += '<span style="color:#E8D5A3;"> │ </span>';
         });
