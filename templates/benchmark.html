@@ -8,7 +8,7 @@
         <div class="absolute inset-y-0 right-0 w-64 bg-gradient-to-l from-violet-100/70 to-transparent pointer-events-none"></div>
         <div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-violet-500 font-semibold">{{ t("benchmark.eyebrow") }}</div>
+                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-gold-400 font-semibold">{{ t("benchmark.eyebrow") }}</div>
                 <h3 class="mt-3 text-3xl font-semibold text-slate-900 leading-tight">{{ t("benchmark.hero_title") }}</h3>
                 <p class="mt-2 text-sm text-slate-600 max-w-2xl">
                     {{ t("benchmark.hero_body") }}
@@ -27,11 +27,11 @@
 
         <!-- Target Servers Row (Sequential Dropdowns) -->
         <div class="mb-6">
-            <label class="block text-xs text-gray-400 mb-3">{{ t("benchmark.target_server") }}</label>
+            <label class="block text-xs text-slate-400 mb-3">{{ t("benchmark.target_server") }}</label>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <!-- Primary Server -->
                 <div class="card p-4 shadow-sm bg-slate-50/50">
-                    <label class="block text-[0.65rem] font-bold text-violet-500 uppercase tracking-widest mb-2">Server 1 (Primary)</label>
+                    <label class="block text-[0.65rem] font-bold text-gold-400 uppercase tracking-widest mb-2">Server 1 (Primary)</label>
                     <select id="server-select-1" class="w-full bench-server-select" onchange="onServerSelectChange(1)">
                         <option value="">-- {{ t("common.select") }} --</option>
                         {% for server_id, server in config.servers.items() %}
@@ -43,7 +43,7 @@
                 
                 <!-- Compare Server 1 -->
                 <div class="card p-4 shadow-sm bg-slate-50/50 opacity-50 transition-opacity" id="server-block-2">
-                    <label class="block text-[0.65rem] font-bold text-violet-500 uppercase tracking-widest mb-2">Server 2 (Compare)</label>
+                    <label class="block text-[0.65rem] font-bold text-gold-400 uppercase tracking-widest mb-2">Server 2 (Compare)</label>
                     <select id="server-select-2" class="w-full bench-server-select" onchange="onServerSelectChange(2)" disabled>
                         <option value="">-- {{ t("common.select") }} --</option>
                         {% for server_id, server in config.servers.items() %}
@@ -55,7 +55,7 @@
 
                 <!-- Compare Server 2 -->
                 <div class="card p-4 shadow-sm bg-slate-50/50 opacity-50 transition-opacity" id="server-block-3">
-                    <label class="block text-[0.65rem] font-bold text-violet-500 uppercase tracking-widest mb-2">Server 3 (Compare)</label>
+                    <label class="block text-[0.65rem] font-bold text-gold-400 uppercase tracking-widest mb-2">Server 3 (Compare)</label>
                     <select id="server-select-3" class="w-full bench-server-select" onchange="onServerSelectChange(3)" disabled>
                         <option value="">-- {{ t("common.select") }} --</option>
                         {% for server_id, server in config.servers.items() %}
@@ -70,7 +70,7 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             <!-- Suite -->
             <div>
-                <label class="block text-xs text-gray-400 mb-2">{{ t("benchmark.test_suite") }}</label>
+                <label class="block text-xs text-slate-400 mb-2">{{ t("benchmark.test_suite") }}</label>
                 <select id="bench-suite" class="w-full">
                     <option value="all">{{ t("benchmark.all_suites") }}</option>
                     {% for name, suite in config.benchmark.test_suites.items() %}
@@ -83,7 +83,7 @@
 
             <!-- Environment -->
             <div>
-                <label class="block text-xs text-gray-400 mb-2">{{ t("benchmark.environment") }}</label>
+                <label class="block text-xs text-slate-400 mb-2">{{ t("benchmark.environment") }}</label>
                 <select id="bench-env" class="w-full">
                     {% for env_id, env in config.environments.items() %}
                         {% if env.enabled %}
@@ -95,7 +95,7 @@
 
             <!-- Model -->
             <div>
-                <label class="block text-xs text-gray-400 mb-2">{{ t("benchmark.model") }}</label>
+                <label class="block text-xs text-slate-400 mb-2">{{ t("benchmark.model") }}</label>
                 <select id="bench-model" class="w-full" disabled>
                     {% for model in config.models %}
                     <option value="{{ model }}">{{ model }}</option>
@@ -105,7 +105,7 @@
 
             <!-- Prompt Set -->
             <div>
-                <label class="block text-xs text-gray-400 mb-2">Prompt Set</label>
+                <label class="block text-xs text-slate-400 mb-2">Prompt Set</label>
                 <select id="bench-prompt-set" class="w-full">
                     {% if prompt_sets %}
                         {% for pset in prompt_sets %}
@@ -120,7 +120,7 @@
 
         <!-- Notes -->
         <div class="mb-6">
-            <label class="block text-xs text-gray-400 mb-2">{{ t("benchmark.notes_optional") }}</label>
+            <label class="block text-xs text-slate-400 mb-2">{{ t("benchmark.notes_optional") }}</label>
             <input type="text" id="bench-notes" class="w-full"
                    placeholder="{{ t('benchmark.notes_placeholder') }}">
         </div>
@@ -128,7 +128,7 @@
         <!-- Parameters & Tags -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-                <label class="block text-xs text-gray-400 mb-2">Editable Parameters</label>
+                <label class="block text-xs text-slate-400 mb-2">Editable Parameters</label>
                 <div class="space-y-3 bg-white/50 border border-slate-200 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-xs text-slate-500">Warmup Requests</span>
@@ -144,7 +144,7 @@
                     </div>
                 </div>
                 
-                <label class="block text-xs text-gray-400 mt-4 mb-2">Fixed Global Limits</label>
+                <label class="block text-xs text-slate-400 mt-4 mb-2">Fixed Global Limits</label>
                 <div class="space-y-2 bg-slate-50/80 border border-slate-100 rounded-lg p-4">
                     <div class="flex items-center justify-between">
                         <span class="text-xs text-slate-400">Repeat Count</span>
@@ -157,7 +157,7 @@
                 </div>
             </div>
             <div>
-                <label class="block text-xs text-gray-400 mb-2">Tags (optional)</label>
+                <label class="block text-xs text-slate-400 mb-2">Tags (optional)</label>
                 <input type="text" id="bench-tags" class="w-full mb-2" placeholder="e.g. production, v2.0">
                 <div class="text-[0.65rem] text-slate-500">Comma separated. Tags help you filter runs in History.</div>
             </div>
@@ -181,7 +181,7 @@
         <div class="space-y-4">
             <div class="flex justify-between items-start text-sm">
                 <div>
-                    <div class="text-slate-500">Run ID: <span class="font-mono text-violet-600" id="progress-runid">--</span></div>
+                    <div class="text-slate-500">Run ID: <span class="font-mono text-gold-400" id="progress-runid">--</span></div>
                     <div class="text-slate-500 mt-1">Status: <span class="text-[#D4AF37] font-medium" id="progress-status">Running</span></div>
                 </div>
                 <div class="text-right">
@@ -230,7 +230,7 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="tools-overview-container">
             {% for tool_name, tool in config.tools.items() %}
             <div class="p-3 rounded-lg border transition-all duration-300 tool-item
-                {% if tool.enabled %}border-violet-100/80 bg-violet-50 text-violet-700{% else %}border-slate-200 bg-slate-50 text-slate-400 opacity-60{% endif %}"
+                {% if tool.enabled %}border-gold-200/80 bg-gold-50 text-gold-400{% else %}border-slate-200 bg-slate-50 text-slate-400 opacity-60{% endif %}"
                 data-tool="{{ tool_name }}"
                 data-enabled="{{ tool.enabled|lower }}"
                 data-suites="{{ tool.supported_suites|join(',') if tool.supported_suites else '' }}">
@@ -257,7 +257,7 @@
         <div class="card-header">{{ t("benchmark.test_suites") }}</div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {% for name, suite in config.benchmark.test_suites.items() %}
-            <div class="border border-slate-200 rounded-xl p-4 bg-white/50 hover:border-violet-300 transition-colors">
+            <div class="border border-slate-200 rounded-xl p-4 bg-white/50 hover:border-gold-200 transition-colors">
                 <div class="flex items-start justify-between mb-2">
                     <div>
                         <div class="font-semibold text-slate-900 text-sm">{{ name|replace('_',' ')|title }}</div>

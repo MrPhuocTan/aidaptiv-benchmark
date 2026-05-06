@@ -21,13 +21,13 @@
         .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
         .text-emerald-800 { color: #065f46; }
         .bg-emerald-50 { background-color: #ecfdf5; }
-        .text-violet-800 { color: #5b21b6; }
-        .bg-violet-50 { background-color: #f5f3ff; }
-        .text-sky-800 { color: #075985; }
-        .bg-sky-50 { background-color: #f0f9ff; }
+        .text-slate-900 { color: #5b21b6; }
+        .bg-gold-50 { background-color: #f5f3ff; }
+        .text-slate-900 { color: #075985; }
+        .bg-gold-50 { background-color: #f0f9ff; }
         .text-[#94A3B8] { color: #ef4444; }
-        .print-btn { display: inline-block; padding: 0.5rem 1rem; background-color: #4f46e5; color: white; border-radius: 0.375rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; }
-        .print-btn:hover { background-color: #4338ca; }
+        .print-btn { display: inline-block; padding: 0.5rem 1rem; background-color: #D4AF37; color: white; border-radius: 0.375rem; font-weight: 500; text-decoration: none; cursor: pointer; border: none; }
+        .print-btn:hover { background-color: #A68B3C; }
         @media print {
             .no-print { display: none !important; }
             body { padding: 0; background-color: white; }
@@ -44,7 +44,7 @@
             <h1 class="text-3xl font-bold text-slate-900">{{ t("report_details.title") }}</h1>
             <p class="text-sm text-slate-500 mt-2">
                 {{ t("common.date") }}: {{ run.started_at.strftime('%Y-%m-%d %H:%M') }} | 
-                Run ID: <span class="font-mono text-violet-700">{{ run.run_id }}</span>
+                Run ID: <span class="font-mono text-gold-400">{{ run.run_id }}</span>
             </p>
         </div>
         <div class="no-print">
@@ -60,7 +60,7 @@
     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         <div class="card p-4">
             <h4 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">{{ t("report_details.test_suite") }}</h4>
-            <div class="text-lg font-bold text-violet-700">{{ run.suite | replace('_', ' ') | title }}</div>
+            <div class="text-lg font-bold text-gold-400">{{ run.suite | replace('_', ' ') | title }}</div>
             <p class="text-[10px] text-slate-400 mt-1 leading-tight">{{ run.suite }} suite execution</p>
         </div>
         <div class="card p-4">
@@ -103,8 +103,8 @@
     <!-- Dashboard Charts -->
     {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
     
-    {% set server_bg_colors = ['bg-violet-50', 'bg-emerald-50', 'bg-sky-50'] %}
-    {% set server_text_colors = ['text-violet-800', 'text-emerald-800', 'text-sky-800'] %}
+    {% set server_bg_colors = ['bg-gold-50', 'bg-emerald-50', 'bg-gold-50'] %}
+    {% set server_text_colors = ['text-slate-900', 'text-emerald-800', 'text-slate-900'] %}
 
     {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
@@ -135,7 +135,7 @@
                         {% for i in range(chart_data.concurrencies | length) %}
                         {% set c = chart_data.concurrencies[i] %}
                         <tr>
-                            <td class="p-2 font-semibold bg-[#67cdef] border border-slate-400 text-slate-900">{{ c }}</td>
+                            <td class="p-2 font-semibold bg-[#D4AF37] border border-slate-400 text-slate-900">{{ c }}</td>
                             {% for srv_key in server_labels %}
                             {% set raw_val = chart_data[data_key][srv_key]['p50'][i] if chart_data[data_key][srv_key] is defined else none %}
                             {% if is_tps_per_user and c > 0 %}
@@ -200,7 +200,7 @@
                     <tr class="bg-slate-100 border-b border-slate-200">
                         <th class="p-3 text-sm font-semibold text-slate-700">Metric</th>
                         {% for srv_key in report_data.hardware_summary|sort %}
-                        <th class="p-3 text-sm font-semibold text-center text-violet-800 bg-violet-50">
+                        <th class="p-3 text-sm font-semibold text-center text-slate-900 bg-gold-50">
                             {{ report_data.metadata.server_labels.get(srv_key, srv_key) }}
                         </th>
                         {% endfor %}
@@ -245,7 +245,7 @@
                     </tr>
                     {% endfor %}
                     <!-- Disk I/O -->
-                    <tr class="border-b border-slate-100 bg-amber-50">
+                    <tr class="border-b border-slate-100 bg-gold-50">
                         <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">Disk / Network I/O</td>
                     </tr>
                     {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
