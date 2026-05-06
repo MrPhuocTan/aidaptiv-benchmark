@@ -62,23 +62,24 @@ a {
 }
 
 /* Apple Buttons */
-.btn {
+.btn, .btn-primary, .btn-secondary, .btn-danger {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 16px;
-    border-radius: 9999px;
-    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 15px;
     font-weight: 500;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
     border: none;
     cursor: pointer;
-    transition: transform 0.1s ease, opacity 0.2s ease;
+    transition: transform 0.1s ease, background-color 0.2s ease, opacity 0.2s ease;
     text-decoration: none;
+    margin-right: 8px; /* Spacing between adjacent buttons */
 }
 
-.btn:active {
-    transform: scale(0.95);
+.btn:active, .btn-primary:active, .btn-secondary:active, .btn-danger:active {
+    transform: scale(0.97);
 }
 
 .btn-primary {
@@ -87,17 +88,17 @@ a {
 }
 
 .btn-primary:hover {
-    opacity: 0.9;
+    background-color: var(--primary-focus);
 }
 
 .btn-secondary {
     background-color: var(--canvas);
-    color: var(--primary);
-    border: 1px solid var(--primary);
+    color: var(--ink);
+    border: 1px solid var(--hairline);
 }
 
 .btn-secondary:hover {
-    background-color: rgba(0, 102, 204, 0.05);
+    background-color: var(--canvas-parchment);
 }
 
 .btn-danger {
@@ -109,7 +110,8 @@ a {
 .btn-sm {
     padding: 6px 12px;
     font-size: 13px;
-    border-radius: 8px;
+    border-radius: 6px;
+    margin-right: 4px;
 }
 
 .btn:disabled {
