@@ -64,8 +64,8 @@
     {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
     
     {# Color palette for N servers #}
-    {% set server_bg_colors = ['bg-gold-50', 'bg-emerald-50', 'bg-gold-50'] %}
-    {% set server_text_colors = ['text-slate-900', 'text-emerald-800', 'text-slate-900'] %}
+    {% set server_bg_colors = ['bg-gold-50', 'bg-slate-50', 'bg-gold-50'] %}
+    {% set server_text_colors = ['text-slate-900', 'text-slate-900', 'text-slate-900'] %}
 
     {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
@@ -92,7 +92,7 @@
                             {% endif %}
                         </tr>
                     </thead>
-                    <tbody class="bg-white">
+                    <tbody class="bg-white font-sans">
                         {% for i in range(chart_data.concurrencies | length) %}
                         {% set c = chart_data.concurrencies[i] %}
                         <tr>
@@ -172,7 +172,7 @@
                         {% endfor %}
                     </tr>
                 </thead>
-                <tbody class="text-sm">
+                <tbody class="text-sm font-sans">
                     <tr class="border-b border-slate-100 bg-[#F8F9FA]">
                         <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
                     </tr>
@@ -321,7 +321,7 @@
                         {% endfor %}
                     </tr>
                 </thead>
-                <tbody class="text-sm">
+                <tbody class="text-sm font-sans">
                     {% for tool, scen_dict in report_data.breakdown.items() %}
                         {% for scenario, srv_dict in scen_dict.items() %}
                         <tr class="border-b border-slate-100 hover:bg-slate-50">

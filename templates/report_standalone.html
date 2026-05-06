@@ -19,8 +19,8 @@
         th { font-weight: 600; color: #475569; background-color: #f8fafc; font-size: 0.875rem; }
         .text-right { text-align: right; }
         .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-        .text-emerald-800 { color: #065f46; }
-        .bg-emerald-50 { background-color: #ecfdf5; }
+        .text-slate-900 { color: #065f46; }
+        .bg-slate-50 { background-color: #ecfdf5; }
         .text-slate-900 { color: #5b21b6; }
         .bg-gold-50 { background-color: #f5f3ff; }
         .text-slate-900 { color: #075985; }
@@ -103,8 +103,8 @@
     <!-- Dashboard Charts -->
     {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
     
-    {% set server_bg_colors = ['bg-gold-50', 'bg-emerald-50', 'bg-gold-50'] %}
-    {% set server_text_colors = ['text-slate-900', 'text-emerald-800', 'text-slate-900'] %}
+    {% set server_bg_colors = ['bg-gold-50', 'bg-slate-50', 'bg-gold-50'] %}
+    {% set server_text_colors = ['text-slate-900', 'text-slate-900', 'text-slate-900'] %}
 
     {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
@@ -131,7 +131,7 @@
                             {% endif %}
                         </tr>
                     </thead>
-                    <tbody class="bg-white">
+                    <tbody class="bg-white font-sans">
                         {% for i in range(chart_data.concurrencies | length) %}
                         {% set c = chart_data.concurrencies[i] %}
                         <tr>
@@ -206,7 +206,7 @@
                         {% endfor %}
                     </tr>
                 </thead>
-                <tbody class="text-sm">
+                <tbody class="text-sm font-sans">
                     <!-- GPU Info -->
                     <tr class="border-b border-slate-100 bg-[#F8F9FA]">
                         <td class="p-3 font-semibold text-slate-900" colspan="{{ report_data.hardware_summary|length + 1 }}">GPU</td>
@@ -354,7 +354,7 @@
                         {% endfor %}
                     </tr>
                 </thead>
-                <tbody class="text-sm">
+                <tbody class="text-sm font-sans">
                     {% for tool, scen_dict in report_data.breakdown.items() %}
                         {% for scenario, srv_dict in scen_dict.items() %}
                         <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -397,7 +397,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const serverLabels = chartData.server_labels || {};
     const serverKeys = Object.keys(serverLabels);
     
-    const serverColors = ['#7c3aed', '#16a34a', '#dc2626', '#2563eb', '#d97706', '#0d9488'];
+    const serverColors = ['#0F172A', '#D4AF37', '#94A3B8', '#0F172A', '#D4AF37', '#0d9488'];
     const percentileStyles = {
         'p50': { dash: [], width: 2.5 },
         'p95': { dash: [6, 3], width: 2 },
@@ -492,7 +492,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!timelineData || Object.keys(timelineData).length === 0) return;
     
     const servers = Object.keys(timelineData).filter(k => k !== "timestamps");
-    const colors = ["#a855f7", "#9ca3af", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+    const colors = ["#0F172A", "#94A3B8", "#D4AF37", "#10b981", "#f59e0b", "#ef4444"];
     
     const commonOptions = {
         responsive: true,

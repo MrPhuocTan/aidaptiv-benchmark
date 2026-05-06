@@ -5,7 +5,7 @@
 <div class="space-y-6">
 
     <div class="card relative overflow-hidden">
-        <div class="absolute inset-y-0 right-0 w-64 bg-gradient-to-l from-violet-100/70 to-transparent pointer-events-none"></div>
+        <div class="absolute inset-y-0 right-0 w-64 bg-gradient-to-l from-slate-100 to-transparent pointer-events-none"></div>
         <div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
                 <div class="text-[0.7rem] uppercase tracking-[0.24em] text-gold-400 font-semibold">{{ t("benchmark.eyebrow") }}</div>
@@ -264,7 +264,7 @@
                         <div class="text-xs text-slate-500 mt-0.5">{{ suite.description or '--' }}</div>
                     </div>
                     {% if suite.enabled %}
-                    <span class="px-2 py-1 bg-emerald-100 text-emerald-700 text-[0.65rem] font-bold rounded-full uppercase tracking-wider">{{ t("common.enabled") }}</span>
+                    <span class="px-2 py-1 bg-emerald-100 text-slate-900 text-[0.65rem] font-bold rounded-full uppercase tracking-wider">{{ t("common.enabled") }}</span>
                     {% else %}
                     <span class="px-2 py-1 bg-slate-100 text-slate-500 text-[0.65rem] font-bold rounded-full uppercase tracking-wider">{{ t("common.disabled") }}</span>
                     {% endif %}

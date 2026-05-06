@@ -17,7 +17,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="card border-t-4 border-t-violet-500">
+    <div class="card border-t-4 border-t-gold-400">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-semibold text-slate-900">Upload New Prompt Set</h3>
             <a href="/api/prompts/template" class="btn btn-secondary">
@@ -49,7 +49,7 @@
     </div>
 
     <!-- List -->
-    <div class="card p-0 overflow-hidden border-t-4 border-t-emerald-500">
+    <div class="card p-0 overflow-hidden border-t-4 border-t-gold-400">
         <div class="p-6 border-b border-slate-100">
             <h3 class="text-lg font-semibold text-slate-900">Available Prompt Sets</h3>
         </div>
@@ -66,7 +66,7 @@
                         <th class="px-6 py-4 font-medium text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-sm" id="promptsList">
+                <tbody class="divide-y divide-slate-100 text-sm font-sans" id="promptsList">
                     <!-- Loaded via JS -->
                 </tbody>
             </table>
@@ -97,7 +97,7 @@ async function loadPromptSets() {
                 <td class="px-6 py-4 text-slate-500">#${set.id}</td>
                 <td class="px-6 py-4 font-medium text-slate-900">${set.name}</td>
                 <td class="px-6 py-4 text-slate-500">${set.description}</td>
-                <td class="px-6 py-4 font-medium text-emerald-600">${set.prompt_count}</td>
+                <td class="px-6 py-4 font-medium text-gold-400">${set.prompt_count}</td>
                 <td class="px-6 py-4 text-slate-500">${new Date(set.created_at).toLocaleString()}</td>
                 <td class="px-6 py-4 text-right">
                     <button onclick="deletePromptSet(${set.id})" class="text-rose-500 hover:text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity p-2">
@@ -145,7 +145,7 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
         
         if (!res.ok) throw new Error(data.detail || "Upload failed");
         
-        resultDiv.className = "mt-4 text-sm text-emerald-600 font-medium";
+        resultDiv.className = "mt-4 text-sm text-gold-400 font-medium";
         resultDiv.textContent = `Success! Loaded ${data.prompts_loaded} prompts.`;
         
         e.target.reset();

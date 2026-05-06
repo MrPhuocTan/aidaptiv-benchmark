@@ -261,14 +261,14 @@
                             label: "{{ t('run_detail.chart_label_server1') }}",
                             data: comparisonData.server1,
                             backgroundColor: "rgba(156, 163, 175, 0.75)",
-                            borderColor: "#9ca3af",
+                            borderColor: "#94A3B8",
                             borderWidth: 1,
                         },
                         {
                             label: "{{ t('run_detail.chart_label_server2') }}",
                             data: comparisonData.server2,
                             backgroundColor: "rgba(168, 85, 247, 0.75)",
-                            borderColor: "#a855f7",
+                            borderColor: "#0F172A",
                             borderWidth: 1,
                         }
                     ]
@@ -295,7 +295,7 @@
 
         if (timelineData && Object.keys(timelineData).length > 0) {
             const servers = Object.keys(timelineData).filter(k => k !== "timestamps");
-            const colors = ["#a855f7", "#9ca3af", "#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+            const colors = ["#0F172A", "#94A3B8", "#D4AF37", "#10b981", "#f59e0b", "#ef4444"];
             
             // Shared options for all timeline charts
             const commonOptions = {

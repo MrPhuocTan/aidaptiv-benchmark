@@ -4,18 +4,18 @@
    Serif Typography: Noto Serif / Noto Serif TC
    ================================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Serif+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
     /* Bach Lap Kim - Core Palette */
     --white: #FFFFFF;
     --ivory: #FAFAF5;
-    --gold: #C5A55A;
+    --gold: #D4AF37;
     --gold-light: #E8D5A3;
     --gold-soft: #F5EDD8;
-    --silver: #B8B8B8;
+    --silver: #94A3B8;
     --ash: #6B6B6B;
-    --charcoal: #2D2D2D;
+    --charcoal: #0F172A;
     --obsidian: #1A1A1A;
 
     /* Semantic Tokens */
@@ -53,7 +53,7 @@
 }
 
 body {
-    font-family: 'Noto Serif', 'Noto Serif TC', Georgia, 'Times New Roman', serif;
+    font-family: 'Inter', sans-serif;
     background: var(--bg-main);
     color: var(--text-main);
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -209,7 +209,7 @@ body {
     border-radius: 0.375rem;
     font-size: 0.875rem;
     font-weight: 600;
-    font-family: 'Noto Serif', serif;
+    font-family: 'Inter', sans-serif;
     border: none;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -247,7 +247,7 @@ body {
     border-radius: 0.375rem;
     font-size: 0.875rem;
     font-weight: 600;
-    font-family: 'Noto Serif', serif;
+    font-family: 'Inter', sans-serif;
     border: 1px solid var(--border-soft);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -279,7 +279,7 @@ body {
     border-radius: 0.375rem;
     font-size: 0.875rem;
     font-weight: 600;
-    font-family: 'Noto Serif', serif;
+    font-family: 'Inter', sans-serif;
     border: 1px solid rgba(185, 28, 28, 0.2);
     cursor: pointer;
     transition: all 0.2s ease;
@@ -472,7 +472,7 @@ select, input[type="text"], textarea {
     padding: 0.5rem 0.75rem;
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    font-family: 'Noto Serif', serif;
+    font-family: 'Inter', sans-serif;
     outline: none;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
