@@ -2,71 +2,66 @@
 {% block page_title %}Prompt Management{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y">
 
-    <div class="card">
-        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+    <!-- Hero -->
+    <div class="card tile-parchment">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:var(--sp-lg);">
             <div>
-                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-[#1d1d1f] font-semibold">Configuration</div>
-                <h3 class="mt-3 text-3xl font-semibold text-[#1d1d1f]">Prompt Management</h3>
+                <div class="text-caption-strong" style="color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;">Configuration</div>
+                <h2 style="margin-top:var(--sp-xs);">Prompt Management</h2>
             </div>
-            <div class="surface-muted rounded-[18px] px-4 py-3 text-sm text-[#7a7a7a] max-w-sm">
-                Upload and manage prompt sets for your benchmarks. Download the template to see the required Excel format.
-            </div>
+            <p class="text-caption" style="max-width:360px;">
+                Upload and manage prompt sets for benchmarks. Download the template to see the required Excel format.
+            </p>
         </div>
     </div>
 
-    <!-- Actions -->
-    <div class="card  ">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold text-[#1d1d1f]">Upload New Prompt Set</h3>
-            <a href="/api/prompts/template" class="btn btn-secondary">
-                <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                Download Template
-            </a>
+    <!-- Upload Form -->
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-md);">
+            <h3>Upload New Prompt Set</h3>
+            <a href="/api/prompts/template" class="btn btn-secondary btn-sm">Download Template</a>
         </div>
-        
-        <form id="uploadForm" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+
+        <form id="uploadForm" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:var(--sp-sm);align-items:end;">
             <div>
-                <label class="block text-sm font-medium text-apple-muted mb-1">Set Name *</label>
-                <input type="text" id="setName" required placeholder="e.g. Code Gen V2" class="input">
+                <label>Set Name *</label>
+                <input type="text" id="setName" required placeholder="e.g. Code Gen V2">
             </div>
             <div>
-                <label class="block text-sm font-medium text-apple-muted mb-1">Description</label>
-                <input type="text" id="setDescription" placeholder="Optional notes" class="input">
+                <label>Description</label>
+                <input type="text" id="setDescription" placeholder="Optional notes">
             </div>
             <div>
-                <label class="block text-sm font-medium text-apple-muted mb-1">Excel File *</label>
-                <input type="file" id="setFile" required accept=".xlsx" class="block w-full text-sm text-[#7a7a7a] file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-apple-parchment file:text-[#1d1d1f] hover:file:bg-apple-primary">
+                <label>Excel File *</label>
+                <input type="file" id="setFile" required accept=".xlsx" style="font-size:13px;padding:7px 12px;border:1px solid var(--hairline);border-radius:var(--r-pill);background:var(--canvas);">
             </div>
             <div>
-                <button type="submit" class="btn btn-primary w-full">
-                    Upload Prompt Set
-                </button>
+                <button type="submit" class="btn btn-primary">Upload</button>
             </div>
         </form>
-        <div id="uploadResult" class="mt-4 hidden text-sm"></div>
+        <div id="uploadResult" class="hidden" style="margin-top:var(--sp-md);font-size:13px;"></div>
     </div>
 
-    <!-- List -->
-    <div class="card p-0 overflow-hidden  ">
-        <div class="p-6 border-b border-slate-100">
-            <h3 class="text-lg font-semibold text-[#1d1d1f]">Available Prompt Sets</h3>
+    <!-- Prompt Sets List -->
+    <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:var(--sp-lg);border-bottom:1px solid var(--hairline);">
+            <h3>Available Prompt Sets</h3>
         </div>
-        
         <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse" id="promptsTable">
+            <table id="promptsTable">
                 <thead>
-                    <tr class="bg-[#f5f5f7] text-[#7a7a7a] text-xs uppercase tracking-wider">
-                        <th class="px-6 py-4 font-medium">ID</th>
-                        <th class="px-6 py-4 font-medium">Name</th>
-                        <th class="px-6 py-4 font-medium">Description</th>
-                        <th class="px-6 py-4 font-medium">Prompt Count</th>
-                        <th class="px-6 py-4 font-medium">Created At</th>
-                        <th class="px-6 py-4 font-medium text-right">Actions</th>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Prompt Count</th>
+                        <th>Created At</th>
+                        <th style="text-align:right;">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-sm font-sans" id="promptsList">
+                <tbody id="promptsList">
                     <!-- Loaded via JS -->
                 </tbody>
             </table>
@@ -78,37 +73,34 @@
 <script>
 async function loadPromptSets() {
     const tbody = document.getElementById("promptsList");
-    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-[#7a7a7a]">Loading...</td></tr>';
-    
+    tbody.innerHTML = '<tr><td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-lg);">Loading...</td></tr>';
+
     try {
         const res = await fetch("/api/prompts");
         const data = await res.json();
-        
+
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-[#7a7a7a]">No prompt sets found. Upload one above.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-xxl);">No prompt sets found. Upload one above.</td></tr>';
             return;
         }
-        
+
         tbody.innerHTML = '';
         data.forEach(set => {
             const tr = document.createElement("tr");
-            tr.className = "hover:bg-[#f5f5f7] transition-colors group";
             tr.innerHTML = `
-                <td class="px-6 py-4 text-[#7a7a7a]">#${set.id}</td>
-                <td class="px-6 py-4 font-medium text-[#1d1d1f]">${set.name}</td>
-                <td class="px-6 py-4 text-[#7a7a7a]">${set.description}</td>
-                <td class="px-6 py-4 font-medium text-[#1d1d1f]">${set.prompt_count}</td>
-                <td class="px-6 py-4 text-[#7a7a7a]">${new Date(set.created_at).toLocaleString()}</td>
-                <td class="px-6 py-4 text-right">
-                    <button onclick="deletePromptSet(${set.id})" class="text-rose-500 hover:text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity p-2">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
+                <td class="text-caption">#${set.id}</td>
+                <td class="text-body-strong" style="font-size:13px;">${set.name}</td>
+                <td class="text-caption">${set.description}</td>
+                <td class="text-body-strong" style="font-size:13px;">${set.prompt_count}</td>
+                <td class="text-caption">${new Date(set.created_at).toLocaleString()}</td>
+                <td style="text-align:right;">
+                    <button onclick="deletePromptSet(${set.id})" class="btn btn-danger btn-sm">Delete</button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-4 text-center text-rose-500">Error loading data: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:var(--sp-lg);color:var(--danger);">Error loading data: ${e.message}</td></tr>`;
     }
 }
 
@@ -116,62 +108,51 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = e.target.querySelector('button[type="submit"]');
     const resultDiv = document.getElementById("uploadResult");
-    
+
     const name = document.getElementById("setName").value;
     const desc = document.getElementById("setDescription").value;
     const fileInput = document.getElementById("setFile");
-    
-    if (!fileInput.files.length) {
-        return;
-    }
-    
+
+    if (!fileInput.files.length) return;
+
     btn.disabled = true;
     btn.textContent = "Uploading...";
-    resultDiv.className = "mt-4 text-sm text-[#7a7a7a]";
+    resultDiv.className = "alert alert-info";
     resultDiv.textContent = "Processing Excel file...";
-    resultDiv.classList.remove("hidden");
-    
+    resultDiv.style.marginTop = 'var(--sp-md)';
+
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", desc);
     formData.append("file", fileInput.files[0]);
-    
+
     try {
-        const res = await fetch("/api/prompts", {
-            method: "POST",
-            body: formData
-        });
+        const res = await fetch("/api/prompts", { method: "POST", body: formData });
         const data = await res.json();
-        
         if (!res.ok) throw new Error(data.detail || "Upload failed");
-        
-        resultDiv.className = "mt-4 text-sm text-[#1d1d1f] font-medium";
-        resultDiv.textContent = `Success! Loaded ${data.prompts_loaded} prompts.`;
-        
+
+        resultDiv.className = "alert alert-info";
+        resultDiv.innerHTML = `<strong>Success!</strong> Loaded ${data.prompts_loaded} prompts.`;
         e.target.reset();
         loadPromptSets();
     } catch (err) {
-        resultDiv.className = "mt-4 text-sm text-rose-500 font-medium";
+        resultDiv.className = "alert alert-warning";
         resultDiv.textContent = `Error: ${err.message}`;
     } finally {
         btn.disabled = false;
-        btn.textContent = "Upload Prompt Set";
+        btn.textContent = "Upload";
     }
 });
 
 async function deletePromptSet(id) {
     if (!confirm(`Are you sure you want to delete Prompt Set #${id}?`)) return;
-    
     try {
         const res = await fetch(`/api/prompts/${id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("Delete failed");
         loadPromptSets();
-    } catch (err) {
-        alert(err.message);
-    }
+    } catch (err) { alert(err.message); }
 }
 
-// Load initial data
 document.addEventListener("DOMContentLoaded", loadPromptSets);
 </script>
 {% endblock %}

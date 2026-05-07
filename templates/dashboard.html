@@ -2,26 +2,23 @@
 {% block page_title %}{{ t("dashboard.title") }}{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y">
 
-    <div class="grid grid-cols-1 xl:grid-cols-[1.7fr,1fr] gap-6">
-        <div class="card relative overflow-hidden">
-            <div class="absolute inset-y-0 right-0 w-56    pointer-events-none"></div>
-            <div class="relative">
-                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-[#1d1d1f] font-semibold mb-3">{{ t("dashboard.eyebrow") }}</div>
-                <h3 class="text-3xl font-semibold text-[#1d1d1f] leading-tight max-w-2xl">
-                    {{ t("dashboard.hero_title") }}
-                </h3>
-                <p class="mt-3 text-sm text-[#7a7a7a] max-w-2xl">
-                    {{ t("dashboard.hero_body") }}
-                </p>
-                <div class="mt-6 flex flex-wrap gap-3">
-                    <a href="/benchmark" class="btn-primary">{{ t("dashboard.cta_start") }}</a>
-                    <a href="/comparison" class="btn-secondary">{{ t("dashboard.cta_compare") }}</a>
-                </div>
+    <!-- Hero + Stats Row -->
+    <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:var(--sp-lg);">
+        <!-- Hero card -->
+        <div class="card tile-parchment" style="padding:var(--sp-xxl) var(--sp-xl);">
+            <div class="text-caption-strong" style="color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-sm);">{{ t("dashboard.eyebrow") }}</div>
+            <h2 class="text-display-md" style="max-width:560px;">{{ t("dashboard.hero_title") }}</h2>
+            <p class="text-body" style="color:var(--ink-muted-48);margin-top:var(--sp-sm);max-width:560px;">{{ t("dashboard.hero_body") }}</p>
+            <div style="display:flex;gap:var(--sp-sm);margin-top:var(--sp-lg);">
+                <a href="/benchmark" class="btn btn-primary">{{ t("dashboard.cta_start") }}</a>
+                <a href="/comparison" class="btn btn-secondary">{{ t("dashboard.cta_compare") }}</a>
             </div>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <!-- Stats grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);">
             <div class="card">
                 <div class="card-header">{{ t("dashboard.completed_runs") }}</div>
                 <div class="metric-value">{{ recent_runs|selectattr('status', 'equalto', 'completed')|list|length }}</div>
@@ -34,45 +31,41 @@
             </div>
             <div class="card">
                 <div class="card-header">{{ t("dashboard.enabled_tooling") }}</div>
-                <div class="metric-value">
-                    {{ config.tools.values()|selectattr('enabled')|list|length }}
-                </div>
+                <div class="metric-value">{{ config.tools.values()|selectattr('enabled')|list|length }}</div>
                 <div class="metric-label">{{ t("dashboard.enabled_tooling_hint") }}</div>
             </div>
             <div class="card">
                 <div class="card-header">{{ t("dashboard.live_environments") }}</div>
-                <div class="metric-value">
-                    {{ config.environments.values()|selectattr('enabled')|list|length }}
-                </div>
+                <div class="metric-value">{{ config.environments.values()|selectattr('enabled')|list|length }}</div>
                 <div class="metric-label">{{ t("dashboard.live_environments_hint") }}</div>
             </div>
         </div>
     </div>
 
     <!-- Server Status Cards -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:var(--sp-lg);">
         {% for status in statuses[:3] %}
         <div class="card">
-            <div class="flex items-center justify-between mb-4">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-md);">
                 <div>
-                    <div class="card-header mb-0">{{ status.server_name }}</div>
-                    <p class="text-xs text-[#7a7a7a] mt-1">{{ status.server_id }}</p>
+                    <div class="text-body-strong">{{ status.server_name }}</div>
+                    <div class="text-caption" style="margin-top:2px;">{{ status.server_id }}</div>
                 </div>
                 <span class="status-dot {% if status.ollama_online and status.agent_online %}status-online{% else %}status-offline{% endif %}" id="status-{{ status.server_id }}"></span>
             </div>
-            <div class="grid grid-cols-3 gap-4">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp-md);">
                 <div>
-                    <div class="metric-value text-lg" id="{{ status.server_id }}-gpu">--</div>
+                    <div class="metric-value" style="font-size:22px;" id="{{ status.server_id }}-gpu">--</div>
                     <div class="metric-label">{{ t("dashboard.gpu_util") }}</div>
                 </div>
                 <div>
-                    <div class="metric-value text-lg" id="{{ status.server_id }}-vram">
+                    <div class="metric-value" style="font-size:22px;" id="{{ status.server_id }}-vram">
                         {% if status.vram_total_gb %}{{ "%.1f"|format(status.vram_total_gb) }} GB{% else %}--{% endif %}
                     </div>
                     <div class="metric-label">{{ t("dashboard.vram_used") }}</div>
                 </div>
                 <div>
-                    <div class="metric-value text-lg" id="{{ status.server_id }}-cpu">--</div>
+                    <div class="metric-value" style="font-size:22px;" id="{{ status.server_id }}-cpu">--</div>
                     <div class="metric-label">CPU Util</div>
                 </div>
             </div>
@@ -80,26 +73,27 @@
         {% endfor %}
     </div>
 
+    <!-- TPS Trend Chart -->
     <div class="card">
-        <div class="flex items-center justify-between mb-4">
-            <div class="card-header mb-0">{{ t("dashboard.recent_tps_trend") }}</div>
-            <span class="text-xs text-[#7a7a7a]">{{ t("dashboard.built_in_viz") }}</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-md);">
+            <div class="card-header" style="margin-bottom:0;">{{ t("dashboard.recent_tps_trend") }}</div>
+            <span class="text-caption">{{ t("dashboard.built_in_viz") }}</span>
         </div>
-        <div class="h-72">
+        <div style="height:280px;">
             <canvas id="dashboard-trend-chart"></canvas>
         </div>
     </div>
 
-    <!-- Recent Runs -->
+    <!-- Recent Runs Table -->
     <div class="card">
-        <div class="flex items-center justify-between mb-4">
-            <div class="card-header mb-0">{{ t("dashboard.recent_runs") }}</div>
-            <a href="/history" class="text-xs text-primary-400 hover:text-primary-300">{{ t("common.view_all") }}</a>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-md);">
+            <div class="card-header" style="margin-bottom:0;">{{ t("dashboard.recent_runs") }}</div>
+            <a href="/history" class="text-caption" style="color:var(--primary);">{{ t("common.view_all") }}</a>
         </div>
 
         {% if recent_runs %}
         <div class="overflow-x-auto">
-            <table class="data-table">
+            <table>
                 <thead>
                     <tr>
                         <th>{{ t("history.run_id") }}</th>
@@ -113,29 +107,25 @@
                 <tbody>
                     {% for run in recent_runs %}
                     <tr class="cursor-pointer" onclick="window.location='/history/{{ run.run_id }}'">
-                        <td class="font-mono text-xs text-primary-400">{{ run.run_id }}</td>
+                        <td class="font-mono" style="font-size:12px;color:var(--primary);">{{ run.run_id }}</td>
                         <td>
                             {% if run.status == 'completed' %}
-                            <span class="text-[#0066cc]">{{ t("common.completed") }}</span>
+                            <span class="status-badge status-badge-success">{{ t("common.completed") }}</span>
                             {% elif run.status == 'running' %}
-                            <span class="text-[#0066cc]">{{ t("common.running") }}</span>
+                            <span class="status-badge status-badge-info">{{ t("common.running") }}</span>
                             {% elif run.status == 'failed' %}
-                            <span class="text-[#d2d2d7]">{{ t("common.failed") }}</span>
+                            <span class="status-badge status-badge-danger">{{ t("common.failed") }}</span>
                             {% else %}
-                            <span class="text-[#cccccc]">{{ run.status }}</span>
+                            <span class="status-badge status-badge-muted">{{ run.status }}</span>
                             {% endif %}
                         </td>
                         <td>{{ run.suite or '--' }}</td>
                         <td>{{ run.environment or '--' }}</td>
                         <td>
-                            {% if run.duration_seconds %}
-                            {{ "%.1f"|format(run.duration_seconds) }}s
-                            {% else %}--{% endif %}
+                            {% if run.duration_seconds %}{{ "%.1f"|format(run.duration_seconds) }}s{% else %}--{% endif %}
                         </td>
-                        <td class="text-xs text-[#7a7a7a]">
-                            {% if run.started_at %}
-                            {{ run.started_at.strftime('%Y-%m-%d %H:%M') }}
-                            {% endif %}
+                        <td class="text-caption">
+                            {% if run.started_at %}{{ run.started_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -143,9 +133,7 @@
             </table>
         </div>
         {% else %}
-        <p class="text-[#7a7a7a] text-sm py-8 text-center">
-            {{ t("dashboard.empty_runs") }}
-        </p>
+        <p class="text-caption" style="text-align:center;padding:var(--sp-xxl) 0;">{{ t("dashboard.empty_runs") }}</p>
         {% endif %}
     </div>
 
@@ -153,17 +141,15 @@
 {% endblock %}
 
 {% block scripts %}
-<script type="application/json" id="dashboard-trend-data">
-{{ trend|tojson }}
-</script>
+<script type="application/json" id="dashboard-trend-data">{{ trend|tojson }}</script>
 <script>
     (function () {
         const trendDataElement = document.getElementById("dashboard-trend-data");
         const trendData = trendDataElement ? JSON.parse(trendDataElement.textContent) : [];
         const ctx = document.getElementById("dashboard-trend-chart");
-        if (!ctx || !trendData || trendData.length === 0 || typeof Chart === "undefined") {
-            return;
-        }
+        if (!ctx || !trendData || trendData.length === 0 || typeof Chart === "undefined") return;
+
+        const fontStack = '-apple-system, BlinkMacSystemFont, "Inter", sans-serif';
 
         new Chart(ctx, {
             type: "line",
@@ -174,43 +160,60 @@
                         label: "{{ t('dashboard.chart_server1') }}",
                         data: trendData.map(item => item.server1_tps),
                         borderColor: "#1d1d1f",
-                        backgroundColor: "rgba(45, 45, 45, 0.15)",
-                        tension: 0.25,
+                        backgroundColor: "rgba(29, 29, 31, 0.08)",
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: "#1d1d1f",
+                        fill: true,
                     },
                     {
                         label: "{{ t('dashboard.chart_server2') }}",
                         data: trendData.map(item => item.server2_tps),
                         borderColor: "#0066cc",
-                        backgroundColor: "rgba(197, 165, 90, 0.15)",
-                        tension: 0.25,
+                        backgroundColor: "rgba(0, 102, 204, 0.08)",
+                        tension: 0.35,
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: "#0066cc",
+                        fill: true,
                     }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
                 plugins: {
-                    legend: { labels: { color: "#6B6B6B", font: { family: "'JetBrains Mono', 'Courier New', monospace" } } }
+                    legend: {
+                        labels: {
+                            color: "#86868b",
+                            font: { family: fontStack, size: 12 },
+                            boxWidth: 12,
+                            boxHeight: 2,
+                            padding: 16,
+                        }
+                    }
                 },
                 scales: {
                     x: {
-                        ticks: { color: "#d2d2d7", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
-                        grid: { color: "rgba(232, 213, 163, 0.3)" }
+                        ticks: { color: "#86868b", font: { family: fontStack, size: 11 } },
+                        grid: { color: "rgba(0, 0, 0, 0.04)" }
                     },
                     y: {
-                        ticks: { color: "#d2d2d7", font: { family: "'JetBrains Mono', 'Courier New', monospace" } },
-                        grid: { color: "rgba(232, 213, 163, 0.3)" }
+                        ticks: { color: "#86868b", font: { family: fontStack, size: 11 } },
+                        grid: { color: "rgba(0, 0, 0, 0.04)" }
                     }
                 }
             }
         });
     })();
 
-    // Poll Hardware Metrics for active cards
+    /* Poll Hardware Metrics for active server cards */
     (function () {
         const serverCards = document.querySelectorAll('[id$="-gpu"]');
         const serverIds = Array.from(serverCards).map(el => el.id.replace("-gpu", ""));
-        
+
         async function pollMetrics() {
             for (const id of serverIds) {
                 try {
@@ -221,17 +224,15 @@
                         const gpuEl = document.getElementById(`${id}-gpu`);
                         const vramEl = document.getElementById(`${id}-vram`);
                         const cpuEl = document.getElementById(`${id}-cpu`);
-                        
+
                         if (gpuEl && m.gpu_util_pct != null) gpuEl.textContent = `${m.gpu_util_pct.toFixed(1)}%`;
                         if (vramEl && m.vram_used_gb != null) vramEl.textContent = `${m.vram_used_gb.toFixed(1)} GB`;
                         if (cpuEl && m.cpu_pct != null) cpuEl.textContent = `${m.cpu_pct.toFixed(1)}%`;
                     }
-                } catch (e) {
-                    // silently ignore
-                }
+                } catch (e) { /* silently ignore */ }
             }
         }
-        
+
         if (serverIds.length > 0) {
             pollMetrics();
             setInterval(pollMetrics, 5000);

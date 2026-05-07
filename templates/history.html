@@ -2,24 +2,22 @@
 {% block page_title %}{{ t("history.title") }}{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y">
 
     <!-- Header -->
-    <div class="flex items-center justify-between">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-md);">
         <div>
-            <h3 class="text-3xl font-semibold text-[#1d1d1f]">{{ t("history.header") }}</h3>
-            <p class="text-sm text-[#7a7a7a] mt-2">{{ t("history.subheader", count=total_runs) }}</p>
+            <h2>{{ t("history.header") }}</h2>
+            <p class="text-caption" style="margin-top:var(--sp-xxs);">{{ t("history.subheader", count=total_runs) }}</p>
         </div>
-        <a href="/benchmark" class="btn-primary">{{ t("history.new_benchmark") }}</a>
+        <a href="/benchmark" class="btn btn-primary">{{ t("history.new_benchmark") }}</a>
     </div>
 
-
-
     <!-- Runs Table -->
-    <div class="card p-0 overflow-hidden">
+    <div class="card" style="padding:0;overflow:hidden;">
         {% if runs %}
         <div class="overflow-x-auto">
-        <table class="data-table">
+        <table>
             <thead>
                 <tr>
                     <th>{{ t("history.run_id") }}</th>
@@ -39,77 +37,64 @@
                 {% for run in runs %}
                 <tr id="row-{{ run.run_id }}">
                     <td>
-                        <a href="/history/{{ run.run_id }}"
-                           class="font-mono text-xs text-[#1d1d1f] hover:text-[#1d1d1f]">
-                            {{ run.run_id }}
-                        </a>
+                        <a href="/history/{{ run.run_id }}" class="font-mono" style="font-size:12px;">{{ run.run_id }}</a>
                     </td>
                     <td>
                         {% if run.status == 'completed' %}
-                        <span class="text-[#0066cc] text-xs">{{ t("common.completed") }}</span>
+                        <span class="status-badge status-badge-success">{{ t("common.completed") }}</span>
                         {% elif run.status == 'running' %}
-                        <span class="text-[#1d1d1f] text-xs">{{ t("common.running") }}</span>
+                        <span class="status-badge status-badge-info">{{ t("common.running") }}</span>
                         {% elif run.status == 'failed' %}
-                        <span class="text-[#d2d2d7] text-xs">{{ t("common.failed") }}</span>
+                        <span class="status-badge status-badge-danger">{{ t("common.failed") }}</span>
                         {% else %}
-                        <span class="text-[#cccccc] text-xs">{{ run.status }}</span>
+                        <span class="status-badge status-badge-muted">{{ run.status }}</span>
                         {% endif %}
                     </td>
-                    <td class="text-sm">{{ run.suite or '--' }}</td>
-                    <td class="text-sm">{{ run.environment or '--' }}</td>
-                    <td class="text-xs text-[#7a7a7a]">{{ run.model or '--' }}</td>
-                    <td class="text-xs text-[#7a7a7a] truncate" style="max-width: 120px;" title="{{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}">
+                    <td>{{ run.suite or '--' }}</td>
+                    <td>{{ run.environment or '--' }}</td>
+                    <td class="text-caption">{{ run.model or '--' }}</td>
+                    <td class="text-caption truncate" style="max-width:120px;" title="{{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}">
                         {{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}
                     </td>
-                    <td class="text-sm w-40">
-                        <div class="flex items-center justify-between text-[0.65rem] mb-1">
-                            <span class="text-[#7a7a7a] font-medium run-progress-text" data-run-id="{{ run.run_id }}">{{ run.completed_tests or 0 }} / {{ run.total_tests or 0 }}</span>
+                    <td style="width:140px;">
+                        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px;">
+                            <span class="text-muted run-progress-text" data-run-id="{{ run.run_id }}">{{ run.completed_tests or 0 }} / {{ run.total_tests or 0 }}</span>
                             {% set pct = 0 %}
                             {% if run.total_tests and run.total_tests > 0 %}
                                 {% set pct = (((run.completed_tests or 0) / run.total_tests) * 100)|int %}
                             {% endif %}
-                            <span class="text-[#7a7a7a] run-progress-pct" data-run-id="{{ run.run_id }}">{{ pct }}%</span>
+                            <span class="text-muted run-progress-pct" data-run-id="{{ run.run_id }}">{{ pct }}%</span>
                         </div>
-                        <div class="w-full bg-[#f5f5f7] rounded-full h-1.5 overflow-hidden">
+                        <div class="progress-bar-track" style="height:4px;">
                             {% set pct_style = 'style="width: ' ~ pct ~ '%"' %}
                             {% if run.status == 'completed' %}
-                            <div class="bg-[#0066cc] h-1.5 rounded-full" {{ pct_style|safe }}></div>
+                            <div class="progress-bar-fill" style="background:var(--success);" {{ pct_style|safe }}></div>
                             {% elif run.status == 'failed' %}
-                            <div class="bg-[#d2d2d7] h-1.5 rounded-full" {{ pct_style|safe }}></div>
+                            <div class="progress-bar-fill" style="background:var(--danger);" {{ pct_style|safe }}></div>
                             {% elif run.status == 'running' %}
-                            <div class="bg-apple-primary h-1.5 rounded-full run-progress-bar" data-run-id="{{ run.run_id }}" {{ pct_style|safe }}></div>
+                            <div class="progress-bar-fill run-progress-bar" data-run-id="{{ run.run_id }}" {{ pct_style|safe }}></div>
                             {% else %}
-                            <div class="bg-slate-400 h-1.5 rounded-full" {{ pct_style|safe }}></div>
+                            <div class="progress-bar-fill" style="background:var(--ink-muted-48);" {{ pct_style|safe }}></div>
                             {% endif %}
                         </div>
                     </td>
-                    <td class="text-sm">
-                        {% if run.duration_seconds %}
-                        {{ "%.1f"|format(run.duration_seconds) }}s
-                        {% else %}--{% endif %}
+                    <td>
+                        {% if run.duration_seconds %}{{ "%.1f"|format(run.duration_seconds) }}s{% else %}--{% endif %}
                     </td>
-                    <td class="text-xs text-[#7a7a7a]">
-                        {% if run.started_at %}
-                        {{ run.started_at.strftime('%Y-%m-%d %H:%M') }}
-                        {% endif %}
+                    <td class="text-caption">
+                        {% if run.started_at %}{{ run.started_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
                     </td>
                     <td>
                         {% if run.tags %}
                             {% for tag in run.tags %}
-                            <span class="tag">{{ tag }}</span>
+                            <span class="status-badge status-badge-muted" style="font-size:10px;margin:1px;">{{ tag }}</span>
                             {% endfor %}
                         {% endif %}
                     </td>
                     <td>
-                        <div class="flex gap-2">
-                            <button onclick="exportCSV('{{ run.run_id }}')"
-                                    class="text-xs text-[#7a7a7a] hover:text-[#1d1d1f]">
-                                CSV
-                            </button>
-                            <button onclick="deleteRun('{{ run.run_id }}')"
-                                    class="text-xs text-[#7a7a7a] hover:text-[#d2d2d7]">
-                                Del
-                            </button>
+                        <div style="display:flex;gap:8px;">
+                            <button onclick="exportCSV('{{ run.run_id }}')" class="btn btn-pearl btn-sm">CSV</button>
+                            <button onclick="deleteRun('{{ run.run_id }}')" class="btn btn-danger btn-sm">Del</button>
                         </div>
                     </td>
                 </tr>
@@ -119,31 +104,27 @@
 
         <!-- Pagination -->
         {% if total_pages > 1 %}
-        <div class="p-4 border-t border-slate-900 flex justify-center">
-            <div class="pagination">
-                {% if current_page > 1 %}
-                <a href="/history?page_num={{ current_page - 1 }}{% if lang %}&lang={{ lang }}{% endif %}">{{ t("history.prev") }}</a>
+        <div style="padding:var(--sp-lg);border-top:1px solid var(--hairline);display:flex;justify-content:center;gap:4px;">
+            {% if current_page > 1 %}
+            <a href="/history?page_num={{ current_page - 1 }}{% if lang %}&lang={{ lang }}{% endif %}" class="btn btn-pearl btn-sm">{{ t("history.prev") }}</a>
+            {% endif %}
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == current_page %}
+                <span class="btn btn-primary btn-sm">{{ p }}</span>
+                {% else %}
+                <a href="/history?page_num={{ p }}{% if lang %}&lang={{ lang }}{% endif %}" class="btn btn-pearl btn-sm">{{ p }}</a>
                 {% endif %}
-
-                {% for p in range(1, total_pages + 1) %}
-                    {% if p == current_page %}
-                    <span class="current">{{ p }}</span>
-                    {% else %}
-                    <a href="/history?page_num={{ p }}{% if lang %}&lang={{ lang }}{% endif %}">{{ p }}</a>
-                    {% endif %}
-                {% endfor %}
-
-                {% if current_page < total_pages %}
-                <a href="/history?page_num={{ current_page + 1 }}{% if lang %}&lang={{ lang }}{% endif %}">{{ t("history.next") }}</a>
-                {% endif %}
-            </div>
+            {% endfor %}
+            {% if current_page < total_pages %}
+            <a href="/history?page_num={{ current_page + 1 }}{% if lang %}&lang={{ lang }}{% endif %}" class="btn btn-pearl btn-sm">{{ t("history.next") }}</a>
+            {% endif %}
         </div>
         {% endif %}
 
         {% else %}
-        <div class="p-12 text-center text-[#7a7a7a]">
-            <p class="text-sm">{{ t("history.empty") }}</p>
-            <a href="/benchmark" class="btn-primary mt-4 inline-block">{{ t("history.start_first") }}</a>
+        <div style="padding:var(--sp-xxl) var(--sp-lg);text-align:center;">
+            <p class="text-caption">{{ t("history.empty") }}</p>
+            <a href="/benchmark" class="btn btn-primary" style="margin-top:var(--sp-md);">{{ t("history.start_first") }}</a>
         </div>
         {% endif %}
     </div>

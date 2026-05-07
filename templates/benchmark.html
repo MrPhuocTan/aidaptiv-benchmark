@@ -2,76 +2,71 @@
 {% block page_title %}{{ t("benchmark.title") }}{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y">
 
-    <div class="card relative overflow-hidden">
-        <div class="absolute inset-y-0 right-0 w-64    pointer-events-none"></div>
-        <div class="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <!-- Hero -->
+    <div class="card tile-parchment" style="padding:var(--sp-xxl) var(--sp-xl);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:var(--sp-lg);">
             <div>
-                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-[#1d1d1f] font-semibold">{{ t("benchmark.eyebrow") }}</div>
-                <h3 class="mt-3 text-3xl font-semibold text-[#1d1d1f] leading-tight">{{ t("benchmark.hero_title") }}</h3>
-                <p class="mt-2 text-sm text-[#7a7a7a] max-w-2xl">
-                    {{ t("benchmark.hero_body") }}
-                </p>
+                <div class="text-caption-strong" style="color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;">{{ t("benchmark.eyebrow") }}</div>
+                <h2 class="text-display-md" style="margin-top:var(--sp-xs);max-width:560px;">{{ t("benchmark.hero_title") }}</h2>
+                <p class="text-body" style="color:var(--ink-muted-48);margin-top:var(--sp-xs);max-width:560px;">{{ t("benchmark.hero_body") }}</p>
             </div>
-            <div class="surface-muted rounded-[18px] px-4 py-3 text-sm text-[#7a7a7a] max-w-sm">
-                {{ t("benchmark.hero_note") }}
-            </div>
+            <p class="text-caption" style="max-width:300px;">{{ t("benchmark.hero_note") }}</p>
         </div>
     </div>
-
 
     <!-- Config Form -->
     <div class="card">
         <div class="card-header">{{ t("benchmark.run_configuration") }}</div>
 
-        <!-- Target Servers Row (Sequential Dropdowns) -->
-        <div class="mb-6">
-            <label class="block text-xs text-[#cccccc] mb-3">{{ t("benchmark.target_server") }}</label>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Target Servers -->
+        <div style="margin-bottom:var(--sp-lg);">
+            <label>{{ t("benchmark.target_server") }}</label>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-md);margin-top:var(--sp-xs);">
                 <!-- Primary Server -->
-                <div class="card p-4 shadow-sm bg-[#f5f5f7]/50">
-                    <label class="block text-[0.65rem] font-bold text-[#1d1d1f] uppercase tracking-widest mb-2">Server 1 (Primary)</label>
-                    <select id="server-select-1" class="w-full bench-server-select" onchange="onServerSelectChange(1)">
+                <div style="background:var(--canvas-parchment);border-radius:var(--r-lg);padding:var(--sp-md);">
+                    <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-xs);">Server 1 (Primary)</div>
+                    <select id="server-select-1" class="bench-server-select" onchange="onServerSelectChange(1)">
                         <option value="">-- {{ t("common.select") }} --</option>
                         {% for server_id, server in config.servers.items() %}
                         <option value="{{ server_id }}">{{ server.name }}</option>
                         {% endfor %}
                     </select>
-                    <div id="specs-card-1" class="mt-4 hidden space-y-2 text-xs border-t border-slate-200 pt-3"></div>
+                    <div id="specs-card-1" class="hidden" style="margin-top:var(--sp-sm);padding-top:var(--sp-sm);border-top:1px solid var(--hairline);font-size:12px;"></div>
                 </div>
-                
+
                 <!-- Compare Server 1 -->
-                <div class="card p-4 shadow-sm bg-[#f5f5f7]/50 opacity-50 transition-opacity" id="server-block-2">
-                    <label class="block text-[0.65rem] font-bold text-[#1d1d1f] uppercase tracking-widest mb-2">Server 2 (Compare)</label>
-                    <select id="server-select-2" class="w-full bench-server-select" onchange="onServerSelectChange(2)" disabled>
+                <div id="server-block-2" style="background:var(--canvas-parchment);border-radius:var(--r-lg);padding:var(--sp-md);opacity:0.5;transition:opacity 0.2s;">
+                    <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-xs);">Server 2 (Compare)</div>
+                    <select id="server-select-2" class="bench-server-select" onchange="onServerSelectChange(2)" disabled>
                         <option value="">-- {{ t("common.select") }} --</option>
                         {% for server_id, server in config.servers.items() %}
                         <option value="{{ server_id }}">{{ server.name }}</option>
                         {% endfor %}
                     </select>
-                    <div id="specs-card-2" class="mt-4 hidden space-y-2 text-xs border-t border-slate-200 pt-3"></div>
+                    <div id="specs-card-2" class="hidden" style="margin-top:var(--sp-sm);padding-top:var(--sp-sm);border-top:1px solid var(--hairline);font-size:12px;"></div>
                 </div>
 
                 <!-- Compare Server 2 -->
-                <div class="card p-4 shadow-sm bg-[#f5f5f7]/50 opacity-50 transition-opacity" id="server-block-3">
-                    <label class="block text-[0.65rem] font-bold text-[#1d1d1f] uppercase tracking-widest mb-2">Server 3 (Compare)</label>
-                    <select id="server-select-3" class="w-full bench-server-select" onchange="onServerSelectChange(3)" disabled>
+                <div id="server-block-3" style="background:var(--canvas-parchment);border-radius:var(--r-lg);padding:var(--sp-md);opacity:0.5;transition:opacity 0.2s;">
+                    <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-xs);">Server 3 (Compare)</div>
+                    <select id="server-select-3" class="bench-server-select" onchange="onServerSelectChange(3)" disabled>
                         <option value="">-- {{ t("common.select") }} --</option>
                         {% for server_id, server in config.servers.items() %}
                         <option value="{{ server_id }}">{{ server.name }}</option>
                         {% endfor %}
                     </select>
-                    <div id="specs-card-3" class="mt-4 hidden space-y-2 text-xs border-t border-slate-200 pt-3"></div>
+                    <div id="specs-card-3" class="hidden" style="margin-top:var(--sp-sm);padding-top:var(--sp-sm);border-top:1px solid var(--hairline);font-size:12px;"></div>
                 </div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-            <!-- Suite -->
+        <!-- Config row -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-md);margin-bottom:var(--sp-lg);">
             <div>
-                <label class="block text-xs text-[#cccccc] mb-2">{{ t("benchmark.test_suite") }}</label>
-                <select id="bench-suite" class="w-full">
+                <label>{{ t("benchmark.test_suite") }}</label>
+                <select id="bench-suite">
                     <option value="all">{{ t("benchmark.all_suites") }}</option>
                     {% for name, suite in config.benchmark.test_suites.items() %}
                         {% if suite.enabled %}
@@ -80,11 +75,9 @@
                     {% endfor %}
                 </select>
             </div>
-
-            <!-- Environment -->
             <div>
-                <label class="block text-xs text-[#cccccc] mb-2">{{ t("benchmark.environment") }}</label>
-                <select id="bench-env" class="w-full">
+                <label>{{ t("benchmark.environment") }}</label>
+                <select id="bench-env">
                     {% for env_id, env in config.environments.items() %}
                         {% if env.enabled %}
                         <option value="{{ env_id }}">{{ env.name }}</option>
@@ -92,21 +85,17 @@
                     {% endfor %}
                 </select>
             </div>
-
-            <!-- Model -->
             <div>
-                <label class="block text-xs text-[#cccccc] mb-2">{{ t("benchmark.model") }}</label>
-                <select id="bench-model" class="w-full" disabled>
+                <label>{{ t("benchmark.model") }}</label>
+                <select id="bench-model" disabled>
                     {% for model in config.models %}
                     <option value="{{ model }}">{{ model }}</option>
                     {% endfor %}
                 </select>
             </div>
-
-            <!-- Prompt Set -->
             <div>
-                <label class="block text-xs text-[#cccccc] mb-2">Prompt Set</label>
-                <select id="bench-prompt-set" class="w-full">
+                <label>Prompt Set</label>
+                <select id="bench-prompt-set">
                     {% if prompt_sets %}
                         {% for pset in prompt_sets %}
                         <option value="{{ pset.id }}">{{ pset.name }} ({{ pset.prompts|length }} prompts)</option>
@@ -119,133 +108,117 @@
         </div>
 
         <!-- Notes -->
-        <div class="mb-6">
-            <label class="block text-xs text-[#cccccc] mb-2">{{ t("benchmark.notes_optional") }}</label>
-            <input type="text" id="bench-notes" class="w-full"
-                   placeholder="{{ t('benchmark.notes_placeholder') }}">
+        <div style="margin-bottom:var(--sp-lg);">
+            <label>{{ t("benchmark.notes_optional") }}</label>
+            <input type="text" id="bench-notes" placeholder="{{ t('benchmark.notes_placeholder') }}">
         </div>
 
         <!-- Parameters & Tags -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-lg);margin-bottom:var(--sp-lg);">
             <div>
-                <label class="block text-xs text-[#cccccc] mb-2">Editable Parameters</label>
-                <div class="space-y-3 bg-apple-canvas/50 border border-slate-200 rounded-full p-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-[#7a7a7a]">Warmup Requests</span>
-                        <input type="number" id="bench-warmup" class="w-24 px-2 py-1 text-xs" value="{{ config.benchmark.warmup_requests }}">
+                <label>Editable Parameters</label>
+                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-sm);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="text-caption">Warmup Requests</span>
+                        <input type="number" id="bench-warmup" value="{{ config.benchmark.warmup_requests }}" style="width:80px;padding:4px 8px;font-size:12px;">
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-[#7a7a7a]">Concurrency Levels <span class="text-[0.6rem] text-[#cccccc]">(Load testing only)</span></span>
-                        <input type="text" id="bench-concurrency" class="w-32 px-2 py-1 text-xs" value="{{ config.benchmark.concurrency_levels|join(', ') }}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="text-caption">Concurrency Levels</span>
+                        <input type="text" id="bench-concurrency" value="{{ config.benchmark.concurrency_levels|join(', ') }}" style="width:120px;padding:4px 8px;font-size:12px;">
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-[#7a7a7a]">Cooldown Between (s)</span>
-                        <input type="number" id="bench-cooldown" class="w-24 px-2 py-1 text-xs" value="{{ config.benchmark.cooldown_seconds }}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="text-caption">Cooldown Between (s)</span>
+                        <input type="number" id="bench-cooldown" value="{{ config.benchmark.cooldown_seconds }}" style="width:80px;padding:4px 8px;font-size:12px;">
                     </div>
                 </div>
-                
-                <label class="block text-xs text-[#cccccc] mt-4 mb-2">Fixed Global Limits</label>
-                <div class="space-y-2 bg-[#f5f5f7]/80 border border-slate-100 rounded-full p-4">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-[#cccccc]">Repeat Count</span>
-                        <span class="text-xs font-mono text-[#7a7a7a] bg-[#f5f5f7] px-2 py-1 rounded">1</span>
+
+                <label style="margin-top:var(--sp-md);">Fixed Global Limits</label>
+                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-xs);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="text-caption">Repeat Count</span>
+                        <span class="font-mono text-caption" style="background:var(--canvas);padding:2px 8px;border-radius:var(--r-xs);">1</span>
                     </div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs text-[#cccccc]">Request Timeout (s)</span>
-                        <span class="text-xs font-mono text-[#7a7a7a] bg-[#f5f5f7] px-2 py-1 rounded">120</span>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <span class="text-caption">Request Timeout (s)</span>
+                        <span class="font-mono text-caption" style="background:var(--canvas);padding:2px 8px;border-radius:var(--r-xs);">120</span>
                     </div>
                 </div>
             </div>
             <div>
-                <label class="block text-xs text-[#cccccc] mb-2">Tags (optional)</label>
-                <input type="text" id="bench-tags" class="w-full mb-2" placeholder="e.g. production, v2.0">
-                <div class="text-[0.65rem] text-[#7a7a7a]">Comma separated. Tags help you filter runs in History.</div>
+                <label>Tags (optional)</label>
+                <input type="text" id="bench-tags" placeholder="e.g. production, v2.0">
+                <div class="text-fine" style="margin-top:var(--sp-xxs);">Comma separated. Tags help you filter runs in History.</div>
             </div>
         </div>
 
         <!-- Start Button -->
-        <div class="flex items-center gap-4">
-            <button id="btn-start-benchmark" class="btn-primary" onclick="startBenchmark()">
-                {{ t("benchmark.start_button") }}
-            </button>
-            <span class="text-xs text-[#7a7a7a]">
-                {{ t("benchmark.start_help") }}
-            </span>
+        <div style="display:flex;align-items:center;gap:var(--sp-md);">
+            <button id="btn-start-benchmark" class="btn btn-primary btn-lg" onclick="startBenchmark()">{{ t("benchmark.start_button") }}</button>
+            <span class="text-caption">{{ t("benchmark.start_help") }}</span>
         </div>
     </div>
 
     <!-- Progress -->
-    <div class="card" id="progress-container" style="display: none;">
+    <div class="card" id="progress-container" style="display:none;">
         <div class="card-header">{{ t("benchmark.progress_title") }}</div>
 
-        <div class="space-y-4">
-            <div class="flex justify-between items-start text-sm">
+        <div style="display:flex;flex-direction:column;gap:var(--sp-md);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
                 <div>
-                    <div class="text-[#7a7a7a]">Run ID: <span class="font-mono text-[#1d1d1f]" id="progress-runid">--</span></div>
-                    <div class="text-[#7a7a7a] mt-1">Status: <span class="text-[#0066cc] font-medium" id="progress-status">Running</span></div>
+                    <div class="text-caption">Run ID: <span class="font-mono" style="color:var(--ink);" id="progress-runid">--</span></div>
+                    <div class="text-caption" style="margin-top:4px;">Status: <span style="color:var(--primary);font-weight:600;" id="progress-status">Running</span></div>
                 </div>
-                <div class="text-right">
-                    <div class="text-apple-muted font-medium" id="progress-phase">{{ t("benchmark.preparing") }}</div>
-                    <div class="text-xs text-[#7a7a7a] mt-1 font-mono" id="progress-current-test">--</div>
+                <div style="text-align:right;">
+                    <div class="text-body-strong" style="font-size:14px;" id="progress-phase">{{ t("benchmark.preparing") }}</div>
+                    <div class="text-caption font-mono" style="margin-top:4px;" id="progress-current-test">--</div>
                 </div>
             </div>
 
             <div>
-                <div class="flex items-center justify-between text-sm mb-2">
-                    <span class="text-[#7a7a7a] font-medium">Progress</span>
-                    <span class="text-[#7a7a7a] font-medium"><span id="progress-text">0 / 0</span> (<span id="progress-percent">0</span>%)</span>
+                <div style="display:flex;justify-content:space-between;margin-bottom:var(--sp-xs);">
+                    <span class="text-caption">Progress</span>
+                    <span class="text-caption"><span id="progress-text">0 / 0</span> (<span id="progress-percent">0</span>%)</span>
                 </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-4 text-center">
-                <div class="p-2 rounded-full border border-slate-200 bg-[#f5f5f7]">
-                    <div class="text-[0.65rem] text-[#7a7a7a] uppercase tracking-wider mb-1">Elapsed</div>
-                    <div class="text-sm font-mono text-apple-muted" id="progress-elapsed">00:00</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-md);text-align:center;">
+                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-sm);">
+                    <div class="text-caption" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Elapsed</div>
+                    <div class="font-mono" style="font-size:14px;" id="progress-elapsed">00:00</div>
                 </div>
-                <div class="p-2 rounded-full border border-slate-200 bg-[#f5f5f7]">
-                    <div class="text-[0.65rem] text-[#7a7a7a] uppercase tracking-wider mb-1">Remaining</div>
-                    <div class="text-sm font-mono text-apple-muted" id="progress-remaining">--:--</div>
+                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-sm);">
+                    <div class="text-caption" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Remaining</div>
+                    <div class="font-mono" style="font-size:14px;" id="progress-remaining">--:--</div>
                 </div>
-                <div class="p-2 rounded-full border border-slate-200 bg-[#f5f5f7]">
-                    <div class="text-[0.65rem] text-[#7a7a7a] uppercase tracking-wider mb-1">ETA</div>
-                    <div class="text-sm font-mono text-apple-muted" id="progress-eta">--:--</div>
+                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-sm);">
+                    <div class="text-caption" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">ETA</div>
+                    <div class="font-mono" style="font-size:14px;" id="progress-eta">--:--</div>
                 </div>
             </div>
         </div>
 
-        <div class="flex items-center justify-between gap-4 mt-6 text-xs">
-            <div class="text-[#7a7a7a]" id="progress-extra">{{ t("benchmark.waiting_live_metrics") }}</div>
-            <button id="btn-stop-benchmark" class="btn-danger" onclick="stopBenchmark()">
-                {{ t("benchmark.stop_button") }}
-            </button>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--sp-lg);">
+            <span class="text-caption" id="progress-extra">{{ t("benchmark.waiting_live_metrics") }}</span>
+            <button id="btn-stop-benchmark" class="btn btn-danger" onclick="stopBenchmark()">{{ t("benchmark.stop_button") }}</button>
         </div>
     </div>
 
     <!-- Tools Overview -->
     <div class="card">
         <div class="card-header">{{ t("benchmark.enabled_tools") }}</div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="tools-overview-container">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-sm);" id="tools-overview-container">
             {% for tool_name, tool in config.tools.items() %}
-            <div class="p-3 rounded-full border transition-all duration-300 tool-item
-                {% if tool.enabled %}border-apple-hairline/80 bg-apple-parchment text-[#1d1d1f]{% else %}border-slate-200 bg-[#f5f5f7] text-[#cccccc] opacity-60{% endif %}"
-                data-tool="{{ tool_name }}"
-                data-enabled="{{ tool.enabled|lower }}"
-                data-suites="{{ tool.supported_suites|join(',') if tool.supported_suites else '' }}">
-                <div class="text-sm font-medium tool-name">
-                    {{ tool_name|replace('_',' ')|title }}
-                </div>
-                <div class="text-xs mt-1 tool-status">
+            <div class="tool-item" data-tool="{{ tool_name }}" data-enabled="{{ tool.enabled|lower }}" data-suites="{{ tool.supported_suites|join(',') if tool.supported_suites else '' }}"
+                 style="padding:var(--sp-sm);border-radius:var(--r-md);border:1px solid var(--hairline);background:{% if tool.enabled %}var(--canvas-parchment){% else %}var(--canvas){% endif %};{% if not tool.enabled %}opacity:0.5;{% endif %}transition:all 0.2s;">
+                <div class="text-body-strong" style="font-size:13px;">{{ tool_name|replace('_',' ')|title }}</div>
+                <div class="text-caption tool-status" style="margin-top:2px;">
                     {% if tool.enabled %}{{ t("common.enabled") }}{% else %}{{ t("common.disabled") }}{% endif %}
                 </div>
-                <div class="text-[0.65rem] mt-2 text-[#7a7a7a] tool-suites italic">
-                    {% if tool.supported_suites %}
-                        {{ tool.supported_suites|join(', ')|replace('_',' ')|title }}
-                    {% else %}
-                        All Suites
-                    {% endif %}
+                <div class="text-fine tool-suites" style="margin-top:var(--sp-xs);font-style:italic;">
+                    {% if tool.supported_suites %}{{ tool.supported_suites|join(', ')|replace('_',' ')|title }}{% else %}All Suites{% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -255,55 +228,55 @@
     <!-- Test Suites -->
     <div class="card">
         <div class="card-header">{{ t("benchmark.test_suites") }}</div>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--sp-md);">
             {% for name, suite in config.benchmark.test_suites.items() %}
-            <div class="border border-slate-200 rounded-[18px] p-4 bg-apple-canvas/50 hover:border-apple-hairline transition-colors">
-                <div class="flex items-start justify-between mb-2">
+            <div style="border:1px solid var(--hairline);border-radius:var(--r-lg);padding:var(--sp-md);">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--sp-sm);">
                     <div>
-                        <div class="font-semibold text-[#1d1d1f] text-sm">{{ name|replace('_',' ')|title }}</div>
-                        <div class="text-xs text-[#7a7a7a] mt-0.5">{{ suite.description or '--' }}</div>
+                        <div class="text-body-strong" style="font-size:14px;">{{ name|replace('_',' ')|title }}</div>
+                        <div class="text-caption" style="margin-top:2px;">{{ suite.description or '--' }}</div>
                     </div>
                     {% if suite.enabled %}
-                    <span class="px-2 py-1 bg-emerald-100 text-[#1d1d1f] text-[0.65rem] font-bold rounded-full uppercase tracking-wider">{{ t("common.enabled") }}</span>
+                    <span class="status-badge status-badge-success">{{ t("common.enabled") }}</span>
                     {% else %}
-                    <span class="px-2 py-1 bg-[#f5f5f7] text-[#7a7a7a] text-[0.65rem] font-bold rounded-full uppercase tracking-wider">{{ t("common.disabled") }}</span>
+                    <span class="status-badge status-badge-muted">{{ t("common.disabled") }}</span>
                     {% endif %}
                 </div>
-                
-                <div class="w-full h-px bg-[#f5f5f7] my-3"></div>
-                
-                <div class="grid grid-cols-2 gap-4 text-xs">
+
+                <div style="height:1px;background:var(--divider-soft);margin:var(--sp-sm) 0;"></div>
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-md);font-size:12px;">
                     <div>
-                        <div class="text-[#cccccc] mb-1 uppercase text-[0.65rem] font-bold">{{ t("benchmark.scenarios") }}</div>
+                        <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.04em;margin-bottom:var(--sp-xxs);">{{ t("benchmark.scenarios") }}</div>
                         {% if suite.scenarios %}
-                        <div class="flex flex-wrap gap-1">
+                        <div style="display:flex;flex-wrap:wrap;gap:4px;">
                             {% for s in suite.scenarios %}
-                            <span class="tag">{{ s }}</span>
+                            <span class="status-badge status-badge-muted" style="font-size:10px;">{{ s }}</span>
                             {% endfor %}
                         </div>
-                        {% else %}<span class="text-[#7a7a7a]">--</span>{% endif %}
+                        {% else %}<span class="text-muted">--</span>{% endif %}
                     </div>
-                    <div class="space-y-2">
+                    <div style="display:flex;flex-direction:column;gap:4px;">
                         <div>
-                            <span class="text-[#cccccc] mr-2">Requests:</span>
-                            <span class="font-mono text-apple-muted">{{ suite.requests_per_scenario or '--' }} / scenario</span>
+                            <span class="text-muted">Requests:</span>
+                            <span class="font-mono">{{ suite.requests_per_scenario or '--' }} / scenario</span>
                         </div>
                         {% if suite.duration_seconds %}
                         <div>
-                            <span class="text-[#cccccc] mr-2">Duration:</span>
-                            <span class="font-mono text-apple-muted">{{ suite.duration_seconds }}s</span>
+                            <span class="text-muted">Duration:</span>
+                            <span class="font-mono">{{ suite.duration_seconds }}s</span>
                         </div>
                         {% endif %}
                         {% if suite.concurrency %}
                         <div>
-                            <span class="text-[#cccccc] mr-2">Concurrency:</span>
-                            <span class="font-mono text-apple-muted">{{ suite.concurrency }}</span>
+                            <span class="text-muted">Concurrency:</span>
+                            <span class="font-mono">{{ suite.concurrency }}</span>
                         </div>
                         {% endif %}
                         {% if suite.pattern %}
                         <div>
-                            <span class="text-[#cccccc] mr-2">Pattern:</span>
-                            <span class="font-mono text-apple-muted">{{ suite.pattern }}</span>
+                            <span class="text-muted">Pattern:</span>
+                            <span class="font-mono">{{ suite.pattern }}</span>
                         </div>
                         {% endif %}
                     </div>
