@@ -845,8 +845,19 @@ class Orchestrator:
         """Generate server comparison records"""
         repo = self.data_sink.get_repository()
 
-        s1_data = repo.get_aggregated_results(run_id, "server1")
-        s2_data = repo.get_aggregated_results(run_id, "server2")
+        # Dynamically discover which servers were used in this run
+        results = repo.get_results_by_run(run_id)
+        servers_used = sorted(set(r.server for r in results if r.server))
+        
+        if len(servers_used) < 2:
+            console.print("    ⚠ Less than 2 servers in results, skipping comparison", style="yellow")
+            return
+
+        s1_id = servers_used[0]
+        s2_id = servers_used[1]
+        
+        s1_data = repo.get_aggregated_results(run_id, s1_id)
+        s2_data = repo.get_aggregated_results(run_id, s2_id)
 
         if s1_data["result_count"] == 0 or s2_data["result_count"] == 0:
             console.print("    ⚠ Not enough data for comparison", style="yellow")
@@ -860,20 +871,37 @@ class Orchestrator:
                 return round(delta, 2)
             return None
 
+        delta_tps = calc_delta(s1_data.get("avg_tps"), s2_data.get("avg_tps"))
+        delta_ttft = calc_delta(s1_data.get("avg_ttft_ms"), s2_data.get("avg_ttft_ms"), lower_is_better=True)
+        
+        # Determine winner: positive delta means s2 is better for TPS, negative for latency
+        score_s1 = 0
+        score_s2 = 0
+        if delta_tps is not None:
+            if delta_tps > 0:
+                score_s2 += 1
+            elif delta_tps < 0:
+                score_s1 += 1
+        if delta_ttft is not None:
+            if delta_ttft > 0:
+                score_s2 += 1
+            elif delta_ttft < 0:
+                score_s1 += 1
+        
+        if score_s1 > score_s2:
+            overall_winner = "server1"
+        elif score_s2 > score_s1:
+            overall_winner = "server2"
+        else:
+            overall_winner = "tie"
+
         comparison_data = {
             "s1_ttft_ms": s1_data.get("avg_ttft_ms"),
             "s2_ttft_ms": s2_data.get("avg_ttft_ms"),
-            "delta_ttft_pct": calc_delta(
-                s1_data.get("avg_ttft_ms"),
-                s2_data.get("avg_ttft_ms"),
-                lower_is_better=True,
-            ),
+            "delta_ttft_pct": delta_ttft,
             "s1_tps": s1_data.get("avg_tps"),
             "s2_tps": s2_data.get("avg_tps"),
-            "delta_tps_pct": calc_delta(
-                s1_data.get("avg_tps"),
-                s2_data.get("avg_tps"),
-            ),
+            "delta_tps_pct": delta_tps,
             "s1_rps": s1_data.get("avg_rps"),
             "s2_rps": s2_data.get("avg_rps"),
             "delta_rps_pct": calc_delta(
@@ -887,14 +915,15 @@ class Orchestrator:
                 s2_data.get("avg_p99_ms"),
                 lower_is_better=True,
             ),
+            "overall_winner": overall_winner,
         }
 
         self.data_sink.write_comparison(run_id, **comparison_data)
         
         # Print summary
-        console.print(f"    Server1 avg TPS: {s1_data.get('avg_tps', 0):.2f}", style="white")
-        console.print(f"    Server2 avg TPS: {s2_data.get('avg_tps', 0):.2f}", style="white")
-        if comparison_data.get("delta_tps_pct"):
-            delta = comparison_data["delta_tps_pct"]
-            color = "green" if delta > 0 else "red"
-            console.print(f"    Delta TPS: {delta:+.2f}%", style=color)
+        console.print(f"    {s1_id} avg TPS: {s1_data.get('avg_tps', 0):.2f}", style="white")
+        console.print(f"    {s2_id} avg TPS: {s2_data.get('avg_tps', 0):.2f}", style="white")
+        if delta_tps:
+            color = "green" if delta_tps > 0 else "red"
+            console.print(f"    Delta TPS: {delta_tps:+.2f}%", style=color)
+        console.print(f"    Winner: {overall_winner}", style="cyan")

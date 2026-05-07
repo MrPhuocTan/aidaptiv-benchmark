@@ -5,10 +5,10 @@ import json
 import logging
 from src.time_utils import get_local_time
 from datetime import datetime
-from typing import List
+from typing import List, Tuple, Optional
 
 from src.adapters.base import BaseToolAdapter
-from src.models import BenchmarkResult
+from src.models import BenchmarkResult, PromptLogEntry, ToolEvidence
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ class OhaAdapter(BaseToolAdapter):
     def is_available(self) -> bool:
         return self.check_binary(self.binary_path)
 
-    async def run(self, prompts: list) -> List[BenchmarkResult]:
+    async def run(self, prompts: list) -> Tuple[List[BenchmarkResult], List[PromptLogEntry], Optional[ToolEvidence]]:
         prompt_text = prompts[0].get("prompt", "Hello") if prompts else "Hello"
 
         payload = json.dumps({
@@ -66,8 +66,17 @@ class OhaAdapter(BaseToolAdapter):
             )
 
             if proc.returncode == 0 and stdout:
-                data = json.loads(stdout.decode())
-                return [self._parse_results(data)]
+                raw_text = stdout.decode()
+                data = json.loads(raw_text)
+                result = self._parse_results(data)
+                evidence = ToolEvidence(
+                    tool_name=self.tool_name,
+                    tool_version="unknown",
+                    command_line=" ".join(cmd),
+                    raw_output=raw_text,
+                    output_format="json",
+                )
+                return [result], [], evidence
 
             stderr_text = stderr.decode(errors="ignore").strip()
             if stderr_text:

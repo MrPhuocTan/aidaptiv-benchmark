@@ -260,7 +260,7 @@ async def startup():
                         print(f"  Found interrupted run {running_run.run_id}. Resuming...")
                         snapshot = running_run.config_snapshot or {}
                         suite = snapshot.get("suite", "all")
-                        server = snapshot.get("server", "all")
+                        target_servers = snapshot.get("servers")
                         env = snapshot.get("environment", "lan")
                         
                         # Trigger resume asynchronously
@@ -268,7 +268,7 @@ async def startup():
                             orchestrator.run_async(
                                 run_id=running_run.run_id,
                                 suite=suite,
-                                server=server,
+                                target_servers=target_servers if target_servers else None,
                                 environment=env,
                                 notes=running_run.notes or "",
                                 tags=running_run.tags or [],
@@ -632,15 +632,9 @@ async def api_benchmark_start(request: Request):
     advanced_options = body.get("advanced_options")
     if advanced_options:
         if "warmup_requests" in advanced_options:
-            config.benchmark.warmup_requests = advanced_options["warmup_requests"]
+            config.benchmark.warmup_requests = int(advanced_options["warmup_requests"])
         if "cooldown_seconds" in advanced_options:
-            config.benchmark.cooldown_seconds = advanced_options["cooldown_seconds"]
-        if "concurrency_levels" in advanced_options:
-            try:
-                levels = [int(x.strip()) for x in advanced_options["concurrency_levels"].split(",")]
-                config.benchmark.concurrency_levels = levels
-            except ValueError:
-                pass # fallback to default if parsing fails
+            config.benchmark.cooldown_seconds = int(advanced_options["cooldown_seconds"])
 
     run_id = orchestrator.generate_run_id()
 
