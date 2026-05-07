@@ -1,247 +1,292 @@
 {% extends "base.html" %}
 {% block page_title %}{{ t("run_detail.title", run_id=run.run_id) }}{% endblock %}
-
 {% block content %}
-<div class="space-y-6">
-
-    <div class="card">
-        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-            <div>
-                <div class="text-[0.7rem] uppercase tracking-[0.24em] text-[#1d1d1f] font-semibold">{{ t("run_detail.eyebrow") }}</div>
-                <h3 class="mt-3 text-3xl font-semibold text-[#1d1d1f] font-mono">{{ run.run_id }}</h3>
-                <p class="mt-2 text-sm text-[#7a7a7a]">
-                    {% if run.started_at %}{{ run.started_at.strftime('%Y-%m-%d %H:%M:%S UTC') }}{% endif %}
-                    {% if run.duration_seconds %} | {{ "%.1f"|format(run.duration_seconds) }}s{% endif %}
-                </p>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="exportCSV('{{ run.run_id }}')" class="btn-secondary">{{ t("common.export_csv") }}</button>
-                <button onclick="deleteRun('{{ run.run_id }}')" class="btn-danger">{{ t("common.delete") }}</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Header -->
-    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-        <div class="card text-center">
-            <div class="card-header">{{ t("common.status") }}</div>
-            <div class="text-lg font-semibold
-                {% if run.status == 'completed' %}text-[#0066cc]
-                {% elif run.status == 'failed' %}text-[#d2d2d7]
-                {% else %}text-[#1d1d1f]{% endif %}">
-                {% if run.status == 'completed' %}{{ t("common.completed") }}
-                {% elif run.status == 'running' %}{{ t("common.running") }}
-                {% elif run.status == 'failed' %}{{ t("common.failed") }}
-                {% elif run.status == 'stopped' %}{{ t("common.stopped") }}
-                {% else %}{{ run.status|title }}{% endif %}
-            </div>
-        </div>
-        <div class="card text-center">
-            <div class="card-header">{{ t("benchmark.suite") }}</div>
-            <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.suite or '--' }}</div>
-        </div>
-        <div class="card text-center">
-            <div class="card-header">{{ t("common.environment") }}</div>
-            <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.environment or '--' }}</div>
-        </div>
-        <div class="card text-center">
-            <div class="card-header">{{ t("common.model") }}</div>
-            <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.model or '--' }}</div>
-        </div>
-        <div class="card text-center">
-            <div class="card-header">{{ t("nav.prompts") }}</div>
-            <div class="text-lg font-semibold text-[#1d1d1f] truncate" title="{{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}">
-                {{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}
-            </div>
-        </div>
-        <div class="card text-center">
-            <div class="card-header">{{ t("history.tests") }}</div>
-            <div class="text-lg font-semibold text-[#1d1d1f] run-progress-text" data-run-id="{{ run.run_id }}">
-                {{ run.completed_tests or 0 }} / {{ run.total_tests or 0 }}
-            </div>
-        </div>
-    </div>
-
-    <!-- Notes & Tags -->
-    {% if run.notes or run.tags %}
-    <div class="card">
-        {% if run.notes %}
-        <div class="text-sm text-[#7a7a7a] mb-2">{{ run.notes }}</div>
-        {% endif %}
-        {% if run.tags %}
-        <div class="flex gap-2">
-            {% for tag in run.tags %}
-            <span class="tag">{{ tag }}</span>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
-    {% endif %}
-
-    <!-- Summary Comparison -->
-    {% if summary %}
-    <div class="card">
-        <div class="card-header">{{ t("run_detail.performance_summary") }}</div>
-        <div class="overflow-x-auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>{{ t("common.metric") }}</th>
-                        <th>{{ t("run_detail.server1") }}</th>
-                        <th>{{ t("run_detail.server2") }}</th>
-                        <th>{{ t("common.delta") }}</th>
-                        <th>{{ t("common.winner") }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% set s1 = summary.get('server1', {}) %}
-                    {% set s2 = summary.get('server2', {}) %}
-
-                    {% set metrics = [
-                        ('TTFT (ms)', 'avg_ttft_ms', true),
-                        ('TPOT (ms)', 'avg_tpot_ms', true),
-                        ('TPS', 'avg_tps', false),
-                        ('RPS', 'avg_rps', false),
-                        ('P99 Latency (ms)', 'avg_p99_ms', true),
-                    ] %}
-
-                    {% for label, key, lower_better in metrics %}
-                    {% set v1 = s1.get(key) %}
-                    {% set v2 = s2.get(key) %}
-                    <tr>
-                        <td class="font-medium">{{ label }}</td>
-                        <td>{% if v1 %}{{ "%.2f"|format(v1) }}{% else %}--{% endif %}</td>
-                        <td class="text-[#1d1d1f]">{% if v2 %}{{ "%.2f"|format(v2) }}{% else %}--{% endif %}</td>
-                        <td>
-                            {% if v1 and v2 and v1 != 0 %}
-                                {% set delta = ((v2 - v1) / v1) * 100 %}
-                                {% if lower_better %}{% set delta = -delta %}{% endif %}
-                                <span class="metric-delta {% if delta > 0 %}positive{% else %}negative{% endif %}">
-                                    {% if delta > 0 %}+{% endif %}{{ "%.1f"|format(delta) }}%
-                                </span>
-                            {% else %}--{% endif %}
-                        </td>
-                        <td>
-                            {% if v1 and v2 %}
-                                {% if lower_better %}
-                                    {% if v2 < v1 %}
-                                    <span class="text-[#1d1d1f] text-xs">{{ t("run_detail.server2") }}</span>
-                                    {% elif v1 < v2 %}
-                                    <span class="text-[#7a7a7a] text-xs">{{ t("run_detail.server1") }}</span>
-                                    {% else %}
-                                    <span class="text-[#cccccc] text-xs">{{ t("common.tie") }}</span>
-                                    {% endif %}
-                                {% else %}
-                                    {% if v2 > v1 %}
-                                    <span class="text-[#1d1d1f] text-xs">{{ t("run_detail.server2") }}</span>
-                                    {% elif v1 > v2 %}
-                                    <span class="text-[#7a7a7a] text-xs">{{ t("run_detail.server1") }}</span>
-                                    {% else %}
-                                    <span class="text-[#cccccc] text-xs">{{ t("common.tie") }}</span>
-                                    {% endif %}
-                                {% endif %}
-                            {% else %}--{% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="space-y-6">
         <div class="card">
-            <div class="card-header">{{ t("run_detail.comparison_chart") }}</div>
-            <div class="h-80">
-                <canvas id="comparison-chart"></canvas>
-            </div>
-        </div>
-        <div class="card lg:col-span-2">
-            <div class="card-header">{{ t("run_detail.hardware_timeline") }}</div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
                 <div>
-                    <h4 class="text-sm font-semibold text-apple-muted mb-2">GPU Utilization (%)</h4>
-                    <div class="h-60"><canvas id="timeline-chart-gpu"></canvas></div>
+                    <div class="text-[0.7rem] uppercase tracking-[0.24em] text-[#1d1d1f] font-semibold">{{ t("run_detail.eyebrow") }}</div>
+                    <h3 class="mt-3 text-3xl font-semibold text-[#1d1d1f] font-mono">{{ run.run_id }}</h3>
+                    <p class="mt-2 text-sm text-[#7a7a7a]">
+                        {% if run.started_at %}
+                            {{ run.started_at.strftime("%Y-%m-%d %H:%M:%S UTC") }}
+                        {% endif %}
+                        {% if run.duration_seconds %}
+                            | {{ "%.1f"|format(run.duration_seconds) }}s
+                        {% endif %}
+                    </p>
                 </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-apple-muted mb-2">CPU Utilization (%)</h4>
-                    <div class="h-60"><canvas id="timeline-chart-cpu"></canvas></div>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-apple-muted mb-2">RAM Usage (GB)</h4>
-                    <div class="h-60"><canvas id="timeline-chart-ram"></canvas></div>
-                </div>
-                <div>
-                    <h4 class="text-sm font-semibold text-apple-muted mb-2">Disk Read/Write (MB/s)</h4>
-                    <div class="h-60"><canvas id="timeline-chart-disk"></canvas></div>
+                <div class="flex gap-3">
+                    <button onclick="exportCSV('{{ run.run_id }}')" class="btn-secondary">{{ t("common.export_csv") }}</button>
+                    <button onclick="deleteRun('{{ run.run_id }}')" class="btn-danger">{{ t("common.delete") }}</button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Detailed Results -->
-    {% if results %}
-    <div class="card">
-        <div class="card-header">{{ t("run_detail.detailed_results", count=results|length) }}</div>
-        <div class="overflow-x-auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>{{ t("common.server") }}</th>
-                        <th>{{ t("common.tool") }}</th>
-                        <th>{{ t("run_detail.scenario") }}</th>
-                        <th>TTFT (ms)</th>
-                        <th>TPOT (ms)</th>
-                        <th>TPS</th>
-                        <th>RPS</th>
-                        <th>P99 (ms)</th>
-                        <th>{{ t("run_detail.err_pct") }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for r in results %}
-                    <tr>
-                        <td>
-                            <span class="{% if r.server == 'server2' %}text-[#1d1d1f]{% else %}text-[#7a7a7a]{% endif %}">
-                                {{ r.server }}
-                            </span>
-                        </td>
-                        <td class="text-xs">{{ r.tool }}</td>
-                        <td class="text-xs">{{ r.scenario }}</td>
-                        <td>{% if r.ttft_ms %}{{ "%.1f"|format(r.ttft_ms) }}{% else %}--{% endif %}</td>
-                        <td>{% if r.tpot_ms %}{{ "%.2f"|format(r.tpot_ms) }}{% else %}--{% endif %}</td>
-                        <td>{% if r.tps %}{{ "%.1f"|format(r.tps) }}{% else %}--{% endif %}</td>
-                        <td>{% if r.rps %}{{ "%.2f"|format(r.rps) }}{% else %}--{% endif %}</td>
-                        <td>{% if r.latency_p99_ms %}{{ "%.0f"|format(r.latency_p99_ms) }}{% else %}--{% endif %}</td>
-                        <td>
-                            {% if r.error_rate is not none %}
-                                {% if r.error_rate > 0.05 %}
-                                <span class="text-[#d2d2d7]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
-                                {% else %}
-                                <span class="text-[#0066cc]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
-                                {% endif %}
-                            {% else %}--{% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <!-- Header -->
+        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div class="card text-center">
+                <div class="card-header">{{ t("common.status") }}</div>
+                <div class="text-lg font-semibold {% if run.status == 'completed' %}text-[#0066cc] {% elif run.status == 'failed' %}text-[#d2d2d7] {% else %}text-[#1d1d1f]{% endif %}">
+                    {% if run.status == 'completed' %}
+                        {{ t("common.completed") }}
+                    {% elif run.status == 'running' %}
+                        {{ t("common.running") }}
+                    {% elif run.status == 'failed' %}
+                        {{ t("common.failed") }}
+                    {% elif run.status == 'stopped' %}
+                        {{ t("common.stopped") }}
+                    {% else %}
+                        {{ run.status|title }}
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card text-center">
+                <div class="card-header">{{ t("benchmark.suite") }}</div>
+                <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.suite or '--' }}</div>
+            </div>
+            <div class="card text-center">
+                <div class="card-header">{{ t("common.environment") }}</div>
+                <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.environment or '--' }}</div>
+            </div>
+            <div class="card text-center">
+                <div class="card-header">{{ t("common.model") }}</div>
+                <div class="text-lg font-semibold text-[#1d1d1f]">{{ run.model or '--' }}</div>
+            </div>
+            <div class="card text-center">
+                <div class="card-header">{{ t("nav.prompts") }}</div>
+                <div class="text-lg font-semibold text-[#1d1d1f] truncate"
+                     title="{{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}">
+                    {{ run.config_snapshot.get('prompt_set', 'Default') if run.config_snapshot else 'Default' }}
+                </div>
+            </div>
+            <div class="card text-center">
+                <div class="card-header">{{ t("history.tests") }}</div>
+                <div class="text-lg font-semibold text-[#1d1d1f] run-progress-text"
+                     data-run-id="{{ run.run_id }}">{{ run.completed_tests or 0 }} / {{ run.total_tests or 0 }}</div>
+            </div>
         </div>
+        <!-- Notes & Tags -->
+        {% if run.notes or run.tags %}
+            <div class="card">
+                {% if run.notes %}<div class="text-sm text-[#7a7a7a] mb-2">{{ run.notes }}</div>{% endif %}
+                {% if run.tags %}
+                    <div class="flex gap-2">
+                        {% for tag in run.tags %}<span class="tag">{{ tag }}</span>{% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+        <!-- Summary Comparison -->
+        {% if summary %}
+            <div class="card">
+                <div class="card-header">{{ t("run_detail.performance_summary") }}</div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ t("common.metric") }}</th>
+                                <th>{{ t("run_detail.server1") }}</th>
+                                <th>{{ t("run_detail.server2") }}</th>
+                                <th>{{ t("common.delta") }}</th>
+                                <th>{{ t("common.winner") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% set s1 = summary.get('server1', {}) %}
+                            {% set s2 = summary.get('server2', {}) %}
+                            {% set metrics = [
+                                                            ('TTFT (ms)', 'avg_ttft_ms', true),
+                                                            ('TPOT (ms)', 'avg_tpot_ms', true),
+                                                            ('TPS', 'avg_tps', false),
+                                                            ('RPS', 'avg_rps', false),
+                                                            ('P99 Latency (ms)', 'avg_p99_ms', true),
+                                                        ] %}
+                            {% for label, key, lower_better in metrics %}
+                                {% set v1 = s1.get(key) %}
+                                {% set v2 = s2.get(key) %}
+                                <tr>
+                                    <td class="font-medium">{{ label }}</td>
+                                    <td>
+                                        {% if v1 %}
+                                            {{ "%.2f"|format(v1) }}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-[#1d1d1f]">
+                                        {% if v2 %}
+                                            {{ "%.2f"|format(v2) }}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if v1 and v2 and v1 != 0 %}
+                                            {% set delta = ((v2 - v1) / v1) * 100 %}
+                                            {% if lower_better %}
+                                                {% set delta = -delta %}
+                                            {% endif %}
+                                            <span class="metric-delta {% if delta > 0 %}positive{% else %}negative{% endif %}">
+                                                {% if delta > 0 %}+{% endif %}
+                                                {{ "%.1f"|format(delta) }}%
+                                            </span>
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if v1 and v2 %}
+                                            {% if lower_better %}
+                                                {% if v2 < v1 %}
+                                                    <span class="text-[#1d1d1f] text-xs">{{ t("run_detail.server2") }}</span>
+                                                {% elif v1 < v2 %}
+                                                    <span class="text-[#7a7a7a] text-xs">{{ t("run_detail.server1") }}</span>
+                                                {% else %}
+                                                    <span class="text-[#cccccc] text-xs">{{ t("common.tie") }}</span>
+                                                {% endif %}
+                                            {% else %}
+                                                {% if v2 > v1 %}
+                                                    <span class="text-[#1d1d1f] text-xs">{{ t("run_detail.server2") }}</span>
+                                                {% elif v1 > v2 %}
+                                                    <span class="text-[#7a7a7a] text-xs">{{ t("run_detail.server1") }}</span>
+                                                {% else %}
+                                                    <span class="text-[#cccccc] text-xs">{{ t("common.tie") }}</span>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            <div class="card">
+                <div class="card-header">{{ t("run_detail.comparison_chart") }}</div>
+                <div class="h-80">
+                    <canvas id="comparison-chart"></canvas>
+                </div>
+            </div>
+            <div class="card lg:col-span-2">
+                <div class="card-header">{{ t("run_detail.hardware_timeline") }}</div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="text-sm font-semibold text-apple-muted mb-2">GPU Utilization (%)</h4>
+                        <div class="h-60">
+                            <canvas id="timeline-chart-gpu"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-apple-muted mb-2">CPU Utilization (%)</h4>
+                        <div class="h-60">
+                            <canvas id="timeline-chart-cpu"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-apple-muted mb-2">RAM Usage (GB)</h4>
+                        <div class="h-60">
+                            <canvas id="timeline-chart-ram"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-semibold text-apple-muted mb-2">Disk Read/Write (MB/s)</h4>
+                        <div class="h-60">
+                            <canvas id="timeline-chart-disk"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Detailed Results -->
+        {% if results %}
+            <div class="card">
+                <div class="card-header">{{ t("run_detail.detailed_results", count=results|length) }}</div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ t("common.server") }}</th>
+                                <th>{{ t("common.tool") }}</th>
+                                <th>{{ t("run_detail.scenario") }}</th>
+                                <th>TTFT (ms)</th>
+                                <th>TPOT (ms)</th>
+                                <th>TPS</th>
+                                <th>RPS</th>
+                                <th>P99 (ms)</th>
+                                <th>{{ t("run_detail.err_pct") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in results %}
+                                <tr>
+                                    <td>
+                                        <span class="{% if r.server == 'server2' %}text-[#1d1d1f]{% else %}text-[#7a7a7a]{% endif %}">{{ r.server }}</span>
+                                    </td>
+                                    <td class="text-xs">{{ r.tool }}</td>
+                                    <td class="text-xs">{{ r.scenario }}</td>
+                                    <td>
+                                        {% if r.ttft_ms %}
+                                            {{ "%.1f"|format(r.ttft_ms) }}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if r.tpot_ms %}
+                                            {{ "%.2f"|format(r.tpot_ms) }}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if r.tps %}
+                                            {{ "%.1f"|format(r.tps) }}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if r.rps %}
+                                            {{ "%.2f"|format(r.rps) }}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if r.latency_p99_ms %}
+                                            {{ "%.0f"|format(r.latency_p99_ms) }}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if r.error_rate is not none %}
+                                            {% if r.error_rate > 0.05 %}
+                                                <span class="text-[#d2d2d7]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
+                                            {% else %}
+                                                <span class="text-[#0066cc]">{{ "%.1f"|format(r.error_rate * 100) }}%</span>
+                                            {% endif %}
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
     </div>
-    {% endif %}
-
-</div>
 {% endblock %}
-
 {% block scripts %}
-<script type="application/json" id="comparison-data">
-{{ comparison_chart|tojson }}
-</script>
-<script type="application/json" id="timeline-data">
-{{ timeline_chart|tojson }}
-</script>
-<script>
+    <script type="application/json" id="comparison-data">{{ comparison_chart|tojson }}</script>
+    <script type="application/json" id="timeline-data">{{ timeline_chart|tojson }}</script>
+    <script>
     (function () {
         if (typeof Chart === "undefined") {
             return;
@@ -387,14 +432,13 @@
             createChart("timeline-chart-disk", diskDatasets);
         }
     })();
-</script>
-
-{% if run.status == 'running' %}
-<script>
+    </script>
+    {% if run.status == 'running' %}
+        <script>
     // Auto-reload the page every 10 seconds to update charts and progress in real-time
     setTimeout(function() {
         window.location.reload();
     }, 10000);
-</script>
-{% endif %}
+        </script>
+    {% endif %}
 {% endblock %}

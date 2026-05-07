@@ -1,360 +1,406 @@
 {% extends "base.html" %}
 {% block page_title %}{{ t("report_details.title") }} - {{ run.run_id }}{% endblock %}
-
 {% block content %}
-<div class="space-y-6">
-
-    <!-- Header Section -->
-    <div class="flex items-center justify-between mb-4">
-        <div>
-            <a href="/reports" class="text-[#1d1d1f] text-sm font-semibold hover:underline mb-2 inline-block">&larr; {{ t("report_details.back") }}</a>
-            <h3 class="text-3xl font-semibold text-[#1d1d1f]">{{ t("report_details.title") }}</h3>
-            <p class="text-sm text-[#7a7a7a] mt-2">{{ t("common.date") }}: {{ run.started_at.strftime('%Y-%m-%d %H:%M') }} | Run ID: <span class="font-mono text-[#1d1d1f]">{{ run.run_id }}</span></p>
-        </div>
-        <div class="flex gap-2">
-            <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary" >{{ t("report_details.download_evidence") if t else "Download Evidence" }}</a>
-            <a href="/reports/{{ run.run_id }}/export/excel" class="btn-primary" >{{ t("report_details.export_excel") if t else "Export Excel" }}</a>
-            <a href="/reports/{{ run.run_id }}/download" class="btn-primary">{{ t("report_details.download_pdf") if t else "Download PDF" }}</a>
-            <button onclick="window.print()" class="btn-secondary">{{ t("report_details.print") }}</button>
-        </div>
-    </div>
-
-    {% if report_data %}
-    {% set server_count = report_data.metadata.server_count | default(0) %}
-    {% set server_labels = report_data.metadata.server_labels | default({}) %}
-
-    <!-- Metadata Summary -->
-    <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
-        <div class="card p-4">
-            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.test_suite") }}</h4>
-            <div class="text-lg font-bold text-[#1d1d1f]">{{ run.suite | replace('_', ' ') | title }}</div>
-            <p class="text-[10px] text-[#cccccc] mt-1 leading-tight">{{ config.benchmark.test_suites[run.suite].description if run.suite in config.benchmark.test_suites else '' }}</p>
-        </div>
-        <div class="card p-4">
-            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.servers_evaluated") }}</h4>
-            <div class="flex flex-wrap gap-1">
-                {% for s in report_data.metadata.servers %}
-                <span class="badge">{{ s }}</span>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="card p-4">
-            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.tools_deployed") }}</h4>
-            <div class="flex flex-wrap gap-1">
-                {% for t in report_data.metadata.tools %}
-                <span class="badge">{{ t }}</span>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="card p-4">
-            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.scenarios_tested") }}</h4>
-            <div class="flex flex-wrap gap-1">
-                {% for s in report_data.metadata.scenarios %}
-                <span class="badge">{{ s }}</span>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="card p-4">
-            <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">{{ t("report_details.total_prompts") }}</h4>
-            <div class="text-2xl font-bold text-[#1d1d1f]">{{ report_data.metadata.total_requests }}</div>
-        </div>
-    </div>
-
-    <!-- Dashboard Charts -->
-    {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
-    
-    {# Color palette for N servers #}
-    {% set server_bg_colors = ['bg-apple-parchment', 'bg-[#f5f5f7]', 'bg-apple-parchment'] %}
-    {% set server_text_colors = ['text-[#1d1d1f]', 'text-[#1d1d1f]', 'text-[#1d1d1f]'] %}
-
-    {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
-    <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
-        <div class="flex flex-col lg:flex-row">
-            <!-- Chart Side -->
-            <div class="w-full lg:w-[60%] p-4 border-b lg:border-b-0 lg:border-r border-slate-200 bg-apple-canvas">
-                <h4 class="text-center font-semibold text-[#1d1d1f] mb-4">{{ title }}</h4>
-                <div class="relative h-80 w-full">
-                    <canvas id="{{ canvas_id }}"></canvas>
-                </div>
-            </div>
-            
-            <!-- Table Side -->
-            <div class="w-full lg:w-[40%] flex flex-col justify-start bg-apple-canvas p-4 overflow-x-auto">
-                <table class="w-full text-center border-collapse">
-                    <thead>
-                        <tr>
-                            <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">{{ t("report_details.concurrency") }}</th>
-                            {% for srv_key, srv_name in server_labels.items() %}
-                            <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">{{ srv_name }}<br><span class="text-xs font-normal opacity-80">({{ t("report_details.avg_tokens") if is_tps_per_user else t("report_details.avg_ms") }})</span></th>
-                            {% endfor %}
-                            {% if server_count >= 2 %}
-                            <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">{{ t("report_details.improvement") }}</th>
-                            {% endif %}
-                        </tr>
-                    </thead>
-                    <tbody class="bg-apple-canvas font-sans">
-                        {% for i in range(chart_data.concurrencies | length) %}
-                        {% set c = chart_data.concurrencies[i] %}
-                        <tr>
-                            <td class="p-2 font-semibold bg-apple-canvas border border-apple-hairline text-apple-ink">{{ c }}</td>
-                            
-                            {# Render value for each server #}
-                            {% for srv_key in server_labels %}
-                            {% set raw_val = chart_data[data_key][srv_key]['p50'][i] if chart_data[data_key][srv_key] is defined else none %}
-                            {% if is_tps_per_user and c > 0 %}
-                                {% set val = raw_val / c if raw_val else none %}
-                            {% else %}
-                                {% set val = raw_val %}
-                            {% endif %}
-                            <td class="p-2 font-mono border border-slate-300 text-apple-muted">{{ "%.3f"|format(val) if val else '--' }}</td>
-                            {% endfor %}
-                            
-                            {# Improvement column (only for ≥2 servers: compare first vs second) #}
-                            {% if server_count >= 2 %}
-                            {% set val_s1 = chart_data[data_key]['server1']['p50'][i] if chart_data[data_key]['server1'] is defined else none %}
-                            {% set val_s2 = chart_data[data_key]['server2']['p50'][i] if chart_data[data_key]['server2'] is defined else none %}
-                            {% if is_tps_per_user and c > 0 %}
-                                {% set val_s1 = val_s1 / c if val_s1 else none %}
-                                {% set val_s2 = val_s2 / c if val_s2 else none %}
-                            {% endif %}
-                            <td class="p-2 font-mono border border-slate-300 text-apple-muted">
-                                {% if val_s1 and val_s2 and val_s1 > 0 and val_s2 > 0 %}
-                                    {% if is_tps_per_user %}
-                                        {% set imp = ((val_s2 - val_s1) / val_s2) * 100 %}
-                                    {% else %}
-                                        {% set imp = ((val_s1 - val_s2) / val_s2) * 100 %}
-                                    {% endif %}
-                                    
-                                    {% if imp > 0.1 %}
-                                        ↑ {{ "%.1f"|format(imp) }}%
-                                    {% elif imp < -0.1 %}
-                                        ↓ {{ "%.1f"|format(imp|abs) }}%
-                                    {% else %}
-                                        ≒
-                                    {% endif %}
-                                {% else %}
-                                    --
-                                {% endif %}
-                            </td>
-                            {% endif %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    {% endmacro %}
-
-    <div class="mt-8">
-        {{ render_chart_row(t("report_details.chart_ttft"), "chart-ttft", "ttft") }}
-        {{ render_chart_row(t("report_details.chart_itl"), "chart-itl", "itl") }}
-        {{ render_chart_row(t("report_details.chart_tps"), "chart-tps", "tps", true) }}
-        {{ render_chart_row(t("report_details.chart_latency"), "chart-latency", "latency") }}
-    </div>
-    {% endif %}
-
-    <!-- Hardware Specifications Table -->
-    {% if report_data.hardware_summary and report_data.hardware_summary|length > 0 %}
-    <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
-        <div class="p-4 border-b border-slate-200 bg-[#f5f5f7]">
-            <h4 class="font-semibold text-[#1d1d1f]">{{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}</h4>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-[#f5f5f7] border-b border-slate-200">
-                        <th class="p-3 text-sm font-semibold text-apple-muted">Metric</th>
-                        {% for srv_key in report_data.hardware_summary|sort %}
-                        <th class="p-3 text-sm font-semibold text-center text-[#1d1d1f] bg-apple-parchment">
-                            {{ report_data.metadata.server_labels.get(srv_key, srv_key) }}
-                        </th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody class="text-sm font-sans">
-                    <tr class="border-b border-slate-100 bg-[#F8F9FA]">
-                        <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_gpu") if t else "GPU" }}</td>
-                    </tr>
-                    {% for label, key in [("GPU Model", "gpu_name"), ("GPU Util (avg)", "gpu_util_avg"), ("GPU Util (max)", "gpu_util_max"), ("VRAM Used (avg)", "vram_used_avg_gb"), ("VRAM Total", "vram_total_gb"), ("Power (avg)", "gpu_power_avg_w"), ("Power (max)", "gpu_power_max_w"), ("Temp (avg)", "gpu_temp_avg_c"), ("Temp (max)", "gpu_temp_max_c")] %}
-                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
-                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
-                        {% for srv_key in report_data.hardware_summary|sort %}
-                        {% set hw = report_data.hardware_summary[srv_key] %}
-                        <td class="p-3 text-center font-mono">
-                            {% if key == "gpu_name" %}{{ hw.get(key, 'N/A') }}
-                            {% elif key in ["gpu_util_avg", "gpu_util_max"] %}{{ "%.1f%%"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}
-                            {% elif key in ["vram_used_avg_gb", "vram_total_gb"] %}{{ "%.2f GB"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}
-                            {% elif key in ["gpu_power_avg_w", "gpu_power_max_w"] %}{{ "%.1f W"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}
-                            {% elif key in ["gpu_temp_avg_c", "gpu_temp_max_c"] %}{{ "%.1f °C"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}
-                            {% else %}{{ hw.get(key, 'N/A') }}{% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    <tr class="border-b border-slate-100 bg-apple-canvas">
-                        <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}</td>
-                    </tr>
-                    {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
-                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
-                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
-                        {% for srv_key in report_data.hardware_summary|sort %}
-                        {% set hw = report_data.hardware_summary[srv_key] %}
-                        <td class="p-3 text-center font-mono">
-                            {% if key in ["cpu_avg_pct", "cpu_max_pct"] %}{{ "%.1f%%"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}
-                            {% elif key in ["ram_used_avg_gb", "ram_total_gb"] %}{{ "%.2f GB"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}
-                            {% else %}{{ hw.get(key, 'N/A') }}{% endif %}
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    <tr class="border-b border-slate-100 bg-apple-parchment">
-                        <td class="p-3 font-semibold text-[#1d1d1f]" colspan="{{ report_data.hardware_summary|length + 1 }}">{{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}</td>
-                    </tr>
-                    {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
-                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
-                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
-                        {% for srv_key in report_data.hardware_summary|sort %}
-                        {% set hw = report_data.hardware_summary[srv_key] %}
-                        <td class="p-3 text-center font-mono">{{ "%.2f MB/s"|format(hw.get(key, 0)) if hw.get(key) is not none else "N/A" }}</td>
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    <tr class="bg-[#f5f5f7]">
-                        <td class="p-3 text-[#7a7a7a] text-xs">{{ t("report_details.data_points") if t else "Data Points" }}</td>
-                        {% for srv_key in report_data.hardware_summary|sort %}
-                        {% set hw = report_data.hardware_summary[srv_key] %}
-                        <td class="p-3 text-center text-xs text-[#cccccc]">{{ hw.get("snapshot_count", 0) }} {{ t("report_details.snapshots") if t else "snapshots" }}</td>
-                        {% endfor %}
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Hardware Timeline Charts (Redesigned - Financial Grade) -->
-    {% if timeline_chart and timeline_chart|length > 0 %}
-    <div class="mb-8">
+    <div class="space-y-6">
+        <!-- Header Section -->
         <div class="flex items-center justify-between mb-4">
-            <h4 class="text-lg font-semibold text-[#1d1d1f]">{{ t("run_detail.hardware_timeline") }}</h4>
-            <span class="text-xs text-[#cccccc] font-mono">{{ t("report_details.resource_monitoring") if t else "Real-time Resource Monitoring" }}</span>
+            <div>
+                <a href="/reports"
+                   class="text-[#1d1d1f] text-sm font-semibold hover:underline mb-2 inline-block">&larr; {{ t("report_details.back") }}</a>
+                <h3 class="text-3xl font-semibold text-[#1d1d1f]">{{ t("report_details.title") }}</h3>
+                <p class="text-sm text-[#7a7a7a] mt-2">
+                    {{ t("common.date") }}: {{ run.started_at.strftime("%Y-%m-%d %H:%M") }} | Run ID: <span class="font-mono text-[#1d1d1f]">{{ run.run_id }}</span>
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary">{{ t("report_details.download_evidence") if t else "Download Evidence" }}</a>
+                <a href="/reports/{{ run.run_id }}/export/excel" class="btn-primary">{{ t("report_details.export_excel") if t else "Export Excel" }}</a>
+                <a href="/reports/{{ run.run_id }}/download" class="btn-primary">{{ t("report_details.download_pdf") if t else "Download PDF" }}</a>
+                <button onclick="window.print()" class="btn-secondary">{{ t("report_details.print") }}</button>
+            </div>
         </div>
-
-        <!-- GPU Utilization - Full Width -->
-        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
-            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
-                <div class="flex items-center gap-3">
-                    <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.gpu_utilization") if t else "GPU Utilization" }}</h5>
+        {% if report_data %}
+            {% set server_count = report_data.metadata.server_count | default(0) %}
+            {% set server_labels = report_data.metadata.server_labels | default({}) %}
+            <!-- Metadata Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
+                <div class="card p-4">
+                    <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">
+                        {{ t("report_details.test_suite") }}
+                    </h4>
+                    <div class="text-lg font-bold text-[#1d1d1f]">{{ run.suite | replace('_', ' ') | title }}</div>
+                    <p class="text-[10px] text-[#cccccc] mt-1 leading-tight">
+                        {{ config.benchmark.test_suites[run.suite].description if run.suite in config.benchmark.test_suites else '' }}
+                    </p>
                 </div>
-                <div id="gpu-stats" class="flex gap-4 text-xs font-mono"></div>
-            </div>
-            <div class="px-5 pb-4" style="height: 280px; background: var(--white);">
-                <canvas id="timeline-chart-gpu"></canvas>
-            </div>
-        </div>
-
-        <!-- CPU Utilization - Full Width -->
-        <div class="mb-4 rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
-            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
-                <div class="flex items-center gap-3">
-                    <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.cpu_utilization") if t else "CPU Utilization" }}</h5>
-                </div>
-                <div id="cpu-stats" class="flex gap-4 text-xs font-mono"></div>
-            </div>
-            <div class="px-5 pb-4" style="height: 280px; background: var(--white);">
-                <canvas id="timeline-chart-cpu"></canvas>
-            </div>
-        </div>
-
-        <!-- RAM & Disk - Side by Side -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
-                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
-                    <div class="flex items-center gap-3">
-                        <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.ram_usage") if t else "RAM Usage" }}</h5>
+                <div class="card p-4">
+                    <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">
+                        {{ t("report_details.servers_evaluated") }}
+                    </h4>
+                    <div class="flex flex-wrap gap-1">
+                        {% for s in report_data.metadata.servers %}<span class="badge">{{ s }}</span>{% endfor %}
                     </div>
-                    <div id="ram-stats" class="flex gap-4 text-xs font-mono"></div>
                 </div>
-                <div class="px-5 pb-4" style="height: 240px; background: var(--white);">
-                    <canvas id="timeline-chart-ram"></canvas>
-                </div>
-            </div>
-            <div class="rounded-[18px] overflow-hidden card border" style="background: var(--canvas); border-color: var(--hairline);">
-                <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b" style="border-color: var(--hairline); background: var(--canvas-parchment);">
-                    <div class="flex items-center gap-3">
-                        <h5 class="text-sm font-semibold tracking-wide" >{{ t("report_details.disk_io_title") if t else "Disk I/O" }}</h5>
+                <div class="card p-4">
+                    <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">
+                        {{ t("report_details.tools_deployed") }}
+                    </h4>
+                    <div class="flex flex-wrap gap-1">
+                        {% for t in report_data.metadata.tools %}<span class="badge">{{ t }}</span>{% endfor %}
                     </div>
-                    <div id="disk-stats" class="flex gap-4 text-xs font-mono"></div>
                 </div>
-                <div class="px-5 pb-4" style="height: 240px; background: var(--white);">
-                    <canvas id="timeline-chart-disk"></canvas>
+                <div class="card p-4">
+                    <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">
+                        {{ t("report_details.scenarios_tested") }}
+                    </h4>
+                    <div class="flex flex-wrap gap-1">
+                        {% for s in report_data.metadata.scenarios %}<span class="badge">{{ s }}</span>{% endfor %}
+                    </div>
+                </div>
+                <div class="card p-4">
+                    <h4 class="text-xs font-semibold text-[#7a7a7a] uppercase tracking-wider mb-2">
+                        {{ t("report_details.total_prompts") }}
+                    </h4>
+                    <div class="text-2xl font-bold text-[#1d1d1f]">{{ report_data.metadata.total_requests }}</div>
                 </div>
             </div>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Breakdown Table — Dynamic N-Server -->
-    <div class="card p-0 overflow-hidden">
-        <div class="p-4 border-b border-slate-200 bg-[#f5f5f7] flex justify-between items-center">
-            <h4 class="font-semibold text-[#1d1d1f]">{{ t("report_details.table_title") }}</h4>
-        </div>
-        
-        <div class="overflow-x-auto">
-            <table class="data-table w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-[#f5f5f7] border-b border-slate-200">
-                        <th class="p-3 text-sm font-semibold text-apple-muted">{{ t("report_details.tool") }}</th>
-                        <th class="p-3 text-sm font-semibold text-apple-muted border-r border-slate-200">{{ t("report_details.scenario") }}</th>
-                        {% for srv_key, srv_name in server_labels.items() %}
-                        <th colspan="4" class="p-3 text-center text-sm font-semibold {{ server_text_colors[loop.index0 % 3] }} {{ server_bg_colors[loop.index0 % 3] }} {{ 'border-r border-slate-200' if not loop.last else '' }}">{{ srv_name }}</th>
-                        {% endfor %}
-                    </tr>
-                    <tr class="bg-[#f5f5f7] border-b border-slate-200 text-xs text-[#7a7a7a] uppercase tracking-wider">
-                        <th class="p-2 border-r border-slate-200" colspan="2"></th>
-                        {% for srv_key in server_labels %}
-                        <th class="p-2 text-right">TPS</th>
-                        <th class="p-2 text-right">TTFT (ms)</th>
-                        <th class="p-2 text-right">P99 (ms)</th>
-                        <th class="p-2 text-right {{ 'border-r border-slate-200' if not loop.last else '' }}">Error %</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody class="text-sm font-sans">
-                    {% for tool, scen_dict in report_data.breakdown.items() %}
-                        {% for scenario, srv_dict in scen_dict.items() %}
-                        <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
-                            <td class="p-3 font-medium text-[#1d1d1f]">{{ tool }}</td>
-                            <td class="p-3 text-[#7a7a7a] border-r border-slate-200">{{ scenario }}</td>
-                            
-                            {% for srv_key in server_labels %}
-                            {% set s = srv_dict.get(srv_key, {}) %}
-                            <td class="p-3 text-right font-mono">{{ s.get('tps', '--') if s.get('tps') is not none else '--' }}</td>
-                            <td class="p-3 text-right font-mono">{{ s.get('ttft_ms', '--') if s.get('ttft_ms') is not none else '--' }}</td>
-                            <td class="p-3 text-right font-mono">{{ s.get('latency_p99_ms', '--') if s.get('latency_p99_ms') is not none else '--' }}</td>
-                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#d2d2d7] font-semibold' if s.get('error_rate', 0) > 0 else 'text-[#7a7a7a]' }}">{{ s.get('error_rate', '0') }}%</td>
+            <!-- Dashboard Charts -->
+            {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
+                {# Color palette for N servers #}
+                {% set server_bg_colors = ["bg-apple-parchment", "bg-[#f5f5f7]", "bg-apple-parchment"] %}
+                {% set server_text_colors = ["text-[#1d1d1f]", "text-[#1d1d1f]", "text-[#1d1d1f]"] %}
+                {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
+                    <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
+                        <div class="flex flex-col lg:flex-row">
+                            <!-- Chart Side -->
+                            <div class="w-full lg:w-[60%] p-4 border-b lg:border-b-0 lg:border-r border-slate-200 bg-apple-canvas">
+                                <h4 class="text-center font-semibold text-[#1d1d1f] mb-4">{{ title }}</h4>
+                                <div class="relative h-80 w-full">
+                                    <canvas id="{{ canvas_id }}"></canvas>
+                                </div>
+                            </div>
+                            <!-- Table Side -->
+                            <div class="w-full lg:w-[40%] flex flex-col justify-start bg-apple-canvas p-4 overflow-x-auto">
+                                <table class="w-full text-center border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">
+                                                {{ t("report_details.concurrency") }}
+                                            </th>
+                                            {% for srv_key, srv_name in server_labels.items() %}
+                                                <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">
+                                                    {{ srv_name }}
+                                                    <br>
+                                                    <span class="text-xs font-normal opacity-80">({{ t("report_details.avg_tokens") if is_tps_per_user else t("report_details.avg_ms") }})</span>
+                                                </th>
+                                            {% endfor %}
+                                            {% if server_count >= 2 %}
+                                                <th class="p-2 text-[#ffffff] bg-apple-parchment text-apple-ink border border-apple-hairline">
+                                                    {{ t("report_details.improvement") }}
+                                                </th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-apple-canvas font-sans">
+                                        {% for i in range(chart_data.concurrencies | length) %}
+                                            {% set c = chart_data.concurrencies[i] %}
+                                            <tr>
+                                                <td class="p-2 font-semibold bg-apple-canvas border border-apple-hairline text-apple-ink">{{ c }}</td>
+                                                {# Render value for each server #}
+                                                {% for srv_key in server_labels %}
+                                                    {% set raw_val = chart_data[data_key][srv_key]['p50'][i] if chart_data[data_key][srv_key] is defined else none %}
+                                                    {% if is_tps_per_user and c > 0 %}
+                                                        {% set val = raw_val / c if raw_val else none %}
+                                                    {% else %}
+                                                        {% set val = raw_val %}
+                                                    {% endif %}
+                                                    <td class="p-2 font-mono border border-slate-300 text-apple-muted">{{ "%.3f"|format(val) if val else '--' }}</td>
+                                                {% endfor %}
+                                                {# Improvement column (only for ≥2 servers: compare first vs second) #}
+                                                {% if server_count >= 2 %}
+                                                    {% set val_s1 = chart_data[data_key]['server1']['p50'][i] if chart_data[data_key]['server1'] is defined else none %}
+                                                    {% set val_s2 = chart_data[data_key]['server2']['p50'][i] if chart_data[data_key]['server2'] is defined else none %}
+                                                    {% if is_tps_per_user and c > 0 %}
+                                                        {% set val_s1 = val_s1 / c if val_s1 else none %}
+                                                        {% set val_s2 = val_s2 / c if val_s2 else none %}
+                                                    {% endif %}
+                                                    <td class="p-2 font-mono border border-slate-300 text-apple-muted">
+                                                        {% if val_s1 and val_s2 and val_s1 > 0 and val_s2 > 0 %}
+                                                            {% if is_tps_per_user %}
+                                                                {% set imp = ((val_s2 - val_s1) / val_s2) * 100 %}
+                                                            {% else %}
+                                                                {% set imp = ((val_s1 - val_s2) / val_s2) * 100 %}
+                                                            {% endif %}
+                                                            {% if imp > 0.1 %}
+                                                                ↑ {{ "%.1f"|format(imp) }}%
+                                                            {% elif imp < -0.1 %}
+                                                                ↓ {{ "%.1f"|format(imp|abs) }}%
+                                                            {% else %}
+                                                                ≒
+                                                            {% endif %}
+                                                        {% else %}
+                                                            --
+                                                        {% endif %}
+                                                    </td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endmacro %}
+                <div class="mt-8">
+                    {{ render_chart_row(t("report_details.chart_ttft") , "chart-ttft", "ttft") }}
+                    {{ render_chart_row(t("report_details.chart_itl") , "chart-itl", "itl") }}
+                    {{ render_chart_row(t("report_details.chart_tps") , "chart-tps", "tps", true) }}
+                    {{ render_chart_row(t("report_details.chart_latency") , "chart-latency", "latency") }}
+                </div>
+            {% endif %}
+            <!-- Hardware Specifications Table -->
+            {% if report_data.hardware_summary and report_data.hardware_summary|length > 0 %}
+                <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
+                    <div class="p-4 border-b border-slate-200 bg-[#f5f5f7]">
+                        <h4 class="font-semibold text-[#1d1d1f]">
+                            {{ t("report_details.hardware_specs") if t else "Hardware Specifications" }}
+                        </h4>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#f5f5f7] border-b border-slate-200">
+                                    <th class="p-3 text-sm font-semibold text-apple-muted">Metric</th>
+                                    {% for srv_key in report_data.hardware_summary|sort %}
+                                        <th class="p-3 text-sm font-semibold text-center text-[#1d1d1f] bg-apple-parchment">
+                                            {{ report_data.metadata.server_labels.get(srv_key, srv_key) }}
+                                        </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm font-sans">
+                                <tr class="border-b border-slate-100 bg-[#F8F9FA]">
+                                    <td class="p-3 font-semibold text-[#1d1d1f]"
+                                        colspan="{{ report_data.hardware_summary|length + 1 }}">
+                                        {{ t("report_details.hw_gpu") if t else "GPU" }}
+                                    </td>
+                                </tr>
+                                {% for label, key in [("GPU Model", "gpu_name"), ("GPU Util (avg)", "gpu_util_avg"), ("GPU Util (max)", "gpu_util_max"), ("VRAM Used (avg)", "vram_used_avg_gb"), ("VRAM Total", "vram_total_gb"), ("Power (avg)", "gpu_power_avg_w"), ("Power (max)", "gpu_power_max_w"), ("Temp (avg)", "gpu_temp_avg_c"), ("Temp (max)", "gpu_temp_max_c")] %}
+                                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
+                                        {% for srv_key in report_data.hardware_summary|sort %}
+                                            {% set hw = report_data.hardware_summary[srv_key] %}
+                                            <td class="p-3 text-center font-mono">
+                                                {% if key == "gpu_name" %}
+                                                    {{ hw.get(key, 'N/A') }}
+                                                {% elif key in ["gpu_util_avg", "gpu_util_max"] %}
+                                                    {{ "%.1f%%"|format(hw.get(key, 0) ) if hw.get(key) is not none else "N/A" }}
+                                                {% elif key in ["vram_used_avg_gb", "vram_total_gb"] %}
+                                                    {{ "%.2f GB"|format(hw.get(key, 0) ) if hw.get(key) is not none else "N/A" }}
+                                                {% elif key in ["gpu_power_avg_w", "gpu_power_max_w"] %}
+                                                    {{ "%.1f W"|format(hw.get(key, 0) ) if hw.get(key) is not none else "N/A" }}
+                                                {% elif key in ["gpu_temp_avg_c", "gpu_temp_max_c"] %}
+                                                    {{ "%.1f °C"|format(hw.get(key, 0) ) if hw.get(key) is not none else "N/A" }}
+                                                {% else %}
+                                                    {{ hw.get(key, 'N/A') }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                <tr class="border-b border-slate-100 bg-apple-canvas">
+                                    <td class="p-3 font-semibold text-[#1d1d1f]"
+                                        colspan="{{ report_data.hardware_summary|length + 1 }}">
+                                        {{ t("report_details.hw_cpu_ram") if t else "CPU / RAM" }}
+                                    </td>
+                                </tr>
+                                {% for label, key in [("CPU (avg)", "cpu_avg_pct"), ("CPU (max)", "cpu_max_pct"), ("RAM Used (avg)", "ram_used_avg_gb"), ("RAM Total", "ram_total_gb")] %}
+                                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
+                                        {% for srv_key in report_data.hardware_summary|sort %}
+                                            {% set hw = report_data.hardware_summary[srv_key] %}
+                                            <td class="p-3 text-center font-mono">
+                                                {% if key in ["cpu_avg_pct", "cpu_max_pct"] %}
+                                                    {{ "%.1f%%"|format(hw.get(key, 0) ) if hw.get(key) is not none else "N/A" }}
+                                                {% elif key in ["ram_used_avg_gb", "ram_total_gb"] %}
+                                                    {{ "%.2f GB"|format(hw.get(key, 0) ) if hw.get(key) is not none else "N/A" }}
+                                                {% else %}
+                                                    {{ hw.get(key, 'N/A') }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                <tr class="border-b border-slate-100 bg-apple-parchment">
+                                    <td class="p-3 font-semibold text-[#1d1d1f]"
+                                        colspan="{{ report_data.hardware_summary|length + 1 }}">
+                                        {{ t("report_details.hw_disk_io") if t else "Disk / Network I/O" }}
+                                    </td>
+                                </tr>
+                                {% for label, key in [("Disk Read (avg)", "disk_read_avg_mbps"), ("Disk Write (avg)", "disk_write_avg_mbps"), ("Network RX (avg)", "network_rx_avg_mbps"), ("Network TX (avg)", "network_tx_avg_mbps")] %}
+                                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                                        <td class="p-3 text-[#7a7a7a]">{{ label }}</td>
+                                        {% for srv_key in report_data.hardware_summary|sort %}
+                                            {% set hw = report_data.hardware_summary[srv_key] %}
+                                            <td class="p-3 text-center font-mono">
+                                                {{ "%.2f MB/s"|format(hw.get(key, 0) ) if hw.get(key) is not none else "N/A" }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                <tr class="bg-[#f5f5f7]">
+                                    <td class="p-3 text-[#7a7a7a] text-xs">{{ t("report_details.data_points") if t else "Data Points" }}</td>
+                                    {% for srv_key in report_data.hardware_summary|sort %}
+                                        {% set hw = report_data.hardware_summary[srv_key] %}
+                                        <td class="p-3 text-center text-xs text-[#cccccc]">
+                                            {{ hw.get('snapshot_count', 0) }} {{ t("report_details.snapshots") if t else "snapshots" }}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- Hardware Timeline Charts (Redesigned - Financial Grade) -->
+            {% if timeline_chart and timeline_chart|length > 0 %}
+                <div class="mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h4 class="text-lg font-semibold text-[#1d1d1f]">{{ t("run_detail.hardware_timeline") }}</h4>
+                        <span class="text-xs text-[#cccccc] font-mono">{{ t("report_details.resource_monitoring") if t else "Real-time Resource Monitoring" }}</span>
+                    </div>
+                    <!-- GPU Utilization - Full Width -->
+                    <div class="mb-4 rounded-[18px] overflow-hidden card border"
+                         style="background: var(--canvas);
+                                border-color: var(--hairline)">
+                        <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b"
+                             style="border-color: var(--hairline);
+                                    background: var(--canvas-parchment)">
+                            <div class="flex items-center gap-3">
+                                <h5 class="text-sm font-semibold tracking-wide">
+                                    {{ t("report_details.gpu_utilization") if t else "GPU Utilization" }}
+                                </h5>
+                            </div>
+                            <div id="gpu-stats" class="flex gap-4 text-xs font-mono"></div>
+                        </div>
+                        <div class="px-5 pb-4" style="height: 280px; background: var(--white);">
+                            <canvas id="timeline-chart-gpu"></canvas>
+                        </div>
+                    </div>
+                    <!-- CPU Utilization - Full Width -->
+                    <div class="mb-4 rounded-[18px] overflow-hidden card border"
+                         style="background: var(--canvas);
+                                border-color: var(--hairline)">
+                        <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b"
+                             style="border-color: var(--hairline);
+                                    background: var(--canvas-parchment)">
+                            <div class="flex items-center gap-3">
+                                <h5 class="text-sm font-semibold tracking-wide">
+                                    {{ t("report_details.cpu_utilization") if t else "CPU Utilization" }}
+                                </h5>
+                            </div>
+                            <div id="cpu-stats" class="flex gap-4 text-xs font-mono"></div>
+                        </div>
+                        <div class="px-5 pb-4" style="height: 280px; background: var(--white);">
+                            <canvas id="timeline-chart-cpu"></canvas>
+                        </div>
+                    </div>
+                    <!-- RAM & Disk - Side by Side -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                        <div class="rounded-[18px] overflow-hidden card border"
+                             style="background: var(--canvas);
+                                    border-color: var(--hairline)">
+                            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b"
+                                 style="border-color: var(--hairline);
+                                        background: var(--canvas-parchment)">
+                                <div class="flex items-center gap-3">
+                                    <h5 class="text-sm font-semibold tracking-wide">{{ t("report_details.ram_usage") if t else "RAM Usage" }}</h5>
+                                </div>
+                                <div id="ram-stats" class="flex gap-4 text-xs font-mono"></div>
+                            </div>
+                            <div class="px-5 pb-4" style="height: 240px; background: var(--white);">
+                                <canvas id="timeline-chart-ram"></canvas>
+                            </div>
+                        </div>
+                        <div class="rounded-[18px] overflow-hidden card border"
+                             style="background: var(--canvas);
+                                    border-color: var(--hairline)">
+                            <div class="px-5 pt-4 pb-2 flex items-center justify-between border-b"
+                                 style="border-color: var(--hairline);
+                                        background: var(--canvas-parchment)">
+                                <div class="flex items-center gap-3">
+                                    <h5 class="text-sm font-semibold tracking-wide">{{ t("report_details.disk_io_title") if t else "Disk I/O" }}</h5>
+                                </div>
+                                <div id="disk-stats" class="flex gap-4 text-xs font-mono"></div>
+                            </div>
+                            <div class="px-5 pb-4" style="height: 240px; background: var(--white);">
+                                <canvas id="timeline-chart-disk"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            <!-- Breakdown Table — Dynamic N-Server -->
+            <div class="card p-0 overflow-hidden">
+                <div class="p-4 border-b border-slate-200 bg-[#f5f5f7] flex justify-between items-center">
+                    <h4 class="font-semibold text-[#1d1d1f]">{{ t("report_details.table_title") }}</h4>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="data-table w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-[#f5f5f7] border-b border-slate-200">
+                                <th class="p-3 text-sm font-semibold text-apple-muted">{{ t("report_details.tool") }}</th>
+                                <th class="p-3 text-sm font-semibold text-apple-muted border-r border-slate-200">
+                                    {{ t("report_details.scenario") }}
+                                </th>
+                                {% for srv_key, srv_name in server_labels.items() %}
+                                    <th colspan="4"
+                                        class="p-3 text-center text-sm font-semibold {{ server_text_colors[loop.index0 % 3] }} {{ server_bg_colors[loop.index0 % 3] }} {{ 'border-r border-slate-200' if not loop.last else '' }}">
+                                        {{ srv_name }}
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                            <tr class="bg-[#f5f5f7] border-b border-slate-200 text-xs text-[#7a7a7a] uppercase tracking-wider">
+                                <th class="p-2 border-r border-slate-200" colspan="2"></th>
+                                {% for srv_key in server_labels %}
+                                    <th class="p-2 text-right">TPS</th>
+                                    <th class="p-2 text-right">TTFT (ms)</th>
+                                    <th class="p-2 text-right">P99 (ms)</th>
+                                    <th class="p-2 text-right {{ 'border-r border-slate-200' if not loop.last else '' }}">Error %</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm font-sans">
+                            {% for tool, scen_dict in report_data.breakdown.items() %}
+                                {% for scenario, srv_dict in scen_dict.items() %}
+                                    <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                                        <td class="p-3 font-medium text-[#1d1d1f]">{{ tool }}</td>
+                                        <td class="p-3 text-[#7a7a7a] border-r border-slate-200">{{ scenario }}</td>
+                                        {% for srv_key in server_labels %}
+                                            {% set s = srv_dict.get(srv_key, {}) %}
+                                            <td class="p-3 text-right font-mono">{{ s.get('tps', '--') if s.get('tps') is not none else '--' }}</td>
+                                            <td class="p-3 text-right font-mono">{{ s.get('ttft_ms', '--') if s.get('ttft_ms') is not none else '--' }}</td>
+                                            <td class="p-3 text-right font-mono">
+                                                {{ s.get('latency_p99_ms', '--') if s.get('latency_p99_ms') is not none else '--' }}
+                                            </td>
+                                            <td class="p-3 text-right font-mono {{ 'border-r border-slate-200' if not loop.last else '' }} {{ 'text-[#d2d2d7] font-semibold' if s.get('error_rate', 0) > 0 else 'text-[#7a7a7a]' }}">
+                                                {{ s.get('error_rate', '0') }}%
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
                             {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="card p-12 text-center text-[#7a7a7a]">{{ t("report_details.empty") }}</div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="card p-12 text-center text-[#7a7a7a]">
-        {{ t("report_details.empty") }}
-    </div>
-    {% endif %}
-
-</div>
-
-{% if chart_data and chart_data.concurrencies %}
-<script id="dashboard-chart-data" type="application/json">
-    {{ chart_data | tojson }}
-</script>
-<script>
+    {% if chart_data and chart_data.concurrencies %}
+        <script id="dashboard-chart-data" type="application/json">{{ chart_data | tojson }}</script>
+        <script>
 document.addEventListener("DOMContentLoaded", function() {
     const dataNode = document.getElementById("dashboard-chart-data");
     if (!dataNode) return;
@@ -467,14 +513,11 @@ document.addEventListener("DOMContentLoaded", function() {
         options: getOptions('Latency (ms)', true)
     });
 });
-</script>
-{% endif %}
-
-{% if timeline_chart and timeline_chart|length > 0 %}
-<script id="timeline-data" type="application/json">
-{{ timeline_chart|tojson }}
-</script>
-<script>
+        </script>
+    {% endif %}
+    {% if timeline_chart and timeline_chart|length > 0 %}
+        <script id="timeline-data" type="application/json">{{ timeline_chart|tojson }}</script>
+        <script>
 document.addEventListener("DOMContentLoaded", function() {
     const dataNode = document.getElementById("timeline-data");
     if (!dataNode) return;
@@ -659,6 +702,6 @@ document.addEventListener("DOMContentLoaded", function() {
     });
     createLightChart('timeline-chart-disk', diskDatasets, lightChartOptions('Disk (MB/s)', ' MB/s'));
 });
-</script>
-{% endif %}
+        </script>
+    {% endif %}
 {% endblock %}

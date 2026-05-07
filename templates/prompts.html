@@ -1,76 +1,94 @@
 {% extends "base.html" %}
 {% block page_title %}Prompt Management{% endblock %}
-
 {% block content %}
-<div class="space-y">
-
-    <!-- Hero -->
-    <div class="card tile-parchment">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:var(--sp-lg);">
-            <div>
-                <div class="text-caption-strong" style="color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;">Configuration</div>
-                <h2 style="margin-top:var(--sp-xs);">Prompt Management</h2>
+    <div class="space-y">
+        <!-- Hero -->
+        <div class="card tile-parchment">
+            <div style="display:flex;
+                        justify-content:space-between;
+                        align-items:flex-end;
+                        flex-wrap:wrap;
+                        gap:var(--sp-lg)">
+                <div>
+                    <div class="text-caption-strong"
+                         style="color:var(--primary);
+                                text-transform:uppercase;
+                                letter-spacing:0.06em">Configuration</div>
+                    <h2 style="margin-top:var(--sp-xs);">Prompt Management</h2>
+                </div>
+                <p class="text-caption" style="max-width:360px;">
+                    Upload and manage prompt sets for benchmarks. Download the template to see the required Excel format.
+                </p>
             </div>
-            <p class="text-caption" style="max-width:360px;">
-                Upload and manage prompt sets for benchmarks. Download the template to see the required Excel format.
-            </p>
+        </div>
+        <!-- Upload Form -->
+        <div class="card">
+            <div style="display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        margin-bottom:var(--sp-md)">
+                <h3>Upload New Prompt Set</h3>
+                <a href="/api/prompts/template" class="btn btn-secondary btn-sm">Download Template</a>
+            </div>
+            <form id="uploadForm"
+                  style="display:grid;
+                         grid-template-columns:1fr 1fr 1fr auto;
+                         gap:var(--sp-sm);
+                         align-items:end">
+                <div>
+                    <label>Set Name *</label>
+                    <input type="text" id="setName" required placeholder="e.g. Code Gen V2">
+                </div>
+                <div>
+                    <label>Description</label>
+                    <input type="text" id="setDescription" placeholder="Optional notes">
+                </div>
+                <div>
+                    <label>Excel File *</label>
+                    <input type="file"
+                           id="setFile"
+                           required
+                           accept=".xlsx"
+                           style="font-size:13px;
+                                  padding:7px 12px;
+                                  border:1px solid var(--hairline);
+                                  border-radius:var(--r-pill);
+                                  background:var(--canvas)">
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+            <div id="uploadResult"
+                 class="hidden"
+                 style="margin-top:var(--sp-md);
+                        font-size:13px"></div>
+        </div>
+        <!-- Prompt Sets List -->
+        <div class="card" style="padding:0;overflow:hidden;">
+            <div style="padding:var(--sp-lg);border-bottom:1px solid var(--hairline);">
+                <h3>Available Prompt Sets</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="promptsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Prompt Count</th>
+                            <th>Created At</th>
+                            <th style="text-align:right;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="promptsList">
+                        <!-- Loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-    <!-- Upload Form -->
-    <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--sp-md);">
-            <h3>Upload New Prompt Set</h3>
-            <a href="/api/prompts/template" class="btn btn-secondary btn-sm">Download Template</a>
-        </div>
-
-        <form id="uploadForm" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:var(--sp-sm);align-items:end;">
-            <div>
-                <label>Set Name *</label>
-                <input type="text" id="setName" required placeholder="e.g. Code Gen V2">
-            </div>
-            <div>
-                <label>Description</label>
-                <input type="text" id="setDescription" placeholder="Optional notes">
-            </div>
-            <div>
-                <label>Excel File *</label>
-                <input type="file" id="setFile" required accept=".xlsx" style="font-size:13px;padding:7px 12px;border:1px solid var(--hairline);border-radius:var(--r-pill);background:var(--canvas);">
-            </div>
-            <div>
-                <button type="submit" class="btn btn-primary">Upload</button>
-            </div>
-        </form>
-        <div id="uploadResult" class="hidden" style="margin-top:var(--sp-md);font-size:13px;"></div>
-    </div>
-
-    <!-- Prompt Sets List -->
-    <div class="card" style="padding:0;overflow:hidden;">
-        <div style="padding:var(--sp-lg);border-bottom:1px solid var(--hairline);">
-            <h3>Available Prompt Sets</h3>
-        </div>
-        <div class="overflow-x-auto">
-            <table id="promptsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Prompt Count</th>
-                        <th>Created At</th>
-                        <th style="text-align:right;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="promptsList">
-                    <!-- Loaded via JS -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
-
-<script>
+    <script>
 async function loadPromptSets() {
     const tbody = document.getElementById("promptsList");
     tbody.innerHTML = '<tr><td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-lg);">Loading...</td></tr>';
@@ -154,5 +172,5 @@ async function deletePromptSet(id) {
 }
 
 document.addEventListener("DOMContentLoaded", loadPromptSets);
-</script>
+    </script>
 {% endblock %}

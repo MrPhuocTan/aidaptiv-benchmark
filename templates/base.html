@@ -1,144 +1,152 @@
 <!DOCTYPE html>
 <html lang="{{ lang }}">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="aiDaptive Benchmark Suite — AI Server Performance Testing & Comparison Platform">
-    <title>{{ config.app.name }}</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v={{ static_version }}">
-    <link rel="stylesheet" href="/static/css/theme.css?v={{ static_version }}">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-    <script>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description"
+              content="aiDaptive Benchmark Suite — AI Server Performance Testing & Comparison Platform">
+        <title>{{ config.app.name }}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="icon"
+              type="image/svg+xml"
+              href="/static/favicon.svg?v={{ static_version }}">
+        <link rel="stylesheet" href="/static/css/theme.css?v={{ static_version }}">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+        <script>
         /* Apply dark mode before paint to avoid flash */
         (function () {
             var t = localStorage.getItem('theme');
             if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
         })();
-    </script>
-</head>
-
-<body>
-    <div id="notifications"></div>
-
-    <div class="app-shell">
-
-        <!-- Mobile overlay -->
-        <div id="mobile-overlay" class="mobile-overlay"></div>
-
-        <!-- ─── Sidebar ─── -->
-        <aside id="sidebar" class="app-sidebar">
-            <div class="sidebar-brand">
-                <div class="sidebar-brand-icon">B</div>
-                <div class="sidebar-brand-text">
-                    <h1>Benchmark</h1>
-                    <p>Server System v{{ config.app.version }}</p>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a href="/" class="nav-link {% if page == 'dashboard' %}active{% endif %}">
-                    {{ t("nav.dashboard") }}
-                </a>
-                <a href="/servers" class="nav-link {% if page == 'servers' %}active{% endif %}">
-                    {{ t("nav.servers") }}
-                </a>
-                <a href="/benchmark" class="nav-link {% if page == 'benchmark' %}active{% endif %}">
-                    {{ t("nav.benchmark") }}
-                </a>
-                <a href="/prompts" class="nav-link {% if page == 'prompts' %}active{% endif %}">
-                    {{ t("nav.prompts") }}
-                </a>
-                <a href="/history" class="nav-link {% if page == 'history' %}active{% endif %}">
-                    {{ t("nav.history") }}
-                </a>
-                <a href="/comparison" class="nav-link {% if page == 'comparison' %}active{% endif %}">
-                    {{ t("nav.comparison") }}
-                </a>
-                <a href="/reports" class="nav-link {% if page == 'reports' %}active{% endif %}">
-                    {{ t("nav.reports") }}
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <span class="status-dot" id="pg-status"></span>
-                    PostgreSQL
-                </div>
-            </div>
-        </aside>
-
-        <!-- ─── Main Content ─── -->
-        <main class="app-main">
-            <header class="app-header">
-                <button id="mobile-menu-btn" class="mobile-only" style="background:none;border:none;cursor:pointer;padding:4px;margin-right:12px;color:var(--ink-muted-48);">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-
-                <div class="header-title">
-                    <div class="header-eyebrow">{{ t("header.control_center") }}</div>
-                    <div class="header-page-name">{% block page_title %}{% endblock %}</div>
-                </div>
-
-                <div class="header-actions">
-                    <div class="header-chip">
-                        <span>Light</span>
-                        <button class="theme-switch" id="theme-toggle" aria-label="Toggle dark mode"></button>
-                        <span>Dark</span>
+        </script>
+    </head>
+    <body>
+        <div id="notifications"></div>
+        <div class="app-shell">
+            <!-- Mobile overlay -->
+            <div id="mobile-overlay" class="mobile-overlay"></div>
+            <!-- ─── Sidebar ─── -->
+            <aside id="sidebar" class="app-sidebar">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">B</div>
+                    <div class="sidebar-brand-text">
+                        <h1>Benchmark</h1>
+                        <p>Server System v{{ config.app.version }}</p>
                     </div>
-                    <div class="header-chip desktop-only">
-                        <span>{{ t("header.language") }}</span>
-                        <select id="language-switcher" onchange="switchLanguage(this.value)">
-                            {% for code, label in languages.items() %}
-                            <option value="{{ code }}" {% if code==lang %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="header-chip font-mono desktop-only" id="clock"></div>
                 </div>
-            </header>
-
-            <div class="app-content">
-                {% if db_warning %}
-                <div class="alert alert-warning">{{ db_warning }}</div>
-                {% endif %}
-
-                <!-- Global floating progress bar -->
-                <div id="global-progress-banner" class="card" style="display:none;margin-bottom:var(--sp-lg);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                        <div style="display:flex;align-items:center;gap:10px;">
-                            <span class="status-dot pulse-dot" style="background:var(--primary);width:8px;height:8px;"></span>
-                            <span class="text-body-strong" style="font-size:14px;">{{ t("base.benchmark_running") }}</span>
-                            <span class="font-mono text-caption" style="color:var(--primary);" id="gp-runid"></span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <span class="text-caption" id="gp-phase"></span>
-                            <span class="font-mono text-caption-strong" id="gp-percent-label">0%</span>
+                <nav class="sidebar-nav">
+                    <a href="/"
+                       class="nav-link {% if page == 'dashboard' %}active{% endif %}">{{ t("nav.dashboard") }}</a>
+                    <a href="/servers"
+                       class="nav-link {% if page == 'servers' %}active{% endif %}">{{ t("nav.servers") }}</a>
+                    <a href="/benchmark"
+                       class="nav-link {% if page == 'benchmark' %}active{% endif %}">{{ t("nav.benchmark") }}</a>
+                    <a href="/prompts"
+                       class="nav-link {% if page == 'prompts' %}active{% endif %}">{{ t("nav.prompts") }}</a>
+                    <a href="/history"
+                       class="nav-link {% if page == 'history' %}active{% endif %}">{{ t("nav.history") }}</a>
+                    <a href="/comparison"
+                       class="nav-link {% if page == 'comparison' %}active{% endif %}">{{ t("nav.comparison") }}</a>
+                    <a href="/reports"
+                       class="nav-link {% if page == 'reports' %}active{% endif %}">{{ t("nav.reports") }}</a>
+                </nav>
+                <div class="sidebar-footer">
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="status-dot" id="pg-status"></span>
+                        PostgreSQL
+                    </div>
+                </div>
+            </aside>
+            <!-- ─── Main Content ─── -->
+            <main class="app-main">
+                <header class="app-header">
+                    <button id="mobile-menu-btn"
+                            class="mobile-only"
+                            style="background:none;
+                                   border:none;
+                                   cursor:pointer;
+                                   padding:4px;
+                                   margin-right:12px;
+                                   color:var(--ink-muted-48)">
+                        <svg width="20"
+                             height="20"
+                             fill="none"
+                             stroke="currentColor"
+                             viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                    <div class="header-title">
+                        <div class="header-eyebrow">{{ t("header.control_center") }}</div>
+                        <div class="header-page-name">
+                            {% block page_title %}{% endblock %}
                         </div>
                     </div>
-                    <div class="progress-bar-track">
-                        <div class="progress-bar-fill" id="gp-fill" style="width:0%;"></div>
+                    <div class="header-actions">
+                        <div class="header-chip">
+                            <span>Light</span>
+                            <button class="theme-switch" id="theme-toggle" aria-label="Toggle dark mode"></button>
+                            <span>Dark</span>
+                        </div>
+                        <div class="header-chip desktop-only">
+                            <span>{{ t("header.language") }}</span>
+                            <select id="language-switcher" onchange="switchLanguage(this.value)">
+                                {% for code, label in languages.items() %}
+                                    <option value="{{ code }}" {% if code==lang %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="header-chip font-mono desktop-only" id="clock"></div>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-                        <span class="font-mono text-caption" id="gp-current-test"></span>
-                        <div style="display:flex;gap:16px;">
-                            <span class="text-caption">{{ t("base.elapsed") }}: <span id="gp-elapsed" class="font-mono">--:--</span></span>
-                            <span class="text-caption">{{ t("base.eta") }}: <span id="gp-eta" class="font-mono">--:--</span></span>
+                </header>
+                <div class="app-content">
+                    {% if db_warning %}<div class="alert alert-warning">{{ db_warning }}</div>{% endif %}
+                    <!-- Global floating progress bar -->
+                    <div id="global-progress-banner"
+                         class="card"
+                         style="display:none;
+                                margin-bottom:var(--sp-lg)">
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:center;
+                                    margin-bottom:10px">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <span class="status-dot pulse-dot"
+                                      style="background:var(--primary);
+                                             width:8px;
+                                             height:8px"></span>
+                                <span class="text-body-strong" style="font-size:14px;">{{ t("base.benchmark_running") }}</span>
+                                <span class="font-mono text-caption"
+                                      style="color:var(--primary)"
+                                      id="gp-runid"></span>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <span class="text-caption" id="gp-phase"></span>
+                                <span class="font-mono text-caption-strong" id="gp-percent-label">0%</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar-track">
+                            <div class="progress-bar-fill" id="gp-fill" style="width:0%;"></div>
+                        </div>
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:center;
+                                    margin-top:10px">
+                            <span class="font-mono text-caption" id="gp-current-test"></span>
+                            <div style="display:flex;gap:16px;">
+                                <span class="text-caption">{{ t("base.elapsed") }}: <span id="gp-elapsed" class="font-mono">--:--</span></span>
+                                <span class="text-caption">{{ t("base.eta") }}: <span id="gp-eta" class="font-mono">--:--</span></span>
+                            </div>
                         </div>
                     </div>
+                    {% block content %}{% endblock %}
                 </div>
-
-                {% block content %}{% endblock %}
-            </div>
-        </main>
-    </div>
-
-    <script id="app-config-lang" type="application/json">{{ lang | tojson }}</script>
-    <script id="app-config-i18n" type="application/json">{{ js_translations | tojson }}</script>
-
-    <script>
+            </main>
+        </div>
+        <script id="app-config-lang" type="application/json">{{ lang | tojson }}</script>
+        <script id="app-config-i18n" type="application/json">{{ js_translations | tojson }}</script>
+        <script>
         window.APP_LANG = JSON.parse(document.getElementById('app-config-lang').textContent);
         window.APP_I18N = JSON.parse(document.getElementById('app-config-i18n').textContent);
 
@@ -188,9 +196,9 @@
                 overlay.addEventListener('click', closeMenu);
             }
         })();
-    </script>
-    <script src="/static/js/app.js?v={{ static_version }}"></script>
-    {% block scripts %}{% endblock %}
-</body>
-
+        </script>
+        <script src="/static/js/app.js?v={{ static_version }}"></script>
+        {% block scripts %}
+        {% endblock %}
+    </body>
 </html>

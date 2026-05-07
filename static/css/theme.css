@@ -622,28 +622,53 @@ tbody tr:hover { background: var(--canvas-parchment); }
    13. Utilities
    ---------------------------------------------------------------- */
 .grid       { display: grid; }
+.grid-cols-2 { grid-template-columns: 1fr 1fr; }
+.grid-cols-4-auto { grid-template-columns: 1fr 1fr auto auto; }
 .flex       { display: flex; }
 .flex-col   { flex-direction: column; }
+.flex-wrap  { flex-wrap: wrap; }
 .items-center { align-items: center; }
+.items-end  { align-items: flex-end; }
 .justify-between { justify-content: space-between; }
 .gap-xs     { gap: var(--sp-xs); }
 .gap-sm     { gap: var(--sp-sm); }
 .gap-md     { gap: var(--sp-md); }
 .gap-lg     { gap: var(--sp-lg); }
 .gap-xl     { gap: var(--sp-xl); }
+.mt-xs      { margin-top: var(--sp-xs); }
 .mt-sm      { margin-top: var(--sp-sm); }
 .mt-md      { margin-top: var(--sp-md); }
 .mt-lg      { margin-top: var(--sp-lg); }
 .mb-sm      { margin-bottom: var(--sp-sm); }
 .mb-md      { margin-bottom: var(--sp-md); }
 .mb-lg      { margin-bottom: var(--sp-lg); }
+.p-0        { padding: 0 !important; }
+.p-sm       { padding: var(--sp-sm); }
+.p-md       { padding: var(--sp-md); }
 .p-lg       { padding: var(--sp-lg); }
+.py-xxl     { padding-top: var(--sp-xxl); padding-bottom: var(--sp-xxl); }
 .rounded-lg { border-radius: var(--r-lg); }
 .rounded-pill { border-radius: var(--r-pill); }
 .w-full     { width: 100%; }
+.max-w-sm   { max-width: 360px; }
+.max-w-7xl  { max-width: 1280px; }
+.mx-auto    { margin-left: auto; margin-right: auto; }
 .truncate   { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .overflow-x-auto { overflow-x: auto; }
 .font-mono  { font-family: "SF Mono", "JetBrains Mono", "Menlo", monospace; }
+.font-semibold { font-weight: 600; }
+.font-bold  { font-weight: 700; }
+.text-xs    { font-size: 12px; }
+.text-sm    { font-size: 14px; }
+.text-lg    { font-size: 18px; }
+.text-xl    { font-size: 20px; }
+.text-2xl   { font-size: 24px; }
+.text-3xl   { font-size: 30px; }
+.uppercase  { text-transform: uppercase; }
+.tracking-wider { letter-spacing: 0.05em; }
+.leading-relaxed { line-height: 1.6; }
+.border-b   { border-bottom: 1px solid var(--hairline); }
+.w-60       { width: 240px; }
 .hidden     { display: none !important; }
 .text-center { text-align: center; }
 .text-right  { text-align: right; }

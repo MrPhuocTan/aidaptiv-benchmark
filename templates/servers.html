@@ -1,113 +1,123 @@
 {% extends "base.html" %}
 {% block page_title %}Server Management{% endblock %}
-
 {% block content %}
-<div class="space-y">
-
-    <!-- Page header -->
-    <div class="card tile-parchment">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:var(--sp-lg);">
-            <div>
-                <div class="text-caption-strong" style="color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;">Configuration</div>
-                <h2 style="margin-top:var(--sp-xs);">Server Management</h2>
+    <div class="space-y">
+        <!-- Page header -->
+        <div class="card tile-parchment">
+            <div class="flex justify-between items-end flex-wrap gap-lg">
+                <div>
+                    <div class="text-caption-strong text-primary uppercase tracking-wider">Configuration</div>
+                    <h2 class="mt-xs">Server Management</h2>
+                </div>
+                <p class="text-caption max-w-sm">
+                    Add and manage benchmark targets. Ensure the installation script has been run on each server before adding.
+                </p>
             </div>
-            <p class="text-caption" style="max-width:360px;">
-                Add and manage benchmark targets. Ensure the installation script has been run on each server before adding.
-            </p>
+        </div>
+        <!-- Add Server Form -->
+        <div class="card">
+            <h3 class="mb-md">{{ t("servers.add_new_server") }}</h3>
+            <div class="grid grid-cols-4-auto gap-sm items-end">
+                <div>
+                    <label>{{ t("servers.server_name") }}</label>
+                    <input type="text" id="newServerName" placeholder="e.g. GPU Worker 1">
+                </div>
+                <div>
+                    <label>{{ t("servers.ip_address") }}</label>
+                    <input type="text" id="newServerIp" placeholder="e.g. 192.168.1.100">
+                </div>
+                <div>
+                    <button id="verifyServerBtn"
+                            class="btn btn-secondary"
+                            onclick="verifyServer()">{{ t("servers.verify_ports") }}</button>
+                </div>
+                <div>
+                    <button id="addServerBtn"
+                            class="btn btn-primary"
+                            disabled
+                            onclick="addServer()">{{ t("servers.add_server") }}</button>
+                </div>
+            </div>
+            <div id="verifyResult" class="hidden mt-md text-sm"></div>
+        </div>
+        <!-- Server List -->
+        <div class="card p-0 overflow-hidden">
+            <div class="p-lg border-b flex items-center justify-between flex-wrap gap-sm">
+                <h3>Server List</h3>
+                <input type="text"
+                       id="serverSearch"
+                       placeholder="Search by Name or IP..."
+                       onkeyup="filterServers()"
+                       class="w-60 text-sm">
+            </div>
+            <div class="overflow-x-auto">
+                <table id="serversTable">
+                    <thead>
+                        <tr>
+                            <th>Server Name</th>
+                            <th>IP Address</th>
+                            <th>Hardware</th>
+                            <th>Status</th>
+                            <th>Added On</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in servers_data %}
+                            {% set profile = item.profile %}
+                            {% set status = item.status %}
+                            <tr class="server-row">
+                                <td>
+                                    <div class="text-body-strong text-sm server-name-cell">{{ profile.name }}</div>
+                                </td>
+                                <td class="font-mono text-caption server-ip-cell">{{ profile.ip_address or profile.server_id }}</td>
+                                <td>
+                                    <div class="text-caption leading-relaxed">
+                                        {% if profile.cpu_model %}
+                                            CPU: {{ profile.cpu_model }}
+                                            <br>
+                                        {% endif %}
+                                        {% if status.gpu_name %}
+                                            GPU: {{ status.gpu_name }}
+                                            <br>
+                                        {% endif %}
+                                        {% if profile.ram_total_gb %}
+                                            RAM: {{ "%.0f"|format(profile.ram_total_gb) }}GB
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if status.ollama_online and status.agent_online %}
+                                        <span class="status-badge status-badge-success">
+                                            <span class="status-dot status-online"></span> Online
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge status-badge-muted">
+                                            <span class="status-dot status-offline"></span> Offline
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-caption">{{ profile.recorded_at.strftime("%Y-%m-%d %H:%M") if profile.recorded_at else '--' }}</td>
+                                <td class="text-right">
+                                    <button onclick="editServer('{{ profile.server_id }}', '{{ profile.name }}', this)"
+                                            class="btn btn-pearl btn-sm">Edit</button>
+                                    <button onclick="deleteServer('{{ profile.server_id }}', this)"
+                                            class="btn btn-danger btn-sm">Delete</button>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-caption text-center py-xxl p-lg">
+                                    No servers added yet. Add your first server above.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-
-    <!-- Add Server Form -->
-    <div class="card">
-        <h3 style="margin-bottom:var(--sp-md);">{{ t("servers.add_new_server") }}</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr auto auto;gap:var(--sp-sm);align-items:end;">
-            <div>
-                <label>{{ t("servers.server_name") }}</label>
-                <input type="text" id="newServerName" placeholder="e.g. GPU Worker 1">
-            </div>
-            <div>
-                <label>{{ t("servers.ip_address") }}</label>
-                <input type="text" id="newServerIp" placeholder="e.g. 192.168.1.100">
-            </div>
-            <div>
-                <button id="verifyServerBtn" class="btn btn-secondary" onclick="verifyServer()">{{ t("servers.verify_ports") }}</button>
-            </div>
-            <div>
-                <button id="addServerBtn" class="btn btn-primary" disabled onclick="addServer()">{{ t("servers.add_server") }}</button>
-            </div>
-        </div>
-        <div id="verifyResult" class="hidden" style="margin-top:var(--sp-md);font-size:13px;"></div>
-    </div>
-
-    <!-- Server List -->
-    <div class="card" style="padding:0;overflow:hidden;">
-        <div style="padding:var(--sp-lg);border-bottom:1px solid var(--hairline);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-sm);">
-            <h3>Server List</h3>
-            <input type="text" id="serverSearch" placeholder="Search by Name or IP..." onkeyup="filterServers()" style="width:240px;font-size:13px;">
-        </div>
-
-        <div class="overflow-x-auto">
-            <table id="serversTable">
-                <thead>
-                    <tr>
-                        <th>Server Name</th>
-                        <th>IP Address</th>
-                        <th>Hardware</th>
-                        <th>Status</th>
-                        <th>Added On</th>
-                        <th style="text-align:right;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in servers_data %}
-                    {% set profile = item.profile %}
-                    {% set status = item.status %}
-                    <tr class="server-row">
-                        <td>
-                            <div class="text-body-strong server-name-cell" style="font-size:14px;">{{ profile.name }}</div>
-                        </td>
-                        <td class="font-mono text-caption server-ip-cell">{{ profile.ip_address or profile.server_id }}</td>
-                        <td>
-                            <div class="text-caption" style="line-height:1.6;">
-                                {% if profile.cpu_model %}CPU: {{ profile.cpu_model }}<br>{% endif %}
-                                {% if status.gpu_name %}GPU: {{ status.gpu_name }}<br>{% endif %}
-                                {% if profile.ram_total_gb %}RAM: {{ "%.0f"|format(profile.ram_total_gb) }}GB{% endif %}
-                            </div>
-                        </td>
-                        <td>
-                            {% if status.ollama_online and status.agent_online %}
-                            <span class="status-badge status-badge-success">
-                                <span class="status-dot status-online"></span> Online
-                            </span>
-                            {% else %}
-                            <span class="status-badge status-badge-muted">
-                                <span class="status-dot status-offline"></span> Offline
-                            </span>
-                            {% endif %}
-                        </td>
-                        <td class="text-caption">
-                            {{ profile.recorded_at.strftime('%Y-%m-%d %H:%M') if profile.recorded_at else '--' }}
-                        </td>
-                        <td style="text-align:right;">
-                            <button onclick="editServer('{{ profile.server_id }}', '{{ profile.name }}', this)" class="btn btn-pearl btn-sm">Edit</button>
-                            <button onclick="deleteServer('{{ profile.server_id }}', this)" class="btn btn-danger btn-sm">Delete</button>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-xxl) var(--sp-lg);">
-                            No servers added yet. Add your first server above.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
-
-<script>
+    <script>
 async function verifyServer() {
     const ip = document.getElementById('newServerIp').value;
     const resultDiv = document.getElementById('verifyResult');
@@ -240,5 +250,5 @@ function filterServers() {
         row.style.display = (name.includes(query) || ip.includes(query)) ? "" : "none";
     });
 }
-</script>
+    </script>
 {% endblock %}

@@ -1,290 +1,444 @@
 {% extends "base.html" %}
 {% block page_title %}{{ t("benchmark.title") }}{% endblock %}
-
 {% block content %}
-<div class="space-y">
-
-    <!-- Hero -->
-    <div class="card tile-parchment" style="padding:var(--sp-xxl) var(--sp-xl);">
-        <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:var(--sp-lg);">
-            <div>
-                <div class="text-caption-strong" style="color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;">{{ t("benchmark.eyebrow") }}</div>
-                <h2 class="text-display-md" style="margin-top:var(--sp-xs);max-width:560px;">{{ t("benchmark.hero_title") }}</h2>
-                <p class="text-body" style="color:var(--ink-muted-48);margin-top:var(--sp-xs);max-width:560px;">{{ t("benchmark.hero_body") }}</p>
-            </div>
-            <p class="text-caption" style="max-width:300px;">{{ t("benchmark.hero_note") }}</p>
-        </div>
-    </div>
-
-    <!-- Config Form -->
-    <div class="card">
-        <div class="card-header">{{ t("benchmark.run_configuration") }}</div>
-
-        <!-- Target Servers -->
-        <div style="margin-bottom:var(--sp-lg);">
-            <label>{{ t("benchmark.target_server") }}</label>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-md);margin-top:var(--sp-xs);">
-                <!-- Primary Server -->
-                <div style="background:var(--canvas-parchment);border-radius:var(--r-lg);padding:var(--sp-md);">
-                    <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-xs);">Server 1 (Primary)</div>
-                    <select id="server-select-1" class="bench-server-select" onchange="onServerSelectChange(1)">
-                        <option value="">-- {{ t("common.select") }} --</option>
-                        {% for server_id, server in config.servers.items() %}
-                        <option value="{{ server_id }}">{{ server.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <div id="specs-card-1" class="hidden" style="margin-top:var(--sp-sm);padding-top:var(--sp-sm);border-top:1px solid var(--hairline);font-size:12px;"></div>
-                </div>
-
-                <!-- Compare Server 1 -->
-                <div id="server-block-2" style="background:var(--canvas-parchment);border-radius:var(--r-lg);padding:var(--sp-md);opacity:0.5;transition:opacity 0.2s;">
-                    <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-xs);">Server 2 (Compare)</div>
-                    <select id="server-select-2" class="bench-server-select" onchange="onServerSelectChange(2)" disabled>
-                        <option value="">-- {{ t("common.select") }} --</option>
-                        {% for server_id, server in config.servers.items() %}
-                        <option value="{{ server_id }}">{{ server.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <div id="specs-card-2" class="hidden" style="margin-top:var(--sp-sm);padding-top:var(--sp-sm);border-top:1px solid var(--hairline);font-size:12px;"></div>
-                </div>
-
-                <!-- Compare Server 2 -->
-                <div id="server-block-3" style="background:var(--canvas-parchment);border-radius:var(--r-lg);padding:var(--sp-md);opacity:0.5;transition:opacity 0.2s;">
-                    <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-xs);">Server 3 (Compare)</div>
-                    <select id="server-select-3" class="bench-server-select" onchange="onServerSelectChange(3)" disabled>
-                        <option value="">-- {{ t("common.select") }} --</option>
-                        {% for server_id, server in config.servers.items() %}
-                        <option value="{{ server_id }}">{{ server.name }}</option>
-                        {% endfor %}
-                    </select>
-                    <div id="specs-card-3" class="hidden" style="margin-top:var(--sp-sm);padding-top:var(--sp-sm);border-top:1px solid var(--hairline);font-size:12px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Config row -->
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-md);margin-bottom:var(--sp-lg);">
-            <div>
-                <label>{{ t("benchmark.test_suite") }}</label>
-                <select id="bench-suite">
-                    <option value="all">{{ t("benchmark.all_suites") }}</option>
-                    {% for name, suite in config.benchmark.test_suites.items() %}
-                        {% if suite.enabled %}
-                        <option value="{{ name }}">{{ name|replace('_',' ')|title }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>{{ t("benchmark.environment") }}</label>
-                <select id="bench-env">
-                    {% for env_id, env in config.environments.items() %}
-                        {% if env.enabled %}
-                        <option value="{{ env_id }}">{{ env.name }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>{{ t("benchmark.model") }}</label>
-                <select id="bench-model" disabled>
-                    {% for model in config.models %}
-                    <option value="{{ model }}">{{ model }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>Prompt Set</label>
-                <select id="bench-prompt-set">
-                    {% if prompt_sets %}
-                        {% for pset in prompt_sets %}
-                        <option value="{{ pset.id }}">{{ pset.name }} ({{ pset.prompts|length }} prompts)</option>
-                        {% endfor %}
-                    {% else %}
-                        <option value="">No custom sets (using defaults)</option>
-                    {% endif %}
-                </select>
-            </div>
-        </div>
-
-        <!-- Notes -->
-        <div style="margin-bottom:var(--sp-lg);">
-            <label>{{ t("benchmark.notes_optional") }}</label>
-            <input type="text" id="bench-notes" placeholder="{{ t('benchmark.notes_placeholder') }}">
-        </div>
-
-        <!-- Parameters & Tags -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-lg);margin-bottom:var(--sp-lg);">
-            <div>
-                <label>Editable Parameters</label>
-                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-sm);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span class="text-caption">Warmup Requests</span>
-                        <input type="number" id="bench-warmup" value="{{ config.benchmark.warmup_requests }}" style="width:80px;padding:4px 8px;font-size:12px;">
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span class="text-caption">Concurrency Levels</span>
-                        <input type="text" id="bench-concurrency" value="{{ config.benchmark.concurrency_levels|join(', ') }}" style="width:120px;padding:4px 8px;font-size:12px;">
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span class="text-caption">Cooldown Between (s)</span>
-                        <input type="number" id="bench-cooldown" value="{{ config.benchmark.cooldown_seconds }}" style="width:80px;padding:4px 8px;font-size:12px;">
-                    </div>
-                </div>
-
-                <label style="margin-top:var(--sp-md);">Fixed Global Limits</label>
-                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-md);display:flex;flex-direction:column;gap:var(--sp-xs);">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span class="text-caption">Repeat Count</span>
-                        <span class="font-mono text-caption" style="background:var(--canvas);padding:2px 8px;border-radius:var(--r-xs);">1</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
-                        <span class="text-caption">Request Timeout (s)</span>
-                        <span class="font-mono text-caption" style="background:var(--canvas);padding:2px 8px;border-radius:var(--r-xs);">120</span>
-                    </div>
-                </div>
-            </div>
-            <div>
-                <label>Tags (optional)</label>
-                <input type="text" id="bench-tags" placeholder="e.g. production, v2.0">
-                <div class="text-fine" style="margin-top:var(--sp-xxs);">Comma separated. Tags help you filter runs in History.</div>
-            </div>
-        </div>
-
-        <!-- Start Button -->
-        <div style="display:flex;align-items:center;gap:var(--sp-md);">
-            <button id="btn-start-benchmark" class="btn btn-primary btn-lg" onclick="startBenchmark()">{{ t("benchmark.start_button") }}</button>
-            <span class="text-caption">{{ t("benchmark.start_help") }}</span>
-        </div>
-    </div>
-
-    <!-- Progress -->
-    <div class="card" id="progress-container" style="display:none;">
-        <div class="card-header">{{ t("benchmark.progress_title") }}</div>
-
-        <div style="display:flex;flex-direction:column;gap:var(--sp-md);">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+    <div class="space-y">
+        <!-- Hero -->
+        <div class="card tile-parchment"
+             style="padding:var(--sp-xxl) var(--sp-xl)">
+            <div style="display:flex;
+                        justify-content:space-between;
+                        align-items:flex-end;
+                        flex-wrap:wrap;
+                        gap:var(--sp-lg)">
                 <div>
-                    <div class="text-caption">Run ID: <span class="font-mono" style="color:var(--ink);" id="progress-runid">--</span></div>
-                    <div class="text-caption" style="margin-top:4px;">Status: <span style="color:var(--primary);font-weight:600;" id="progress-status">Running</span></div>
+                    <div class="text-caption-strong"
+                         style="color:var(--primary);
+                                text-transform:uppercase;
+                                letter-spacing:0.06em">{{ t("benchmark.eyebrow") }}</div>
+                    <h2 class="text-display-md"
+                        style="margin-top:var(--sp-xs);
+                               max-width:560px">{{ t("benchmark.hero_title") }}</h2>
+                    <p class="text-body"
+                       style="color:var(--ink-muted-48);
+                              margin-top:var(--sp-xs);
+                              max-width:560px">{{ t("benchmark.hero_body") }}</p>
                 </div>
-                <div style="text-align:right;">
-                    <div class="text-body-strong" style="font-size:14px;" id="progress-phase">{{ t("benchmark.preparing") }}</div>
-                    <div class="text-caption font-mono" style="margin-top:4px;" id="progress-current-test">--</div>
-                </div>
-            </div>
-
-            <div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:var(--sp-xs);">
-                    <span class="text-caption">Progress</span>
-                    <span class="text-caption"><span id="progress-text">0 / 0</span> (<span id="progress-percent">0</span>%)</span>
-                </div>
-                <div class="progress-bar-track">
-                    <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-                </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-md);text-align:center;">
-                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-sm);">
-                    <div class="text-caption" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Elapsed</div>
-                    <div class="font-mono" style="font-size:14px;" id="progress-elapsed">00:00</div>
-                </div>
-                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-sm);">
-                    <div class="text-caption" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Remaining</div>
-                    <div class="font-mono" style="font-size:14px;" id="progress-remaining">--:--</div>
-                </div>
-                <div style="background:var(--canvas-parchment);border-radius:var(--r-md);padding:var(--sp-sm);">
-                    <div class="text-caption" style="text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">ETA</div>
-                    <div class="font-mono" style="font-size:14px;" id="progress-eta">--:--</div>
-                </div>
+                <p class="text-caption" style="max-width:300px;">{{ t("benchmark.hero_note") }}</p>
             </div>
         </div>
-
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:var(--sp-lg);">
-            <span class="text-caption" id="progress-extra">{{ t("benchmark.waiting_live_metrics") }}</span>
-            <button id="btn-stop-benchmark" class="btn btn-danger" onclick="stopBenchmark()">{{ t("benchmark.stop_button") }}</button>
-        </div>
-    </div>
-
-    <!-- Tools Overview -->
-    <div class="card">
-        <div class="card-header">{{ t("benchmark.enabled_tools") }}</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:var(--sp-sm);" id="tools-overview-container">
-            {% for tool_name, tool in config.tools.items() %}
-            <div class="tool-item" data-tool="{{ tool_name }}" data-enabled="{{ tool.enabled|lower }}" data-suites="{{ tool.supported_suites|join(',') if tool.supported_suites else '' }}"
-                 style="padding:var(--sp-sm);border-radius:var(--r-md);border:1px solid var(--hairline);background:{% if tool.enabled %}var(--canvas-parchment){% else %}var(--canvas){% endif %};{% if not tool.enabled %}opacity:0.5;{% endif %}transition:all 0.2s;">
-                <div class="text-body-strong" style="font-size:13px;">{{ tool_name|replace('_',' ')|title }}</div>
-                <div class="text-caption tool-status" style="margin-top:2px;">
-                    {% if tool.enabled %}{{ t("common.enabled") }}{% else %}{{ t("common.disabled") }}{% endif %}
-                </div>
-                <div class="text-fine tool-suites" style="margin-top:var(--sp-xs);font-style:italic;">
-                    {% if tool.supported_suites %}{{ tool.supported_suites|join(', ')|replace('_',' ')|title }}{% else %}All Suites{% endif %}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Test Suites -->
-    <div class="card">
-        <div class="card-header">{{ t("benchmark.test_suites") }}</div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--sp-md);">
-            {% for name, suite in config.benchmark.test_suites.items() %}
-            <div style="border:1px solid var(--hairline);border-radius:var(--r-lg);padding:var(--sp-md);">
-                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--sp-sm);">
-                    <div>
-                        <div class="text-body-strong" style="font-size:14px;">{{ name|replace('_',' ')|title }}</div>
-                        <div class="text-caption" style="margin-top:2px;">{{ suite.description or '--' }}</div>
-                    </div>
-                    {% if suite.enabled %}
-                    <span class="status-badge status-badge-success">{{ t("common.enabled") }}</span>
-                    {% else %}
-                    <span class="status-badge status-badge-muted">{{ t("common.disabled") }}</span>
-                    {% endif %}
-                </div>
-
-                <div style="height:1px;background:var(--divider-soft);margin:var(--sp-sm) 0;"></div>
-
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-md);font-size:12px;">
-                    <div>
-                        <div class="text-caption-strong" style="text-transform:uppercase;letter-spacing:0.04em;margin-bottom:var(--sp-xxs);">{{ t("benchmark.scenarios") }}</div>
-                        {% if suite.scenarios %}
-                        <div style="display:flex;flex-wrap:wrap;gap:4px;">
-                            {% for s in suite.scenarios %}
-                            <span class="status-badge status-badge-muted" style="font-size:10px;">{{ s }}</span>
+        <!-- Config Form -->
+        <div class="card">
+            <div class="card-header">{{ t("benchmark.run_configuration") }}</div>
+            <!-- Target Servers -->
+            <div style="margin-bottom:var(--sp-lg);">
+                <label>{{ t("benchmark.target_server") }}</label>
+                <div style="display:grid;
+                            grid-template-columns:repeat(3,1fr);
+                            gap:var(--sp-md);
+                            margin-top:var(--sp-xs)">
+                    <!-- Primary Server -->
+                    <div style="background:var(--canvas-parchment);
+                                border-radius:var(--r-lg);
+                                padding:var(--sp-md)">
+                        <div class="text-caption-strong"
+                             style="text-transform:uppercase;
+                                    letter-spacing:0.06em;
+                                    margin-bottom:var(--sp-xs)">Server 1 (Primary)</div>
+                        <select id="server-select-1"
+                                class="bench-server-select"
+                                onchange="onServerSelectChange(1)">
+                            <option value="">-- {{ t("common.select") }} --</option>
+                            {% for server_id, server in config.servers.items() %}
+                                <option value="{{ server_id }}">{{ server.name }}</option>
                             {% endfor %}
-                        </div>
-                        {% else %}<span class="text-muted">--</span>{% endif %}
+                        </select>
+                        <div id="specs-card-1"
+                             class="hidden"
+                             style="margin-top:var(--sp-sm);
+                                    padding-top:var(--sp-sm);
+                                    border-top:1px solid var(--hairline);
+                                    font-size:12px"></div>
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:4px;">
-                        <div>
-                            <span class="text-muted">Requests:</span>
-                            <span class="font-mono">{{ suite.requests_per_scenario or '--' }} / scenario</span>
-                        </div>
-                        {% if suite.duration_seconds %}
-                        <div>
-                            <span class="text-muted">Duration:</span>
-                            <span class="font-mono">{{ suite.duration_seconds }}s</span>
-                        </div>
-                        {% endif %}
-                        {% if suite.concurrency %}
-                        <div>
-                            <span class="text-muted">Concurrency:</span>
-                            <span class="font-mono">{{ suite.concurrency }}</span>
-                        </div>
-                        {% endif %}
-                        {% if suite.pattern %}
-                        <div>
-                            <span class="text-muted">Pattern:</span>
-                            <span class="font-mono">{{ suite.pattern }}</span>
-                        </div>
-                        {% endif %}
+                    <!-- Compare Server 1 -->
+                    <div id="server-block-2"
+                         style="background:var(--canvas-parchment);
+                                border-radius:var(--r-lg);
+                                padding:var(--sp-md);
+                                opacity:0.5;
+                                transition:opacity 0.2s">
+                        <div class="text-caption-strong"
+                             style="text-transform:uppercase;
+                                    letter-spacing:0.06em;
+                                    margin-bottom:var(--sp-xs)">Server 2 (Compare)</div>
+                        <select id="server-select-2"
+                                class="bench-server-select"
+                                onchange="onServerSelectChange(2)"
+                                disabled>
+                            <option value="">-- {{ t("common.select") }} --</option>
+                            {% for server_id, server in config.servers.items() %}
+                                <option value="{{ server_id }}">{{ server.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="specs-card-2"
+                             class="hidden"
+                             style="margin-top:var(--sp-sm);
+                                    padding-top:var(--sp-sm);
+                                    border-top:1px solid var(--hairline);
+                                    font-size:12px"></div>
+                    </div>
+                    <!-- Compare Server 2 -->
+                    <div id="server-block-3"
+                         style="background:var(--canvas-parchment);
+                                border-radius:var(--r-lg);
+                                padding:var(--sp-md);
+                                opacity:0.5;
+                                transition:opacity 0.2s">
+                        <div class="text-caption-strong"
+                             style="text-transform:uppercase;
+                                    letter-spacing:0.06em;
+                                    margin-bottom:var(--sp-xs)">Server 3 (Compare)</div>
+                        <select id="server-select-3"
+                                class="bench-server-select"
+                                onchange="onServerSelectChange(3)"
+                                disabled>
+                            <option value="">-- {{ t("common.select") }} --</option>
+                            {% for server_id, server in config.servers.items() %}
+                                <option value="{{ server_id }}">{{ server.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div id="specs-card-3"
+                             class="hidden"
+                             style="margin-top:var(--sp-sm);
+                                    padding-top:var(--sp-sm);
+                                    border-top:1px solid var(--hairline);
+                                    font-size:12px"></div>
                     </div>
                 </div>
             </div>
-            {% endfor %}
+            <!-- Config row -->
+            <div style="display:grid;
+                        grid-template-columns:repeat(4,1fr);
+                        gap:var(--sp-md);
+                        margin-bottom:var(--sp-lg)">
+                <div>
+                    <label>{{ t("benchmark.test_suite") }}</label>
+                    <select id="bench-suite">
+                        <option value="all">{{ t("benchmark.all_suites") }}</option>
+                        {% for name, suite in config.benchmark.test_suites.items() %}
+                            {% if suite.enabled %}<option value="{{ name }}">{{ name|replace('_', ' ') |title }}</option>{% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>{{ t("benchmark.environment") }}</label>
+                    <select id="bench-env">
+                        {% for env_id, env in config.environments.items() %}
+                            {% if env.enabled %}<option value="{{ env_id }}">{{ env.name }}</option>{% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>{{ t("benchmark.model") }}</label>
+                    <select id="bench-model" disabled>
+                        {% for model in config.models %}<option value="{{ model }}">{{ model }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>Prompt Set</label>
+                    <select id="bench-prompt-set">
+                        {% if prompt_sets %}
+                            {% for pset in prompt_sets %}
+                                <option value="{{ pset.id }}">{{ pset.name }} ({{ pset.prompts|length }} prompts)</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="">No custom sets (using defaults)</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+            <!-- Notes -->
+            <div style="margin-bottom:var(--sp-lg);">
+                <label>{{ t("benchmark.notes_optional") }}</label>
+                <input type="text"
+                       id="bench-notes"
+                       placeholder="{{ t("benchmark.notes_placeholder") }}">
+            </div>
+            <!-- Parameters & Tags -->
+            <div style="display:grid;
+                        grid-template-columns:1fr 1fr;
+                        gap:var(--sp-lg);
+                        margin-bottom:var(--sp-lg)">
+                <div>
+                    <label>Editable Parameters</label>
+                    <div style="background:var(--canvas-parchment);
+                                border-radius:var(--r-md);
+                                padding:var(--sp-md);
+                                display:flex;
+                                flex-direction:column;
+                                gap:var(--sp-sm)">
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:center">
+                            <span class="text-caption">Warmup Requests</span>
+                            <input type="number"
+                                   id="bench-warmup"
+                                   value="{{ config.benchmark.warmup_requests }}"
+                                   style="width:80px;
+                                          padding:4px 8px;
+                                          font-size:12px">
+                        </div>
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:center">
+                            <span class="text-caption">Concurrency Levels</span>
+                            <input type="text"
+                                   id="bench-concurrency"
+                                   value="{{ config.benchmark.concurrency_levels|join(", ") }}"
+                                   style="width:120px;
+                                          padding:4px 8px;
+                                          font-size:12px">
+                        </div>
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:center">
+                            <span class="text-caption">Cooldown Between (s)</span>
+                            <input type="number"
+                                   id="bench-cooldown"
+                                   value="{{ config.benchmark.cooldown_seconds }}"
+                                   style="width:80px;
+                                          padding:4px 8px;
+                                          font-size:12px">
+                        </div>
+                    </div>
+                    <label style="margin-top:var(--sp-md);">Fixed Global Limits</label>
+                    <div style="background:var(--canvas-parchment);
+                                border-radius:var(--r-md);
+                                padding:var(--sp-md);
+                                display:flex;
+                                flex-direction:column;
+                                gap:var(--sp-xs)">
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:center">
+                            <span class="text-caption">Repeat Count</span>
+                            <span class="font-mono text-caption"
+                                  style="background:var(--canvas);
+                                         padding:2px 8px;
+                                         border-radius:var(--r-xs)">1</span>
+                        </div>
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:center">
+                            <span class="text-caption">Request Timeout (s)</span>
+                            <span class="font-mono text-caption"
+                                  style="background:var(--canvas);
+                                         padding:2px 8px;
+                                         border-radius:var(--r-xs)">120</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label>Tags (optional)</label>
+                    <input type="text" id="bench-tags" placeholder="e.g. production, v2.0">
+                    <div class="text-fine" style="margin-top:var(--sp-xxs);">Comma separated. Tags help you filter runs in History.</div>
+                </div>
+            </div>
+            <!-- Start Button -->
+            <div style="display:flex;align-items:center;gap:var(--sp-md);">
+                <button id="btn-start-benchmark"
+                        class="btn btn-primary btn-lg"
+                        onclick="startBenchmark()">{{ t("benchmark.start_button") }}</button>
+                <span class="text-caption">{{ t("benchmark.start_help") }}</span>
+            </div>
+        </div>
+        <!-- Progress -->
+        <div class="card" id="progress-container" style="display:none;">
+            <div class="card-header">{{ t("benchmark.progress_title") }}</div>
+            <div style="display:flex;flex-direction:column;gap:var(--sp-md);">
+                <div style="display:flex;
+                            justify-content:space-between;
+                            align-items:flex-start">
+                    <div>
+                        <div class="text-caption">
+                            Run ID: <span class="font-mono" style="color:var(--ink);" id="progress-runid">--</span>
+                        </div>
+                        <div class="text-caption" style="margin-top:4px;">
+                            Status: <span style="color:var(--primary);font-weight:600;" id="progress-status">Running</span>
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="text-body-strong" style="font-size:14px;" id="progress-phase">{{ t("benchmark.preparing") }}</div>
+                        <div class="text-caption font-mono"
+                             style="margin-top:4px"
+                             id="progress-current-test">--</div>
+                    </div>
+                </div>
+                <div>
+                    <div style="display:flex;
+                                justify-content:space-between;
+                                margin-bottom:var(--sp-xs)">
+                        <span class="text-caption">Progress</span>
+                        <span class="text-caption"><span id="progress-text">0 / 0</span> (<span id="progress-percent">0</span>%)</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+                    </div>
+                </div>
+                <div style="display:grid;
+                            grid-template-columns:repeat(3,1fr);
+                            gap:var(--sp-md);
+                            text-align:center">
+                    <div style="background:var(--canvas-parchment);
+                                border-radius:var(--r-md);
+                                padding:var(--sp-sm)">
+                        <div class="text-caption"
+                             style="text-transform:uppercase;
+                                    letter-spacing:0.06em;
+                                    margin-bottom:4px">Elapsed</div>
+                        <div class="font-mono" style="font-size:14px;" id="progress-elapsed">00:00</div>
+                    </div>
+                    <div style="background:var(--canvas-parchment);
+                                border-radius:var(--r-md);
+                                padding:var(--sp-sm)">
+                        <div class="text-caption"
+                             style="text-transform:uppercase;
+                                    letter-spacing:0.06em;
+                                    margin-bottom:4px">Remaining</div>
+                        <div class="font-mono" style="font-size:14px;" id="progress-remaining">--:--</div>
+                    </div>
+                    <div style="background:var(--canvas-parchment);
+                                border-radius:var(--r-md);
+                                padding:var(--sp-sm)">
+                        <div class="text-caption"
+                             style="text-transform:uppercase;
+                                    letter-spacing:0.06em;
+                                    margin-bottom:4px">ETA</div>
+                        <div class="font-mono" style="font-size:14px;" id="progress-eta">--:--</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        margin-top:var(--sp-lg)">
+                <span class="text-caption" id="progress-extra">{{ t("benchmark.waiting_live_metrics") }}</span>
+                <button id="btn-stop-benchmark"
+                        class="btn btn-danger"
+                        onclick="stopBenchmark()">{{ t("benchmark.stop_button") }}</button>
+            </div>
+        </div>
+        <!-- Tools Overview -->
+        <div class="card">
+            <div class="card-header">{{ t("benchmark.enabled_tools") }}</div>
+            <div style="display:grid;
+                        grid-template-columns:repeat(4,1fr);
+                        gap:var(--sp-sm)"
+                 id="tools-overview-container">
+                {% for tool_name, tool in config.tools.items() %}
+                    <div class="tool-item"
+                         data-tool="{{ tool_name }}"
+                         data-enabled="{{ tool.enabled|lower }}"
+                         data-suites="{{ tool.supported_suites|join(",") if tool.supported_suites else '' }}"
+                         style="padding:var(--sp-sm);
+                                border-radius:var(--r-md);
+                                border:1px solid var(--hairline);
+                                background:{% if tool.enabled %}var(--canvas-parchment){% else %}var(--canvas){% endif %};
+                                {% if not tool.enabled %}opacity:0.5;{% endif %}transition:all 0.2s">
+                        <div class="text-body-strong" style="font-size:13px;">{{ tool_name|replace('_', ' ') |title }}</div>
+                        <div class="text-caption tool-status" style="margin-top:2px;">
+                            {% if tool.enabled %}
+                                {{ t("common.enabled") }}
+                            {% else %}
+                                {{ t("common.disabled") }}
+                            {% endif %}
+                        </div>
+                        <div class="text-fine tool-suites"
+                             style="margin-top:var(--sp-xs);
+                                    font-style:italic">
+                            {% if tool.supported_suites %}
+                                {{ tool.supported_suites|join(", ") |replace('_',' ')|title }}
+                            {% else %}
+                                All Suites
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <!-- Test Suites -->
+        <div class="card">
+            <div class="card-header">{{ t("benchmark.test_suites") }}</div>
+            <div style="display:grid;
+                        grid-template-columns:repeat(2,1fr);
+                        gap:var(--sp-md)">
+                {% for name, suite in config.benchmark.test_suites.items() %}
+                    <div style="border:1px solid var(--hairline);
+                                border-radius:var(--r-lg);
+                                padding:var(--sp-md)">
+                        <div style="display:flex;
+                                    justify-content:space-between;
+                                    align-items:flex-start;
+                                    margin-bottom:var(--sp-sm)">
+                            <div>
+                                <div class="text-body-strong" style="font-size:14px;">{{ name|replace('_', ' ') |title }}</div>
+                                <div class="text-caption" style="margin-top:2px;">{{ suite.description or '--' }}</div>
+                            </div>
+                            {% if suite.enabled %}
+                                <span class="status-badge status-badge-success">{{ t("common.enabled") }}</span>
+                            {% else %}
+                                <span class="status-badge status-badge-muted">{{ t("common.disabled") }}</span>
+                            {% endif %}
+                        </div>
+                        <div style="height:1px;
+                                    background:var(--divider-soft);
+                                    margin:var(--sp-sm) 0"></div>
+                        <div style="display:grid;
+                                    grid-template-columns:1fr 1fr;
+                                    gap:var(--sp-md);
+                                    font-size:12px">
+                            <div>
+                                <div class="text-caption-strong"
+                                     style="text-transform:uppercase;
+                                            letter-spacing:0.04em;
+                                            margin-bottom:var(--sp-xxs)">{{ t("benchmark.scenarios") }}</div>
+                                {% if suite.scenarios %}
+                                    <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                                        {% for s in suite.scenarios %}
+                                            <span class="status-badge status-badge-muted" style="font-size:10px;">{{ s }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">--</span>
+                                {% endif %}
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <div>
+                                    <span class="text-muted">Requests:</span>
+                                    <span class="font-mono">{{ suite.requests_per_scenario or '--' }} / scenario</span>
+                                </div>
+                                {% if suite.duration_seconds %}
+                                    <div>
+                                        <span class="text-muted">Duration:</span>
+                                        <span class="font-mono">{{ suite.duration_seconds }}s</span>
+                                    </div>
+                                {% endif %}
+                                {% if suite.concurrency %}
+                                    <div>
+                                        <span class="text-muted">Concurrency:</span>
+                                        <span class="font-mono">{{ suite.concurrency }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if suite.pattern %}
+                                    <div>
+                                        <span class="text-muted">Pattern:</span>
+                                        <span class="font-mono">{{ suite.pattern }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-
-</div>
 {% endblock %}

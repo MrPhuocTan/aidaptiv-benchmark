@@ -1,148 +1,182 @@
 {% extends "base.html" %}
 {% block page_title %}{{ t("dashboard.title") }}{% endblock %}
-
 {% block content %}
-<div class="space-y">
-
-    <!-- Hero + Stats Row -->
-    <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:var(--sp-lg);">
-        <!-- Hero card -->
-        <div class="card tile-parchment" style="padding:var(--sp-xxl) var(--sp-xl);">
-            <div class="text-caption-strong" style="color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:var(--sp-sm);">{{ t("dashboard.eyebrow") }}</div>
-            <h2 class="text-display-md" style="max-width:560px;">{{ t("dashboard.hero_title") }}</h2>
-            <p class="text-body" style="color:var(--ink-muted-48);margin-top:var(--sp-sm);max-width:560px;">{{ t("dashboard.hero_body") }}</p>
-            <div style="display:flex;gap:var(--sp-sm);margin-top:var(--sp-lg);">
-                <a href="/benchmark" class="btn btn-primary">{{ t("dashboard.cta_start") }}</a>
-                <a href="/comparison" class="btn btn-secondary">{{ t("dashboard.cta_compare") }}</a>
+    <div class="space-y">
+        <!-- Hero + Stats Row -->
+        <div style="display:grid;
+                    grid-template-columns:1.7fr 1fr;
+                    gap:var(--sp-lg)">
+            <!-- Hero card -->
+            <div class="card tile-parchment"
+                 style="padding:var(--sp-xxl) var(--sp-xl)">
+                <div class="text-caption-strong"
+                     style="color:var(--primary);
+                            text-transform:uppercase;
+                            letter-spacing:0.06em;
+                            margin-bottom:var(--sp-sm)">{{ t("dashboard.eyebrow") }}</div>
+                <h2 class="text-display-md" style="max-width:560px;">{{ t("dashboard.hero_title") }}</h2>
+                <p class="text-body"
+                   style="color:var(--ink-muted-48);
+                          margin-top:var(--sp-sm);
+                          max-width:560px">{{ t("dashboard.hero_body") }}</p>
+                <div style="display:flex;gap:var(--sp-sm);margin-top:var(--sp-lg);">
+                    <a href="/benchmark" class="btn btn-primary">{{ t("dashboard.cta_start") }}</a>
+                    <a href="/comparison" class="btn btn-secondary">{{ t("dashboard.cta_compare") }}</a>
+                </div>
+            </div>
+            <!-- Stats grid -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);">
+                <div class="card">
+                    <div class="card-header">{{ t("dashboard.completed_runs") }}</div>
+                    <div class="metric-value">{{ recent_runs|selectattr('status', 'equalto', 'completed') |list|length }}</div>
+                    <div class="metric-label">{{ t("dashboard.completed_runs_hint") }}</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">{{ t("dashboard.active_model_set") }}</div>
+                    <div class="metric-value">{{ config.models|length }}</div>
+                    <div class="metric-label">{{ t("dashboard.active_model_set_hint") }}</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">{{ t("dashboard.enabled_tooling") }}</div>
+                    <div class="metric-value">{{ config.tools.values() |selectattr('enabled')|list|length }}</div>
+                    <div class="metric-label">{{ t("dashboard.enabled_tooling_hint") }}</div>
+                </div>
+                <div class="card">
+                    <div class="card-header">{{ t("dashboard.live_environments") }}</div>
+                    <div class="metric-value">{{ config.environments.values() |selectattr('enabled')|list|length }}</div>
+                    <div class="metric-label">{{ t("dashboard.live_environments_hint") }}</div>
+                </div>
             </div>
         </div>
-
-        <!-- Stats grid -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-sm);">
-            <div class="card">
-                <div class="card-header">{{ t("dashboard.completed_runs") }}</div>
-                <div class="metric-value">{{ recent_runs|selectattr('status', 'equalto', 'completed')|list|length }}</div>
-                <div class="metric-label">{{ t("dashboard.completed_runs_hint") }}</div>
-            </div>
-            <div class="card">
-                <div class="card-header">{{ t("dashboard.active_model_set") }}</div>
-                <div class="metric-value">{{ config.models|length }}</div>
-                <div class="metric-label">{{ t("dashboard.active_model_set_hint") }}</div>
-            </div>
-            <div class="card">
-                <div class="card-header">{{ t("dashboard.enabled_tooling") }}</div>
-                <div class="metric-value">{{ config.tools.values()|selectattr('enabled')|list|length }}</div>
-                <div class="metric-label">{{ t("dashboard.enabled_tooling_hint") }}</div>
-            </div>
-            <div class="card">
-                <div class="card-header">{{ t("dashboard.live_environments") }}</div>
-                <div class="metric-value">{{ config.environments.values()|selectattr('enabled')|list|length }}</div>
-                <div class="metric-label">{{ t("dashboard.live_environments_hint") }}</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Server Status Cards -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));gap:var(--sp-lg);">
-        {% for status in statuses[:3] %}
-        <div class="card">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-md);">
-                <div>
-                    <div class="text-body-strong">{{ status.server_name }}</div>
-                    <div class="text-caption" style="margin-top:2px;">{{ status.server_id }}</div>
-                </div>
-                <span class="status-dot {% if status.ollama_online and status.agent_online %}status-online{% else %}status-offline{% endif %}" id="status-{{ status.server_id }}"></span>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--sp-md);">
-                <div>
-                    <div class="metric-value" style="font-size:22px;" id="{{ status.server_id }}-gpu">--</div>
-                    <div class="metric-label">{{ t("dashboard.gpu_util") }}</div>
-                </div>
-                <div>
-                    <div class="metric-value" style="font-size:22px;" id="{{ status.server_id }}-vram">
-                        {% if status.vram_total_gb %}{{ "%.1f"|format(status.vram_total_gb) }} GB{% else %}--{% endif %}
+        <!-- Server Status Cards -->
+        <div style="display:grid;
+                    grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));
+                    gap:var(--sp-lg)">
+            {% for status in statuses[:3] %}
+                <div class="card">
+                    <div style="display:flex;
+                                align-items:center;
+                                justify-content:space-between;
+                                margin-bottom:var(--sp-md)">
+                        <div>
+                            <div class="text-body-strong">{{ status.server_name }}</div>
+                            <div class="text-caption" style="margin-top:2px;">{{ status.server_id }}</div>
+                        </div>
+                        <span class="status-dot {% if status.ollama_online and status.agent_online %}status-online{% else %}status-offline{% endif %}"
+                              id="status-{{ status.server_id }}"></span>
                     </div>
-                    <div class="metric-label">{{ t("dashboard.vram_used") }}</div>
+                    <div style="display:grid;
+                                grid-template-columns:1fr 1fr 1fr;
+                                gap:var(--sp-md)">
+                        <div>
+                            <div class="metric-value"
+                                 style="font-size:22px"
+                                 id="{{ status.server_id }}-gpu">--</div>
+                            <div class="metric-label">{{ t("dashboard.gpu_util") }}</div>
+                        </div>
+                        <div>
+                            <div class="metric-value"
+                                 style="font-size:22px"
+                                 id="{{ status.server_id }}-vram">
+                                {% if status.vram_total_gb %}
+                                    {{ "%.1f"|format(status.vram_total_gb) }} GB
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </div>
+                            <div class="metric-label">{{ t("dashboard.vram_used") }}</div>
+                        </div>
+                        <div>
+                            <div class="metric-value"
+                                 style="font-size:22px"
+                                 id="{{ status.server_id }}-cpu">--</div>
+                            <div class="metric-label">CPU Util</div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <div class="metric-value" style="font-size:22px;" id="{{ status.server_id }}-cpu">--</div>
-                    <div class="metric-label">CPU Util</div>
-                </div>
+            {% endfor %}
+        </div>
+        <!-- TPS Trend Chart -->
+        <div class="card">
+            <div style="display:flex;
+                        align-items:center;
+                        justify-content:space-between;
+                        margin-bottom:var(--sp-md)">
+                <div class="card-header" style="margin-bottom:0;">{{ t("dashboard.recent_tps_trend") }}</div>
+                <span class="text-caption">{{ t("dashboard.built_in_viz") }}</span>
+            </div>
+            <div style="height:280px;">
+                <canvas id="dashboard-trend-chart"></canvas>
             </div>
         </div>
-        {% endfor %}
+        <!-- Recent Runs Table -->
+        <div class="card">
+            <div style="display:flex;
+                        align-items:center;
+                        justify-content:space-between;
+                        margin-bottom:var(--sp-md)">
+                <div class="card-header" style="margin-bottom:0;">{{ t("dashboard.recent_runs") }}</div>
+                <a href="/history" class="text-caption" style="color:var(--primary);">{{ t("common.view_all") }}</a>
+            </div>
+            {% if recent_runs %}
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{{ t("history.run_id") }}</th>
+                                <th>{{ t("common.status") }}</th>
+                                <th>{{ t("benchmark.suite") }}</th>
+                                <th>{{ t("common.environment") }}</th>
+                                <th>{{ t("common.duration") }}</th>
+                                <th>{{ t("common.date") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for run in recent_runs %}
+                                <tr class="cursor-pointer"
+                                    onclick="window.location='/history/{{ run.run_id }}'">
+                                    <td class="font-mono" style="font-size:12px;color:var(--primary);">{{ run.run_id }}</td>
+                                    <td>
+                                        {% if run.status == 'completed' %}
+                                            <span class="status-badge status-badge-success">{{ t("common.completed") }}</span>
+                                        {% elif run.status == 'running' %}
+                                            <span class="status-badge status-badge-info">{{ t("common.running") }}</span>
+                                        {% elif run.status == 'failed' %}
+                                            <span class="status-badge status-badge-danger">{{ t("common.failed") }}</span>
+                                        {% else %}
+                                            <span class="status-badge status-badge-muted">{{ run.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ run.suite or '--' }}</td>
+                                    <td>{{ run.environment or '--' }}</td>
+                                    <td>
+                                        {% if run.duration_seconds %}
+                                            {{ "%.1f"|format(run.duration_seconds) }}s
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-caption">
+                                        {% if run.started_at %}
+                                            {{ run.started_at.strftime("%Y-%m-%d %H:%M") }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-caption"
+                   style="text-align:center;
+                          padding:var(--sp-xxl) 0">{{ t("dashboard.empty_runs") }}</p>
+            {% endif %}
+        </div>
     </div>
-
-    <!-- TPS Trend Chart -->
-    <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-md);">
-            <div class="card-header" style="margin-bottom:0;">{{ t("dashboard.recent_tps_trend") }}</div>
-            <span class="text-caption">{{ t("dashboard.built_in_viz") }}</span>
-        </div>
-        <div style="height:280px;">
-            <canvas id="dashboard-trend-chart"></canvas>
-        </div>
-    </div>
-
-    <!-- Recent Runs Table -->
-    <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-md);">
-            <div class="card-header" style="margin-bottom:0;">{{ t("dashboard.recent_runs") }}</div>
-            <a href="/history" class="text-caption" style="color:var(--primary);">{{ t("common.view_all") }}</a>
-        </div>
-
-        {% if recent_runs %}
-        <div class="overflow-x-auto">
-            <table>
-                <thead>
-                    <tr>
-                        <th>{{ t("history.run_id") }}</th>
-                        <th>{{ t("common.status") }}</th>
-                        <th>{{ t("benchmark.suite") }}</th>
-                        <th>{{ t("common.environment") }}</th>
-                        <th>{{ t("common.duration") }}</th>
-                        <th>{{ t("common.date") }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for run in recent_runs %}
-                    <tr class="cursor-pointer" onclick="window.location='/history/{{ run.run_id }}'">
-                        <td class="font-mono" style="font-size:12px;color:var(--primary);">{{ run.run_id }}</td>
-                        <td>
-                            {% if run.status == 'completed' %}
-                            <span class="status-badge status-badge-success">{{ t("common.completed") }}</span>
-                            {% elif run.status == 'running' %}
-                            <span class="status-badge status-badge-info">{{ t("common.running") }}</span>
-                            {% elif run.status == 'failed' %}
-                            <span class="status-badge status-badge-danger">{{ t("common.failed") }}</span>
-                            {% else %}
-                            <span class="status-badge status-badge-muted">{{ run.status }}</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ run.suite or '--' }}</td>
-                        <td>{{ run.environment or '--' }}</td>
-                        <td>
-                            {% if run.duration_seconds %}{{ "%.1f"|format(run.duration_seconds) }}s{% else %}--{% endif %}
-                        </td>
-                        <td class="text-caption">
-                            {% if run.started_at %}{{ run.started_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <p class="text-caption" style="text-align:center;padding:var(--sp-xxl) 0;">{{ t("dashboard.empty_runs") }}</p>
-        {% endif %}
-    </div>
-
-</div>
 {% endblock %}
-
 {% block scripts %}
-<script type="application/json" id="dashboard-trend-data">{{ trend|tojson }}</script>
-<script>
+    <script type="application/json" id="dashboard-trend-data">{{ trend|tojson }}</script>
+    <script>
     (function () {
         const trendDataElement = document.getElementById("dashboard-trend-data");
         const trendData = trendDataElement ? JSON.parse(trendDataElement.textContent) : [];
@@ -238,5 +272,5 @@
             setInterval(pollMetrics, 5000);
         }
     })();
-</script>
+    </script>
 {% endblock %}

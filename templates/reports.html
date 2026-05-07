@@ -1,82 +1,100 @@
 {% extends "base.html" %}
 {% block page_title %}{{ t("reports.title") }}{% endblock %}
-
 {% block content %}
-<div class="space-y">
-
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--sp-md);">
-        <div>
-            <h2>{{ t("reports.header") }}</h2>
-            <p class="text-caption" style="margin-top:var(--sp-xxs);">{{ t("reports.subheader") }}</p>
-        </div>
-    </div>
-
-    {% if runs %}
-    <div class="card" style="padding:0;overflow:hidden;">
-        <div class="overflow-x-auto">
-            <table>
-                <thead>
-                    <tr>
-                        <th>{{ t("history.run_id") }}</th>
-                        <th>{{ t("common.date") }}</th>
-                        <th>{{ t("benchmark.suite") }}</th>
-                        <th>{{ t("common.environment") }}</th>
-                        <th>{{ t("common.duration") }}</th>
-                        <th>{{ t("common.actions") }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for run in runs %}
-                    <tr>
-                        <td>
-                            <a href="/reports/{{ run.run_id }}" class="font-mono" style="font-size:12px;">{{ run.run_id }}</a>
-                        </td>
-                        <td class="text-caption">
-                            {% if run.started_at %}{{ run.started_at.strftime('%Y-%m-%d %H:%M') }}{% endif %}
-                        </td>
-                        <td>{{ run.suite or '--' }}</td>
-                        <td>{{ run.environment or '--' }}</td>
-                        <td>
-                            {% if run.duration_seconds %}{{ "%.1f"|format(run.duration_seconds) }}s{% else %}--{% endif %}
-                        </td>
-                        <td>
-                            <div style="display:flex;gap:8px;">
-                                <button onclick="exportCSV('{{ run.run_id }}')" class="btn btn-pearl btn-sm">{{ t("common.export_csv") }}</button>
-                                <a href="/reports/{{ run.run_id }}/download" class="btn btn-primary btn-sm">Download</a>
-                                <a href="/reports/{{ run.run_id }}" class="btn btn-secondary btn-sm">{{ t("common.view_details") }}</a>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% else %}
-    <div class="card">
-        <p class="text-caption" style="text-align:center;padding:var(--sp-xxl) 0;">{{ t("reports.empty") }}</p>
-    </div>
-    {% endif %}
-
-    <!-- Workflow guide -->
-    <div class="card">
-        <div class="card-header">{{ t("reports.workflow") }}</div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-md);">
-            <div class="tile-parchment" style="border-radius:var(--r-lg);padding:var(--sp-lg);">
-                <div class="text-body-strong" style="font-size:14px;">{{ t("reports.step1_title") }}</div>
-                <p class="text-caption" style="margin-top:var(--sp-xs);">{{ t("reports.step1_body") }}</p>
-            </div>
-            <div class="tile-parchment" style="border-radius:var(--r-lg);padding:var(--sp-lg);">
-                <div class="text-body-strong" style="font-size:14px;">{{ t("reports.step2_title") }}</div>
-                <p class="text-caption" style="margin-top:var(--sp-xs);">{{ t("reports.step2_body") }}</p>
-            </div>
-            <div class="tile-parchment" style="border-radius:var(--r-lg);padding:var(--sp-lg);">
-                <div class="text-body-strong" style="font-size:14px;">{{ t("reports.step3_title") }}</div>
-                <p class="text-caption" style="margin-top:var(--sp-xs);">{{ t("reports.step3_body") }}</p>
+    <div class="space-y">
+        <!-- Header -->
+        <div style="display:flex;
+                    align-items:center;
+                    justify-content:space-between;
+                    flex-wrap:wrap;
+                    gap:var(--sp-md)">
+            <div>
+                <h2>{{ t("reports.header") }}</h2>
+                <p class="text-caption" style="margin-top:var(--sp-xxs);">{{ t("reports.subheader") }}</p>
             </div>
         </div>
+        {% if runs %}
+            <div class="card" style="padding:0;overflow:hidden;">
+                <div class="overflow-x-auto">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>{{ t("history.run_id") }}</th>
+                                <th>{{ t("common.date") }}</th>
+                                <th>{{ t("benchmark.suite") }}</th>
+                                <th>{{ t("common.environment") }}</th>
+                                <th>{{ t("common.duration") }}</th>
+                                <th>{{ t("common.actions") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for run in runs %}
+                                <tr>
+                                    <td>
+                                        <a href="/reports/{{ run.run_id }}"
+                                           class="font-mono"
+                                           style="font-size:12px">{{ run.run_id }}</a>
+                                    </td>
+                                    <td class="text-caption">
+                                        {% if run.started_at %}
+                                            {{ run.started_at.strftime("%Y-%m-%d %H:%M") }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ run.suite or '--' }}</td>
+                                    <td>{{ run.environment or '--' }}</td>
+                                    <td>
+                                        {% if run.duration_seconds %}
+                                            {{ "%.1f"|format(run.duration_seconds) }}s
+                                        {% else %}
+                                            --
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div style="display:flex;gap:8px;">
+                                            <button onclick="exportCSV('{{ run.run_id }}')" class="btn btn-pearl btn-sm">{{ t("common.export_csv") }}</button>
+                                            <a href="/reports/{{ run.run_id }}/download"
+                                               class="btn btn-primary btn-sm">Download</a>
+                                            <a href="/reports/{{ run.run_id }}" class="btn btn-secondary btn-sm">{{ t("common.view_details") }}</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% else %}
+            <div class="card">
+                <p class="text-caption"
+                   style="text-align:center;
+                          padding:var(--sp-xxl) 0">{{ t("reports.empty") }}</p>
+            </div>
+        {% endif %}
+        <!-- Workflow guide -->
+        <div class="card">
+            <div class="card-header">{{ t("reports.workflow") }}</div>
+            <div style="display:grid;
+                        grid-template-columns:repeat(3,1fr);
+                        gap:var(--sp-md)">
+                <div class="tile-parchment"
+                     style="border-radius:var(--r-lg);
+                            padding:var(--sp-lg)">
+                    <div class="text-body-strong" style="font-size:14px;">{{ t("reports.step1_title") }}</div>
+                    <p class="text-caption" style="margin-top:var(--sp-xs);">{{ t("reports.step1_body") }}</p>
+                </div>
+                <div class="tile-parchment"
+                     style="border-radius:var(--r-lg);
+                            padding:var(--sp-lg)">
+                    <div class="text-body-strong" style="font-size:14px;">{{ t("reports.step2_title") }}</div>
+                    <p class="text-caption" style="margin-top:var(--sp-xs);">{{ t("reports.step2_body") }}</p>
+                </div>
+                <div class="tile-parchment"
+                     style="border-radius:var(--r-lg);
+                            padding:var(--sp-lg)">
+                    <div class="text-body-strong" style="font-size:14px;">{{ t("reports.step3_title") }}</div>
+                    <p class="text-caption" style="margin-top:var(--sp-xs);">{{ t("reports.step3_body") }}</p>
+                </div>
+            </div>
+        </div>
     </div>
-
-</div>
 {% endblock %}
