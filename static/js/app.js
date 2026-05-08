@@ -35,6 +35,7 @@ async function pollStatus() {
         const data = await resp.json();
 
         // Server statuses
+        let allModels = new Set();
         if (data.servers) {
             data.servers.forEach(s => {
                 const dot = document.getElementById(`status-${s.server_id}`);
@@ -43,7 +44,28 @@ async function pollStatus() {
                         ? "status-dot status-online"
                         : "status-dot status-offline";
                 }
+                if (s.models_loaded && Array.isArray(s.models_loaded)) {
+                    s.models_loaded.forEach(m => allModels.add(m));
+                }
             });
+        }
+
+        // Update bench-model dropdown dynamically
+        const modelSelect = document.getElementById("bench-model");
+        if (modelSelect) {
+            const currentVal = modelSelect.value;
+            const modelsArray = Array.from(allModels).sort();
+            if (modelsArray.length > 0) {
+                const currentOptions = Array.from(modelSelect.options).map(o => o.value);
+                if (JSON.stringify(currentOptions) !== JSON.stringify(modelsArray)) {
+                    modelSelect.innerHTML = modelsArray.map(m => `<option value="${m}">${m}</option>`).join("");
+                    if (modelsArray.includes(currentVal)) {
+                        modelSelect.value = currentVal;
+                    }
+                }
+            } else {
+                modelSelect.innerHTML = `<option value="">No models found on servers</option>`;
+            }
         }
 
         // Infrastructure
@@ -300,6 +322,7 @@ async function onServerSelectChange(index) {
         
         card.innerHTML = `
             <div class="grid grid-cols-2 gap-2">
+                <div class="text-slate-500">OS/Kernel:</div><div class="font-mono text-slate-800">${specs.kernel || '--'}</div>
                 <div class="text-slate-500">CPU:</div><div class="font-mono text-slate-800">${specs.cpu_model || '--'} (${specs.cpu_cores || '?'} cores)</div>
                 <div class="text-slate-500">RAM:</div><div class="font-mono text-slate-800">${specs.ram_gb || '--'} GB</div>
                 <div class="text-slate-500">SSD:</div><div class="font-mono text-slate-800">${specs.ssd_total || '--'}</div>
@@ -326,7 +349,7 @@ async function startBenchmark() {
         return;
     }
 
-    const env = document.getElementById("bench-env")?.value || "lan";
+    const env = "lan";
     const notes = document.getElementById("bench-notes")?.value || "";
     const promptSetId = document.getElementById("bench-prompt-set")?.value || null;
     
@@ -352,8 +375,10 @@ async function startBenchmark() {
         stopBtn.disabled = false;
     }
 
+    const model = document.getElementById("bench-model")?.value || null;
+
     try {
-        const payload = { suite, servers, environment: env, notes, tags, advanced_options: advancedOptions };
+        const payload = { suite, servers, environment: env, notes, tags, model, advanced_options: advancedOptions };
         if (promptSetId) {
             payload.prompt_set_id = parseInt(promptSetId);
         }

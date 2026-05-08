@@ -511,9 +511,13 @@ class Orchestrator:
         tags: list[str] = None,
         resume_from_db: bool = False,
         prompt_set_id: int = None,
+        model: str = None,
     ):
         """Run benchmark asynchronously"""
         async with self._run_lock:
+            if model:
+                self.config.models = [model]
+            
             self._cancel_requested = False
             self._current_run_id = run_id
             self._live_metrics = {

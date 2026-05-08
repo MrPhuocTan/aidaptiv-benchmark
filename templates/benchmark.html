@@ -129,17 +129,10 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div>
-                    <label>{{ t("benchmark.environment") }}</label>
-                    <select id="bench-env">
-                        {% for env_id, env in config.environments.items() %}
-                            {% if env.enabled %}<option value="{{ env_id }}">{{ env.name }}</option>{% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
+
                 <div>
                     <label>{{ t("benchmark.model") }}</label>
-                    <select id="bench-model" disabled>
+                    <select id="bench-model">
                         {% for model in config.models %}<option value="{{ model }}">{{ model }}</option>{% endfor %}
                     </select>
                 </div>

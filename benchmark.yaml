@@ -17,8 +17,8 @@ servers:
   server1:
     name: "VM01 - Native High-End"
     description: "High-end GPU Server - Native Hardware"
-    ollama_url: "http://35.186.159.250:11434"
-    agent_url: "http://35.186.159.250:9100"
+    ollama_url: "http://34.21.144.84:11434"
+    agent_url: "http://34.21.144.84:9100"
     hardware_cost_usd: 50000
     monthly_power_usd: 500
 
@@ -31,12 +31,33 @@ servers:
     monthly_power_usd: 200
 
 models:
-  - "llama3.2-deterministic:latest"
+  - "llama2:7b"
+  - "llama2:13b"
+  - "llama2:70b"
+  - "llama3:8b"
+  - "llama3:70b"
+  - "llama3.1:8b"
+  - "llama3.1:70b"
+  - "mistral:7b"
+  - "mixtral:8x7b"
+  - "mixtral:8x22b"
+  - "codellama:7b"
+  - "codellama:70b"
+  - "phind-codellama:34b"
+  - "qwen:7b"
+  - "qwen:14b"
+  - "qwen:72b"
+  - "yi:6b"
+  - "yi:34b"
+  - "deepseek-llm:7b"
+  - "deepseek-llm:67b"
+  - "deepseek-v2:16b"
+  - "whisper-large-v2"
 
 environments:
   lan:
     name: "GCloud Direct"
-    server1_url: "http://35.186.159.250:11434"
+    server1_url: "http://34.21.144.84:11434"
     server2_url: "http://34.142.222.133:11434"
     enabled: true
 
@@ -48,7 +69,7 @@ environments:
 
   nat:
     name: "NAT Port Forward"
-    server1_url: "http://35.186.159.250:11434"
+    server1_url: "http://34.21.144.84:11434"
     server2_url: "http://34.142.222.133:11434"
     enabled: false
 
