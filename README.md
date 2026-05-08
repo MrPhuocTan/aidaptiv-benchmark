@@ -23,6 +23,31 @@ The **aiDaptive Benchmark Suite** is an advanced AI performance measurement tool
 
 ---
 
+## Screenshots
+
+<div align="center">
+  <img src="assets/images/dashboard.png" alt="Dashboard" width="80%">
+  <br>
+  <i>Real-time Dashboard</i>
+  <br><br>
+  
+  <img src="assets/images/benchmark.png" alt="Benchmark Setup" width="80%">
+  <br>
+  <i>Benchmark Execution Setup</i>
+  <br><br>
+
+  <img src="assets/images/servers.png" alt="Servers List" width="80%">
+  <br>
+  <i>Servers Management</i>
+  <br><br>
+
+  <img src="assets/images/history.png" alt="History" width="80%">
+  <br>
+  <i>Run History & Reports</i>
+</div>
+
+---
+
 ## Key Features
 
 | Feature | Description |
