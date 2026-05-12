@@ -259,7 +259,13 @@ def render_hardware_timeline(
         except Exception:
             x = list(range(len(timestamps_str)))
         
-        y = values[:len(x)]
+        y_raw = values[:len(x)]
+        y = []
+        for v in y_raw:
+            try:
+                y.append(float(v) if v is not None else 0.0)
+            except (TypeError, ValueError):
+                y.append(0.0)
         color = SERVER_COLORS[srv_idx % len(SERVER_COLORS)]
         
         ax.plot(x, y, "-", color=color, linewidth=1.5, label=srv_key, alpha=0.9)
