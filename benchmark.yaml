@@ -31,6 +31,7 @@ servers:
     monthly_power_usd: 200
 
 models:
+  # ── Legacy Models ──────────────────────────
   - "llama2:7b"
   - "llama2:13b"
   - "llama2:70b"
@@ -53,6 +54,52 @@ models:
   - "deepseek-llm:67b"
   - "deepseek-v2:16b"
   - "whisper-large-v2"
+  # ── Llama 3.x / 4.x ───────────────────────
+  - "llama3.1:405b"
+  - "llama3.2:1b"
+  - "llama3.2:3b"
+  - "llama3.3:70b"
+  - "llama4:scout"
+  # ── Qwen 2.5 Text ─────────────────────────
+  - "qwen2.5:0.5b"
+  - "qwen2.5:1.5b"
+  - "qwen2.5:3b"
+  - "qwen2.5:7b"
+  - "qwen2.5:14b"
+  - "qwen2.5:32b"
+  - "qwen2.5:72b"
+  # ── Qwen 2.5 Vision ───────────────────────
+  - "qwen2.5vl:3b"
+  - "qwen2.5vl:7b"
+  - "qwen2.5vl:32b"
+  - "qwen2.5vl:72b"
+  # ── Qwen 3 ─────────────────────────────────
+  - "qwen3:0.6b"
+  - "qwen3:1.7b"
+  - "qwen3:4b"
+  - "qwen3:14b"
+  - "qwq:32b"
+  # ── DeepSeek R1 Distill ────────────────────
+  - "deepseek-r1:1.5b"
+  - "deepseek-r1:8b"
+  - "deepseek-r1:32b"
+  - "deepseek-r1:70b"
+  # ── Gemma 3 ────────────────────────────────
+  - "gemma3:1b"
+  - "gemma3:4b"
+  - "gemma3:12b"
+  - "gemma3:27b"
+  # ── InternVL3 ──────────────────────────────
+  - "internvl3:1b"
+  - "internvl3:2b"
+  - "internvl3:8b"
+  - "internvl3:14b"
+  - "internvl3:38b"
+  # ── Phi-4 ──────────────────────────────────
+  - "phi4-mini:latest"
+  - "phi4:latest"
+  # ── Mistral Small 3.1 ─────────────────────
+  - "mistral-small:24b"
 
 environments:
   lan:
