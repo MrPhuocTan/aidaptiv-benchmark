@@ -3,20 +3,28 @@
 {% block content %}
     <div class="space-y-6">
         <!-- Header Section -->
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
             <div>
                 <a href="/reports"
                    class="text-[#1d1d1f] text-sm font-semibold hover:underline mb-2 inline-block">&larr; {{ t("report_details.back") }}</a>
                 <h3 class="text-3xl font-semibold text-[#1d1d1f]">{{ t("report_details.title") }}</h3>
                 <p class="text-sm text-[#7a7a7a] mt-2">
-                    {{ t("common.date") }}: {{ run.started_at.strftime("%Y-%m-%d %H:%M") }} | Run ID: <span class="font-mono text-[#1d1d1f]">{{ run.run_id }}</span>
+                    {{ t("common.date") }}: {{ run.started_at.strftime("%Y-%m-%d %H:%M") }} &nbsp;&middot;&nbsp; Run ID: <span class="font-mono text-[#1d1d1f]">{{ run.run_id }}</span>
                 </p>
             </div>
-            <div class="flex gap-2">
-                <a href="/reports/{{ run.run_id }}/export/evidence" class="btn-primary">{{ t("report_details.download_evidence") if t else "Download Evidence" }}</a>
-                <a href="/reports/{{ run.run_id }}/export/excel" class="btn-primary">{{ t("report_details.export_excel") if t else "Export Excel" }}</a>
-                <a href="/reports/{{ run.run_id }}/download" class="btn-primary">{{ t("report_details.download_pdf") if t else "Download PDF" }}</a>
-                <button onclick="window.print()" class="btn-secondary">{{ t("report_details.print") }}</button>
+            <div class="flex gap-2 flex-wrap">
+                <a href="/reports/{{ run.run_id }}/export/evidence" class="btn btn-primary btn-sm">
+                    ↓&nbsp; {{ t("report_details.download_evidence") if t else "Download Evidence" }}
+                </a>
+                <a href="/reports/{{ run.run_id }}/export/excel" class="btn btn-secondary btn-sm">
+                    ↓&nbsp; {{ t("report_details.export_excel") if t else "Export Excel" }}
+                </a>
+                <a href="/reports/{{ run.run_id }}/download" class="btn btn-secondary btn-sm">
+                    ↓&nbsp; {{ t("report_details.download_pdf") if t else "Download PDF" }}
+                </a>
+                <button onclick="window.print()" class="btn btn-pearl btn-sm">
+                    &#128438;&nbsp; {{ t("report_details.print") }}
+                </button>
             </div>
         </div>
         {% if report_data %}
