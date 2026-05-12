@@ -66,27 +66,27 @@ MODELS=(
 
     # ── NEW: DeepSeek R1 Distill Series ──────────────────────────────────────
     "install_47_deepseek_r1_qwen_1.5b.sh|deepseek-r1:1.5b|DeepSeek-R1-Distill-Qwen-1.5B|2 GB|DeepSeek R1|Reasoning"
-    "install_48_deepseek_r1_qwen_4b.sh|deepseek-r1:8b|DeepSeek-R1-Distill-Qwen-4B|4 GB|DeepSeek R1|Reasoning"
+    "install_48_deepseek_r1_qwen_7b.sh|deepseek-r1:7b|DeepSeek-R1-Distill-Qwen-7B|8 GB|DeepSeek R1|Reasoning"
     "install_49_deepseek_r1_qwen_32b.sh|deepseek-r1:32b|DeepSeek-R1-Distill-Qwen-32B|24 GB|DeepSeek R1|Reasoning"
     "install_50_deepseek_r1_llama_70b.sh|deepseek-r1:70b|DeepSeek-R1-Distill-Llama-70B|48 GB|DeepSeek R1|Reasoning"
 
     # ── NEW: Gemma 3 Series ──────────────────────────────────────────────────
-    "install_51_gemma3_270m.sh|gemma3:1b|Gemma-3-270M-IT|1 GB|Google Gemma 3|Text Generation"
+    "install_51_gemma3_270m.sh|gemma3:270m|Gemma-3-270M-IT|1 GB|Google Gemma 3|Text Generation"
     "install_52_gemma3_1b.sh|gemma3:1b|Gemma-3-1B-IT|2 GB|Google Gemma 3|Text Generation"
     "install_53_gemma3_4b.sh|gemma3:4b|Gemma-3-4B-IT|4 GB|Google Gemma 3|Text Generation"
     "install_54_gemma3_12b.sh|gemma3:12b|Gemma-3-12B-IT|12 GB|Google Gemma 3|Text Generation"
     "install_55_gemma3_27b.sh|gemma3:27b|Gemma-3-27B-IT|20 GB|Google Gemma 3|Text Generation"
 
-    # ── NEW: InternVL3 Series (Community) ────────────────────────────────────
-    "install_56_internvl3_1b.sh|internvl3:1b|InternVL3-1B|2 GB|OpenGVLab InternVL3|Vision-Language"
-    "install_57_internvl3_2b.sh|internvl3:2b|InternVL3-2B|4 GB|OpenGVLab InternVL3|Vision-Language"
-    "install_58_internvl3_8b.sh|internvl3:8b|InternVL3-8B|8 GB|OpenGVLab InternVL3|Vision-Language"
-    "install_59_internvl3_14b.sh|internvl3:14b|InternVL3-14B|16 GB|OpenGVLab InternVL3|Vision-Language"
-    "install_60_internvl3_38b.sh|internvl3:38b|InternVL3-38B|24 GB|OpenGVLab InternVL3|Vision-Language"
+    # ── NEW: InternVL3 Series (Community: blaifa/InternVL3) ───────────────────
+    "install_56_internvl3_1b.sh|blaifa/InternVL3:1b|InternVL3-1B|2 GB|OpenGVLab InternVL3|Vision-Language"
+    "install_57_internvl3_2b.sh|blaifa/InternVL3:2b|InternVL3-2B|4 GB|OpenGVLab InternVL3|Vision-Language"
+    "install_58_internvl3_8b.sh|blaifa/InternVL3:8b|InternVL3-8B|8 GB|OpenGVLab InternVL3|Vision-Language"
+    "install_59_internvl3_14b.sh|blaifa/InternVL3:14b|InternVL3-14B|16 GB|OpenGVLab InternVL3|Vision-Language"
+    "install_60_internvl3_38b.sh|blaifa/InternVL3:38b|InternVL3-38B|24 GB|OpenGVLab InternVL3|Vision-Language"
 
     # ── NEW: Phi-4 Series ────────────────────────────────────────────────────
     "install_61_phi4_mini.sh|phi4-mini:latest|Phi-4-Mini-Instruct|4 GB|Microsoft Phi-4|Text Generation"
-    "install_62_phi4_multimodal.sh|phi4:latest|Phi-4-Multimodal-Instruct|8 GB|Microsoft Phi-4|Vision-Language"
+    "install_62_phi4_14b.sh|phi4:latest|Phi-4-14B|8 GB|Microsoft Phi-4|Text Generation"
 
     # ── NEW: Mistral Small 3.1 ───────────────────────────────────────────────
     "install_63_mistral_small_3.1_24b.sh|mistral-small:24b|Mistral-Small-3.1-24B-Instruct|16 GB|Mistral AI|Text Generation"

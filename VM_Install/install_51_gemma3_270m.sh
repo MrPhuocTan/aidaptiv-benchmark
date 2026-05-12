@@ -2,7 +2,7 @@
 # ==============================================================================
 # aiDaptive Benchmark — Model Installer
 # Model:  Gemma-3-270M-IT
-# Ollama: gemma3:1b
+# Ollama: gemma3:270m
 # Family: Google Gemma 3
 # Task:   Text Generation
 # VRAM:   1 GB minimum
@@ -17,9 +17,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/_base_setup.sh"
 
 run_full_install \
-    "gemma3:1b" \
+    "gemma3:270m" \
     "Gemma-3-270M-IT" \
     "1 GB" \
     "Google Gemma 3" \
     "Text Generation" \
-    "gemma3-deterministic:1b"
+    "gemma3-deterministic:270m"

@@ -2,7 +2,7 @@
 # ==============================================================================
 # aiDaptive Benchmark — Model Installer
 # Model:  InternVL3-2B
-# Ollama: internvl3:2b
+# Ollama: blaifa/InternVL3:2b
 # Family: OpenGVLab InternVL3
 # Task:   Vision-Language
 # VRAM:   4 GB minimum
@@ -17,9 +17,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/_base_setup.sh"
 
 run_full_install \
-    "internvl3:2b" \
+    "blaifa/InternVL3:2b" \
     "InternVL3-2B" \
     "4 GB" \
     "OpenGVLab InternVL3" \
     "Vision-Language" \
-    "internvl3-deterministic:2b"
+    "blaifa/InternVL3-deterministic:2b"

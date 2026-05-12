@@ -1,10 +1,10 @@
 #!/bin/bash
 # ==============================================================================
 # aiDaptive Benchmark — Model Installer
-# Model:  Phi-4-Multimodal-Instruct
+# Model:  Phi-4-14B
 # Ollama: phi4:latest
 # Family: Microsoft Phi-4
-# Task:   Vision-Language
+# Task:   Text Generation
 # VRAM:   8 GB minimum
 #
 # Installs: Ollama, Benchmark Agent, oha, litellm, locust, llmperf
@@ -18,8 +18,8 @@ source "${SCRIPT_DIR}/_base_setup.sh"
 
 run_full_install \
     "phi4:latest" \
-    "Phi-4-Multimodal-Instruct" \
+    "Phi-4-14B" \
     "8 GB" \
     "Microsoft Phi-4" \
-    "Vision-Language" \
+    "Text Generation" \
     "phi4-deterministic:latest"
