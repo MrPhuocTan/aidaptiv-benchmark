@@ -136,6 +136,15 @@
                         {% for model in config.models %}<option value="{{ model }}">{{ model }}</option>{% endfor %}
                     </select>
                 </div>
+
+                <div>
+                    <label>{{ t("common.environment") }}</label>
+                    <select id="bench-environment">
+                        {% for env_name in config.environments.keys() %}
+                            <option value="{{ env_name }}" {% if env_name == 'lan' %}selected{% endif %}>{{ env_name|upper }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div>
                     <label>Prompt Set</label>
                     <select id="bench-prompt-set">
@@ -190,32 +199,6 @@
                                    style="width:80px;
                                           padding:4px 8px;
                                           font-size:12px">
-                        </div>
-                    </div>
-                    <label style="margin-top:var(--sp-md);">Fixed Global Limits</label>
-                    <div style="background:var(--canvas-parchment);
-                                border-radius:var(--r-md);
-                                padding:var(--sp-md);
-                                display:flex;
-                                flex-direction:column;
-                                gap:var(--sp-xs)">
-                        <div style="display:flex;
-                                    justify-content:space-between;
-                                    align-items:center">
-                            <span class="text-caption">Repeat Count</span>
-                            <span class="font-mono text-caption"
-                                  style="background:var(--canvas);
-                                         padding:2px 8px;
-                                         border-radius:var(--r-xs)">1</span>
-                        </div>
-                        <div style="display:flex;
-                                    justify-content:space-between;
-                                    align-items:center">
-                            <span class="text-caption">Request Timeout (s)</span>
-                            <span class="font-mono text-caption"
-                                  style="background:var(--canvas);
-                                         padding:2px 8px;
-                                         border-radius:var(--r-xs)">120</span>
                         </div>
                     </div>
                 </div>

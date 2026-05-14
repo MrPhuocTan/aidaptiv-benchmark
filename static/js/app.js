@@ -349,7 +349,7 @@ async function startBenchmark() {
         return;
     }
 
-    const env = "lan";
+    const env = document.getElementById("bench-environment")?.value || "lan";
     const notes = document.getElementById("bench-notes")?.value || "";
     const promptSetId = document.getElementById("bench-prompt-set")?.value || null;
     
@@ -359,8 +359,6 @@ async function startBenchmark() {
     
     const advancedOptions = {
         warmup_requests: parseInt(document.getElementById("bench-warmup")?.value) || 3,
-        repeat_count: 1, // Fixed globally
-        request_timeout_seconds: 120, // Fixed globally
         cooldown_seconds: parseInt(document.getElementById("bench-cooldown")?.value) || 10
     };
 
@@ -441,6 +439,24 @@ async function pollProgress(runId) {
             // handled by global poll
         }
     }, 3000);
+}
+
+async function resumeRun(runId) {
+    if (!confirm(`Resume run ${runId}?`)) return;
+    try {
+        const resp = await fetch(`/api/benchmark/${runId}/resume`, { method: "POST" });
+        const data = await resp.json();
+        if (data.status === "started") {
+            showNotification(data.message || `Run resumed`);
+            setTimeout(() => {
+                window.location.href = `/history/${data.run_id}`;
+            }, 1000);
+        } else if (data.error) {
+            showNotification(data.error, "error");
+        }
+    } catch (e) {
+        showNotification("Failed to resume run", "error");
+    }
 }
 
 async function stopBenchmark() {

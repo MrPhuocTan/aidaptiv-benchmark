@@ -659,6 +659,41 @@ async def api_benchmark_start(request: Request):
     }
 
 
+@app.post("/api/benchmark/{run_id}/resume")
+async def api_benchmark_resume(run_id: str, request: Request, session: AsyncSession = Depends(get_db)):
+    if not orchestrator:
+        return JSONResponse({"error": _t_for_request(request, "api.orchestrator_not_initialized")}, status_code=500)
+    if orchestrator.is_running():
+        return JSONResponse({"error": _t_for_request(request, "api.benchmark_in_progress")}, status_code=409)
+
+    repo = AsyncRepository(session)
+    run = await repo.get_run_by_id(run_id)
+    if not run:
+        return JSONResponse({"error": "Run not found"}, status_code=404)
+    if run.status == "completed":
+        return JSONResponse({"error": "Run is already completed"}, status_code=400)
+
+    config_snap = run.config_snapshot or {}
+    suite = config_snap.get("suite", "all")
+    target_servers = config_snap.get("servers", [])
+    environment = config_snap.get("environment", "lan")
+    prompt_set_id = config_snap.get("prompt_set_id")
+
+    asyncio.create_task(
+        orchestrator.run_async(
+            run_id=run_id,
+            suite=suite,
+            target_servers=target_servers,
+            environment=environment,
+            notes=run.notes,
+            tags=run.tags,
+            resume_from_db=True,
+            prompt_set_id=prompt_set_id
+        )
+    )
+    return {"run_id": run_id, "status": "started", "message": "Benchmark resumed"}
+
+
 @app.post("/api/benchmark/stop")
 async def api_benchmark_stop(request: Request, session: AsyncSession = Depends(get_db)):
     if not orchestrator:

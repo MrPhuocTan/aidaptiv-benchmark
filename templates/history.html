@@ -121,6 +121,9 @@
                                     </td>
                                     <td>
                                         <div style="display:flex;gap:8px;">
+                                            {% if run.status == 'failed' or run.status == 'stopped' %}
+                                                <button onclick="resumeRun('{{ run.run_id }}')" class="btn btn-primary btn-sm">Resume</button>
+                                            {% endif %}
                                             <button onclick="exportCSV('{{ run.run_id }}')" class="btn btn-pearl btn-sm">CSV</button>
                                             <button onclick="deleteRun('{{ run.run_id }}')" class="btn btn-danger btn-sm">Del</button>
                                         </div>

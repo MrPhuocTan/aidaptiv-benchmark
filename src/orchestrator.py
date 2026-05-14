@@ -494,7 +494,7 @@ class Orchestrator:
             self.run_async(
                 run_id=run_id,
                 suite=suite,
-                server=server,
+                target_servers=[server] if server != "all" else None,
                 environment=environment,
                 notes=notes,
                 tags=tags or [],
@@ -644,24 +644,25 @@ class Orchestrator:
                     client = runtime_agent_clients[server_id]
                     target_url = resolved_targets[server_id]
 
-                    for model in self.config.models:
-                        self._check_cancelled()
-                        console.print(
-                            f"    Warming up {model} on {server_id} ({target_url})..."
+                    # Removed batch model execution: we only test exactly 1 model selected from FE
+                    model = self.config.models[0] if self.config.models else "unknown"
+                    self._check_cancelled()
+                    console.print(
+                        f"    Warming up {model} on {server_id} ({target_url})..."
+                    )
+                    warm_ok = await client.warmup_model(
+                        model,
+                        self.config.benchmark.warmup_requests,
+                        ollama_url=target_url,
+                    )
+                    if not warm_ok:
+                        raise RuntimeError(
+                            f"Warmup failed for model '{model}' on '{server_id}'"
                         )
-                        warm_ok = await client.warmup_model(
-                            model,
-                            self.config.benchmark.warmup_requests,
-                            ollama_url=target_url,
-                        )
-                        if not warm_ok:
-                            raise RuntimeError(
-                                f"Warmup failed for model '{model}' on '{server_id}'"
-                            )
-                        console.print(
-                            f"    ✓ {model} on {server_id} ready",
-                            style="green",
-                        )
+                    console.print(
+                        f"    ✓ {model} on {server_id} ready",
+                        style="green",
+                    )
 
                 self._progress["current_phase"] = "Monitoring"
                 console.print("\n  Phase 2: Starting hardware monitors", style="purple")
@@ -692,7 +693,7 @@ class Orchestrator:
                     total += (
                         len(scenarios)
                         * len(servers_to_test)
-                        * len(self.config.models)
+                        * 1 # single model mode
                         * len(suite_tools)
                         * len(concurrencies)
                     )
@@ -704,7 +705,7 @@ class Orchestrator:
                 
                 existing_results = []
                 if resume_from_db:
-                    existing_results = await repo.get_results_by_run(run_id)
+                    existing_results = repo.get_results_by_run(run_id)
                 
                 for suite_name, suite_cfg in suites_to_run:
                     self._check_cancelled()
@@ -719,61 +720,62 @@ class Orchestrator:
                             style="white",
                         )
 
-                        for model in self.config.models:
+                        # Removed batch model execution: we only test exactly 1 model selected from FE
+                        model = self.config.models[0] if self.config.models else "unknown"
+                        self._check_cancelled()
+                        for server_id in servers_to_test:
                             self._check_cancelled()
-                            for server_id in servers_to_test:
-                                self._check_cancelled()
-                                target_url = resolved_targets[server_id]
+                            target_url = resolved_targets[server_id]
 
-                                suite_tools = suite_tools_map[suite_name]
-                                concurrencies = suite_cfg.concurrency_levels if suite_cfg.concurrency_levels else [suite_cfg.concurrency]
-                                
-                                for tool_name, adapter_class, tool_cfg in suite_tools:
-                                    for concurrency in concurrencies:
-                                        self._check_cancelled()
-                                        
-                                        # Ensure prompts list is at least as long as concurrency to properly test scaling
-                                        # and at least as long as requests_per_scenario for volume
-                                        current_prompts = prompts
-                                        num_requests = suite_cfg.requests_per_scenario
-                                        min_needed = max(num_requests, concurrency)
-                                        if len(current_prompts) < min_needed:
-                                            current_prompts = (current_prompts * (min_needed // len(current_prompts) + 1))[:min_needed]
-                                        elif num_requests > 0 and len(current_prompts) > num_requests and len(current_prompts) > concurrency:
-                                            # Slice but don't go below concurrency
-                                            current_prompts = current_prompts[:max(num_requests, concurrency)]
+                            suite_tools = suite_tools_map[suite_name]
+                            concurrencies = suite_cfg.concurrency_levels if suite_cfg.concurrency_levels else [suite_cfg.concurrency]
+                            
+                            for tool_name, adapter_class, tool_cfg in suite_tools:
+                                for concurrency in concurrencies:
+                                    self._check_cancelled()
+                                    
+                                    # Ensure prompts list is at least as long as concurrency to properly test scaling
+                                    # and at least as long as requests_per_scenario for volume
+                                    current_prompts = prompts
+                                    num_requests = suite_cfg.requests_per_scenario
+                                    min_needed = max(num_requests, concurrency)
+                                    if len(current_prompts) < min_needed:
+                                        current_prompts = (current_prompts * (min_needed // len(current_prompts) + 1))[:min_needed]
+                                    elif num_requests > 0 and len(current_prompts) > num_requests and len(current_prompts) > concurrency:
+                                        # Slice but don't go below concurrency
+                                        current_prompts = current_prompts[:max(num_requests, concurrency)]
 
-                                        if resume_from_db:
-                                            has_result = any(
-                                                r.scenario == scenario and r.tool == tool_name and r.server == server_id and r.model == model and r.concurrency == concurrency
-                                                for r in existing_results
-                                            )
-                                            if has_result:
-                                                completed += 1
-                                                self._progress["completed_tests"] = completed
-                                                self._progress["percent"] = int(completed / total * 100) if total > 0 else 0
-                                                console.print(f"        [{completed}/{total}] {server_id} / {scenario} / {model} / [cyan]{tool_name}[/cyan] (c={concurrency}) (Resumed)", style="dim")
-                                                continue
-                                                
-                                        completed = await self._execute_single_test(
-                                            run_id=run_id,
-                                            server_id=server_id,
-                                            environment=environment,
-                                            scenario=scenario,
-                                            model=model,
-                                            tool_name=tool_name,
-                                            adapter_class=adapter_class,
-                                            tool_cfg=tool_cfg,
-                                            target_url=target_url,
-                                            suite_cfg=suite_cfg,
-                                            prompts=current_prompts,
-                                            completed=completed,
-                                            total=total,
-                                            concurrency=concurrency,
+                                    if resume_from_db:
+                                        has_result = any(
+                                            r.scenario == scenario and r.tool == tool_name and r.server == server_id and r.model == model and r.concurrency == concurrency
+                                            for r in existing_results
                                         )
+                                        if has_result:
+                                            completed += 1
+                                            self._progress["completed_tests"] = completed
+                                            self._progress["percent"] = int(completed / total * 100) if total > 0 else 0
+                                            console.print(f"        [{completed}/{total}] {server_id} / {scenario} / {model} / [cyan]{tool_name}[/cyan] (c={concurrency}) (Resumed)", style="dim")
+                                            continue
+                                            
+                                    completed = await self._execute_single_test(
+                                        run_id=run_id,
+                                        server_id=server_id,
+                                        environment=environment,
+                                        scenario=scenario,
+                                        model=model,
+                                        tool_name=tool_name,
+                                        adapter_class=adapter_class,
+                                        tool_cfg=tool_cfg,
+                                        target_url=target_url,
+                                        suite_cfg=suite_cfg,
+                                        prompts=current_prompts,
+                                        completed=completed,
+                                        total=total,
+                                        concurrency=concurrency,
+                                    )
 
-                                    if self.config.benchmark.cooldown_seconds > 0:
-                                        await asyncio.sleep(self.config.benchmark.cooldown_seconds)
+                                if self.config.benchmark.cooldown_seconds > 0:
+                                    await asyncio.sleep(self.config.benchmark.cooldown_seconds)
 
                 self._progress["current_phase"] = "Finalizing"
                 console.print("\n  Phase 4: Stopping monitors", style="purple")
