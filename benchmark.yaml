@@ -104,9 +104,9 @@ models:
 
 environments:
   lan:
-    name: "GCloud Direct"
-    server1_url: "http://34.21.144.84:11434"
-    server2_url: "http://34.142.222.133:11434"
+    name: "Direct LAN"
+    server1_url: "http://192.168.1.101:11434"
+    server2_url: "http://192.168.1.102:11434"
     enabled: true
 
   vpn:
@@ -117,8 +117,8 @@ environments:
 
   nat:
     name: "NAT Port Forward"
-    server1_url: "http://34.21.144.84:11434"
-    server2_url: "http://34.142.222.133:11434"
+    server1_url: "http://123.45.67.89:11434"
+    server2_url: "http://98.76.54.32:11434"
     enabled: false
 
   reverse_proxy:
