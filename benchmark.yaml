@@ -130,7 +130,6 @@ environments:
 benchmark:
   warmup_requests: 3
   cooldown_seconds: 10
-  concurrency_levels: [1, 5, 10, 25, 50]
 
   test_suites:
     single_request:

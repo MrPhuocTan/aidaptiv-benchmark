@@ -70,7 +70,6 @@ class BenchmarkSuiteConfig:
 class BenchmarkConfig:
     warmup_requests: int = 3
     cooldown_seconds: int = 10
-    concurrency_levels: list = field(default_factory=lambda: [1, 5, 10, 25, 50])
     test_suites: dict = field(default_factory=dict)
 
 
@@ -139,9 +138,6 @@ def load_config(path: str = "benchmark.yaml") -> Config:
         bm = raw["benchmark"]
         cfg.benchmark.warmup_requests = bm.get("warmup_requests", 3)
         cfg.benchmark.cooldown_seconds = bm.get("cooldown_seconds", 10)
-        cfg.benchmark.concurrency_levels = bm.get(
-            "concurrency_levels", [1, 5, 10, 25, 50]
-        )
         if "test_suites" in bm:
             for key, val in bm["test_suites"].items():
                 cfg.benchmark.test_suites[key] = BenchmarkSuiteConfig(**val)

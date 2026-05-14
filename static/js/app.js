@@ -360,7 +360,6 @@ async function startBenchmark() {
     const advancedOptions = {
         warmup_requests: parseInt(document.getElementById("bench-warmup")?.value) || 3,
         repeat_count: 1, // Fixed globally
-        concurrency_levels: document.getElementById("bench-concurrency")?.value || "1, 5, 10, 25, 50",
         request_timeout_seconds: 120, // Fixed globally
         cooldown_seconds: parseInt(document.getElementById("bench-cooldown")?.value) || 10
     };
