@@ -629,6 +629,7 @@ async def api_benchmark_start(request: Request):
     tags = body.get("tags", [])
     prompt_set_id = body.get("prompt_set_id")
     model = body.get("model")
+    run_name = body.get("run_name", "").strip() or None
 
     advanced_options = body.get("advanced_options")
     if advanced_options:
@@ -649,6 +650,7 @@ async def api_benchmark_start(request: Request):
             tags=tags,
             prompt_set_id=prompt_set_id,
             model=model,
+            run_name=run_name,
         )
     )
 

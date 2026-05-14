@@ -79,6 +79,7 @@ class BenchmarkRun(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     run_id = Column(String(64), unique=True, nullable=False, index=True)
+    name = Column(String(200), nullable=True)
     status = Column(String(20), default=RunStatus.PENDING.value, nullable=False)
     started_at = Column(DateTime, default=get_local_time)
     finished_at = Column(DateTime, nullable=True)

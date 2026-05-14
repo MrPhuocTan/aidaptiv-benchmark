@@ -117,9 +117,13 @@
             </div>
             <!-- Config row -->
             <div style="display:grid;
-                        grid-template-columns:repeat(4,1fr);
+                        grid-template-columns:repeat(5,1fr);
                         gap:var(--sp-md);
                         margin-bottom:var(--sp-lg)">
+                <div>
+                    <label>Run Name (Optional)</label>
+                    <input type="text" id="bench-run-name" placeholder="Leave empty for default" style="width: 100%;" />
+                </div>
                 <div>
                     <label>{{ t("benchmark.test_suite") }}</label>
                     <select id="bench-suite">

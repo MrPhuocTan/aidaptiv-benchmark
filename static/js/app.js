@@ -352,6 +352,7 @@ async function startBenchmark() {
     const env = document.getElementById("bench-environment")?.value || "lan";
     const notes = document.getElementById("bench-notes")?.value || "";
     const promptSetId = document.getElementById("bench-prompt-set")?.value || null;
+    const runName = document.getElementById("bench-run-name")?.value || "";
     
     // Advanced options & Tags
     const tagsInput = document.getElementById("bench-tags")?.value || "";
@@ -375,7 +376,7 @@ async function startBenchmark() {
     const model = document.getElementById("bench-model")?.value || null;
 
     try {
-        const payload = { suite, servers, environment: env, notes, tags, model, advanced_options: advancedOptions };
+        const payload = { suite, servers, environment: env, notes, tags, model, advanced_options: advancedOptions, run_name: runName };
         if (promptSetId) {
             payload.prompt_set_id = parseInt(promptSetId);
         }

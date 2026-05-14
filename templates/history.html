@@ -39,8 +39,10 @@
                                 <tr id="row-{{ run.run_id }}">
                                     <td>
                                         <a href="/history/{{ run.run_id }}"
-                                           class="font-mono"
-                                           style="font-size:12px">{{ run.run_id }}</a>
+                                           class="font-mono font-bold text-blue-500 hover:underline"
+                                           title="ID: {{ run.run_id }}"
+                                           style="font-size:13px">{{ run.name or run.run_id }}</a>
+                                        {% if run.name %}<div class="text-xs text-gray-500 font-mono">{{ run.run_id }}</div>{% endif %}
                                     </td>
                                     <td>
                                         {% if run.status == 'completed' %}

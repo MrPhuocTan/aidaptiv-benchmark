@@ -488,6 +488,7 @@ class Orchestrator:
         environment: str = "lan",
         notes: str = "",
         tags: list = None,
+        run_name: str = None,
     ):
         """Run benchmark synchronously (for CLI)"""
         asyncio.run(
@@ -498,6 +499,7 @@ class Orchestrator:
                 environment=environment,
                 notes=notes,
                 tags=tags or [],
+                run_name=run_name,
             )
         )
 
@@ -512,6 +514,7 @@ class Orchestrator:
         resume_from_db: bool = False,
         prompt_set_id: int = None,
         model: str = None,
+        run_name: str = None,
     ):
         """Run benchmark asynchronously"""
         async with self._run_lock:
@@ -549,6 +552,7 @@ class Orchestrator:
             if not resume_from_db:
                 repo.create_run(
                     run_id=run_id,
+                    name=run_name,
                     suite=suite,
                     environment=environment,
                     model=",".join(self.config.models),
