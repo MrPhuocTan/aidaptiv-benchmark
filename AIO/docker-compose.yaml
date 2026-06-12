@@ -1,0 +1,59 @@
+# ============================================================================
+#  aiDaptive Benchmark Suite - Docker Compose (AIO)
+#  Chạy: docker compose -f AIO/docker-compose.yaml up --build -d
+#  (Từ thư mục gốc project)
+# ============================================================================
+
+services:
+
+  # ---- PostgreSQL Database ----
+  postgres:
+    image: postgres:16-alpine
+    container_name: aidaptive-postgres
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-aidaptive}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-aidaptive2024}
+      - POSTGRES_DB=${POSTGRES_DB:-aidaptive_benchmark}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aidaptive}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - aidaptive-net
+
+  # ---- aiDaptive Benchmark App ----
+  app:
+    build:
+      context: ..
+      dockerfile: AIO/Dockerfile
+    image: aidaptive-benchmark:latest
+    container_name: aidaptive-app
+    restart: unless-stopped
+    ports:
+      - "${AIDAPTIVE_APP_PORT:-8443}:8443"
+    environment:
+      - AIDAPTIVE_APP_HOST=0.0.0.0
+      - AIDAPTIVE_APP_PORT=8443
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-aidaptive_benchmark}
+      - POSTGRES_USER=${POSTGRES_USER:-aidaptive}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-aidaptive2024}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - aidaptive-net
+
+volumes:
+  postgres_data:
+
+networks:
+  aidaptive-net:
+    driver: bridge

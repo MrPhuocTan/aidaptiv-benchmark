@@ -219,6 +219,8 @@ class Orchestrator:
         servers_to_test: list,
         environment: str,
         enabled_tools: list,
+        runtime_servers: dict,
+        run_model: str,
     ) -> dict:
         env_cfg = self.config.environments.get(environment)
         if not env_cfg:
@@ -227,7 +229,7 @@ class Orchestrator:
         resolved_targets = {}
 
         for server_id in servers_to_test:
-            server_cfg = self.config.servers.get(server_id)
+            server_cfg = runtime_servers.get(server_id)
             if not server_cfg:
                 raise ValueError(f"Server '{server_id}' not found in config")
             
@@ -254,18 +256,17 @@ class Orchestrator:
                 )
 
             models = await client.get_ollama_models(target_url)
-            for model in self.config.models:
-                if model not in models:
-                    raise RuntimeError(
-                        f"Model '{model}' not available on '{server_id}' at '{target_url}'"
-                    )
+            if run_model not in models:
+                raise RuntimeError(
+                    f"Model '{run_model}' not available on '{server_id}' at '{target_url}'"
+                )
 
             resolved_targets[server_id] = target_url
 
         available_tools, unavailable_tools = self._split_available_tools(
             enabled_tools,
             next(iter(resolved_targets.values())),
-            self.config.models[0],
+            run_model,
         )
 
         if not available_tools:
@@ -445,9 +446,11 @@ class Orchestrator:
                     result.environment = environment
                     result.scenario = scenario
                     result.tool = tool_name
-                    self.data_sink.write_benchmark_result(result, run_id)
                     self._record_live_metrics(result, server_id)
                     result_count += 1
+                
+                if results:
+                    await self.data_sink.write_results_batch_async(results, run_id)
 
                 console.print(
                     f"          ✓ {tool_name}: {result_count} results "
@@ -515,11 +518,14 @@ class Orchestrator:
         prompt_set_id: int = None,
         model: str = None,
         run_name: str = None,
+        advanced_options: dict = None,
     ):
         """Run benchmark asynchronously"""
         async with self._run_lock:
-            if model:
-                self.config.models = [model]
+            run_model = model or (self.config.models[0] if self.config.models else "unknown")
+            opts = advanced_options or {}
+            warmup_requests = int(opts.get("warmup_requests", self.config.benchmark.warmup_requests))
+            cooldown_seconds = int(opts.get("cooldown_seconds", self.config.benchmark.cooldown_seconds))
             
             self._cancel_requested = False
             self._current_run_id = run_id
@@ -555,7 +561,7 @@ class Orchestrator:
                     name=run_name,
                     suite=suite,
                     environment=environment,
-                    model=",".join(self.config.models),
+                    model=run_model,
                     config_snapshot={
                         "suite": suite,
                         "servers": target_servers,
@@ -605,24 +611,18 @@ class Orchestrator:
                 if not enabled_tools:
                     raise ValueError("No benchmark tools are enabled")
 
-                original_servers = self.config.servers
-                original_clients = self.agent_clients
-                self.config.servers = runtime_servers
-                self.agent_clients = runtime_agent_clients
-                try:
-                    resolved_targets = await self._validate_run_targets(
-                        servers_to_test,
-                        environment,
-                        enabled_tools,
-                    )
-                finally:
-                    self.config.servers = original_servers
-                    self.agent_clients = original_clients
+                resolved_targets = await self._validate_run_targets(
+                    servers_to_test,
+                    environment,
+                    enabled_tools,
+                    runtime_servers,
+                    run_model,
+                )
 
                 enabled_tools, unavailable_tools = self._split_available_tools(
                     enabled_tools,
                     next(iter(resolved_targets.values())),
-                    self.config.models[0],
+                    run_model,
                 )
                 if unavailable_tools:
                     warning_msg = (
@@ -638,7 +638,7 @@ class Orchestrator:
                     style="cyan",
                 )
                 console.print(f"    Servers: {servers_to_test}", style="cyan")
-                console.print(f"    Models: {self.config.models}", style="cyan")
+                console.print(f"    Model: {run_model}", style="cyan")
 
                 self._progress["current_phase"] = "Warmup"
                 console.print("\n  Phase 1: Warming up models", style="purple")
@@ -649,22 +649,21 @@ class Orchestrator:
                     target_url = resolved_targets[server_id]
 
                     # Removed batch model execution: we only test exactly 1 model selected from FE
-                    model = self.config.models[0] if self.config.models else "unknown"
                     self._check_cancelled()
                     console.print(
-                        f"    Warming up {model} on {server_id} ({target_url})..."
+                        f"    Warming up {run_model} on {server_id} ({target_url})..."
                     )
                     warm_ok = await client.warmup_model(
-                        model,
-                        self.config.benchmark.warmup_requests,
+                        run_model,
+                        warmup_requests,
                         ollama_url=target_url,
                     )
                     if not warm_ok:
                         raise RuntimeError(
-                            f"Warmup failed for model '{model}' on '{server_id}'"
+                            f"Warmup failed for model '{run_model}' on '{server_id}'"
                         )
                     console.print(
-                        f"    ✓ {model} on {server_id} ready",
+                        f"    ✓ {run_model} on {server_id} ready",
                         style="green",
                     )
 
@@ -725,7 +724,6 @@ class Orchestrator:
                         )
 
                         # Removed batch model execution: we only test exactly 1 model selected from FE
-                        model = self.config.models[0] if self.config.models else "unknown"
                         self._check_cancelled()
                         for server_id in servers_to_test:
                             self._check_cancelled()
@@ -751,14 +749,14 @@ class Orchestrator:
 
                                     if resume_from_db:
                                         has_result = any(
-                                            r.scenario == scenario and r.tool == tool_name and r.server == server_id and r.model == model and r.concurrency == concurrency
+                                            r.scenario == scenario and r.tool == tool_name and r.server == server_id and r.model == run_model and r.concurrency == concurrency
                                             for r in existing_results
                                         )
                                         if has_result:
                                             completed += 1
                                             self._progress["completed_tests"] = completed
                                             self._progress["percent"] = int(completed / total * 100) if total > 0 else 0
-                                            console.print(f"        [{completed}/{total}] {server_id} / {scenario} / {model} / [cyan]{tool_name}[/cyan] (c={concurrency}) (Resumed)", style="dim")
+                                            console.print(f"        [{completed}/{total}] {server_id} / {scenario} / {run_model} / [cyan]{tool_name}[/cyan] (c={concurrency}) (Resumed)", style="dim")
                                             continue
                                             
                                     completed = await self._execute_single_test(
@@ -766,7 +764,7 @@ class Orchestrator:
                                         server_id=server_id,
                                         environment=environment,
                                         scenario=scenario,
-                                        model=model,
+                                        model=run_model,
                                         tool_name=tool_name,
                                         adapter_class=adapter_class,
                                         tool_cfg=tool_cfg,
@@ -778,8 +776,8 @@ class Orchestrator:
                                         concurrency=concurrency,
                                     )
 
-                                if self.config.benchmark.cooldown_seconds > 0:
-                                    await asyncio.sleep(self.config.benchmark.cooldown_seconds)
+                                if cooldown_seconds > 0:
+                                    await asyncio.sleep(cooldown_seconds)
 
                 self._progress["current_phase"] = "Finalizing"
                 console.print("\n  Phase 4: Stopping monitors", style="purple")
@@ -863,47 +861,60 @@ class Orchestrator:
             console.print("    ⚠ Less than 2 servers in results, skipping comparison", style="yellow")
             return
 
-        s1_id = servers_used[0]
-        s2_id = servers_used[1]
-        
-        s1_data = repo.get_aggregated_results(run_id, s1_id)
-        s2_data = repo.get_aggregated_results(run_id, s2_id)
-
-        if s1_data["result_count"] == 0 or s2_data["result_count"] == 0:
-            console.print("    ⚠ Not enough data for comparison", style="yellow")
-            return
-
-        def calc_delta(s1_val, s2_val, lower_is_better=False):
-            if s1_val and s2_val and s1_val != 0:
-                delta = ((s2_val - s1_val) / s1_val) * 100
+        def calc_delta(baseline_val, target_val, lower_is_better=False):
+            if baseline_val and target_val and baseline_val != 0:
+                delta = ((target_val - baseline_val) / baseline_val) * 100
                 if lower_is_better:
                     delta = -delta
                 return round(delta, 2)
             return None
 
+        # Fetch all aggregated data
+        server_data = {s_id: repo.get_aggregated_results(run_id, s_id) for s_id in servers_used}
+        
+        # Determine baseline (s1)
+        s1_id = servers_used[0]
+        s1_data = server_data[s1_id]
+
+        if s1_data["result_count"] == 0:
+            console.print("    ⚠ Baseline server has no data", style="yellow")
+            return
+
+        # Find best alternative server (s2)
+        best_score = -999
+        s2_id = servers_used[1] # fallback
+        s2_data = server_data[s2_id]
+        
+        for s_id in servers_used[1:]:
+            data = server_data[s_id]
+            if data["result_count"] == 0:
+                continue
+            
+            delta_tps = calc_delta(s1_data.get("avg_tps"), data.get("avg_tps"))
+            delta_ttft = calc_delta(s1_data.get("avg_ttft_ms"), data.get("avg_ttft_ms"), lower_is_better=True)
+            
+            score = 0
+            if delta_tps is not None and delta_tps > 0: score += 1
+            elif delta_tps is not None and delta_tps < 0: score -= 1
+            if delta_ttft is not None and delta_ttft > 0: score += 1
+            elif delta_ttft is not None and delta_ttft < 0: score -= 1
+            
+            if score > best_score:
+                best_score = score
+                s2_id = s_id
+                s2_data = data
+
         delta_tps = calc_delta(s1_data.get("avg_tps"), s2_data.get("avg_tps"))
         delta_ttft = calc_delta(s1_data.get("avg_ttft_ms"), s2_data.get("avg_ttft_ms"), lower_is_better=True)
-        
-        # Determine winner: positive delta means s2 is better for TPS, negative for latency
-        score_s1 = 0
-        score_s2 = 0
-        if delta_tps is not None:
-            if delta_tps > 0:
-                score_s2 += 1
-            elif delta_tps < 0:
-                score_s1 += 1
-        if delta_ttft is not None:
-            if delta_ttft > 0:
-                score_s2 += 1
-            elif delta_ttft < 0:
-                score_s1 += 1
-        
-        if score_s1 > score_s2:
-            overall_winner = "server1"
-        elif score_s2 > score_s1:
-            overall_winner = "server2"
+
+        if best_score > 0:
+            overall_winner = s2_id
+        elif best_score < 0:
+            overall_winner = s1_id
         else:
             overall_winner = "tie"
+
+        metrics_json = {s: server_data[s] for s in servers_used}
 
         comparison_data = {
             "s1_ttft_ms": s1_data.get("avg_ttft_ms"),
@@ -926,6 +937,7 @@ class Orchestrator:
                 lower_is_better=True,
             ),
             "overall_winner": overall_winner,
+            "metrics_json": metrics_json,
         }
 
         self.data_sink.write_comparison(run_id, **comparison_data)

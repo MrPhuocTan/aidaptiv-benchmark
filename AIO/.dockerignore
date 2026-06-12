@@ -1,0 +1,62 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+.venv
+env
+venv
+ENV
+build
+dist
+*.egg-info
+
+# IDE
+.idea
+.vscode
+.cursor*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose*.yaml
+Dockerfile*
+.dockerignore
+
+# Logs & Data
+logs
+*.log
+*.pid
+*.port
+reports/*.pdf
+reports/*.csv
+reports/*.png
+reports/*.jpg
+reports_output
+
+# Local data
+postgres_data
+influxdb_data
+grafana_data
+node_modules
+
+# Debug
+debug_thing
+debug_things
+
+# Docs (không cần trong image)
+*.md
+*.mmd
+design
+VM_Install
+skills
+prompts
+command
+assets
+report_brd
+AIO
