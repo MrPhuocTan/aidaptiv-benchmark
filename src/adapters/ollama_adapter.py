@@ -2,8 +2,8 @@
 
 import time
 import json
+import logging
 from src.time_utils import get_local_time
-from datetime import datetime
 from typing import List, Tuple, Optional
 
 import httpx
@@ -20,9 +20,11 @@ class OllamaAdapter(BaseToolAdapter):
         self.model = model
 
     def is_available(self) -> bool:
+        """Always available — uses Ollama HTTP API directly."""
         return True
 
     async def run(self, prompts: list) -> Tuple[List[BenchmarkResult], List[PromptLogEntry], Optional[ToolEvidence]]:
+        """Run benchmark by sending each prompt to Ollama API (non-streaming)."""
         results = []
         prompt_logs = []
         raw_outputs = []
@@ -131,80 +133,6 @@ class OllamaAdapter(BaseToolAdapter):
         except Exception as e:
             p_log.status = "error"
             p_log.error_message = str(e)
-            import logging
-            logging.getLogger(__name__).error(f"Ollama request failed: {e}")
+            logging.getLogger(__name__).error("Ollama request failed: %s", e)
 
         return result, p_log, raw_data
-
-    async def run_streaming(self, prompt: str) -> BenchmarkResult:
-        """Send streaming request to measure ITL (inter-token latency)"""
-
-        result = BenchmarkResult(
-            timestamp=get_local_time(),
-            tool=self.tool_name,
-            model=self.model,
-        )
-
-        try:
-            token_times = []
-            first_token_time = None
-            wall_start = time.perf_counter()
-            total_tokens = 0
-
-            async with httpx.AsyncClient(timeout=600.0) as client:
-                async with client.stream(
-                    "POST",
-                    f"{self.ollama_url}/api/generate",
-                    json={
-                        "model": self.model,
-                        "prompt": prompt,
-                        "stream": True,
-                    },
-                ) as resp:
-                    async for line in resp.aiter_lines():
-                        if not line:
-                            continue
-
-                        now = time.perf_counter()
-                        chunk = json.loads(line)
-
-                        if not chunk.get("done", False):
-                            total_tokens += 1
-                            token_times.append(now)
-
-                            if first_token_time is None:
-                                first_token_time = now
-
-            wall_end = time.perf_counter()
-
-            # TTFT
-            if first_token_time:
-                result.ttft_ms = (first_token_time - wall_start) * 1000
-
-            # ITL = average inter-token latency
-            if len(token_times) > 1:
-                intervals = []
-                for i in range(1, len(token_times)):
-                    intervals.append((token_times[i] - token_times[i - 1]) * 1000)
-                result.itl_ms = sum(intervals) / len(intervals)
-
-            # TPS
-            total_time = wall_end - wall_start
-            if total_time > 0 and total_tokens > 0:
-                result.tps = total_tokens / total_time
-
-            # TPOT
-            if total_tokens > 0 and first_token_time:
-                gen_time = wall_end - first_token_time
-                result.tpot_ms = (gen_time * 1000) / total_tokens
-
-            result.completion_tokens = total_tokens
-            result.total_tokens = total_tokens
-            result.total_requests = 1
-            result.successful_requests = 1
-            result.error_rate = 0.0
-
-        except Exception as e:
-            raise RuntimeError(f"Ollama streaming request failed: {e}")
-
-        return result

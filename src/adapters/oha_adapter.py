@@ -4,7 +4,6 @@ import asyncio
 import json
 import logging
 from src.time_utils import get_local_time
-from datetime import datetime
 from typing import List, Tuple, Optional
 
 from src.adapters.base import BaseToolAdapter
@@ -31,9 +30,11 @@ class OhaAdapter(BaseToolAdapter):
         self.binary_path = binary_path
 
     def is_available(self) -> bool:
+        """Check if oha binary exists in PATH."""
         return self.check_binary(self.binary_path)
 
     async def run(self, prompts: list) -> Tuple[List[BenchmarkResult], List[PromptLogEntry], Optional[ToolEvidence]]:
+        """Run oha load test subprocess and parse JSON output."""
         prompt_text = prompts[0].get("prompt", "Hello") if prompts else "Hello"
 
         payload = json.dumps({

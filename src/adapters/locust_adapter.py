@@ -4,10 +4,8 @@ import asyncio
 import csv
 import importlib.util
 import json
-import sys
 import tempfile
 from src.time_utils import get_local_time
-from datetime import datetime
 from pathlib import Path
 from typing import List, Tuple, Optional
 
@@ -33,11 +31,13 @@ class LocustAdapter(BaseToolAdapter):
         self.binary_path = binary_path.strip()
 
     def is_available(self) -> bool:
+        """Check if locust is available via binary path or Python import."""
         if self.binary_path:
             return self.check_binary(self.binary_path)
         return importlib.util.find_spec("locust") is not None
 
     async def run(self, prompts: list) -> Tuple[List[BenchmarkResult], List[PromptLogEntry], Optional[ToolEvidence]]:
+        """Run locust load test as subprocess and parse CSV results."""
         if not self.is_available():
             result = BenchmarkResult(
                 timestamp=get_local_time(),

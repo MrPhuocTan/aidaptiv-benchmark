@@ -3,7 +3,6 @@
 import logging
 import time
 from src.time_utils import get_local_time
-from datetime import datetime
 from typing import List, Tuple, Optional
 
 from src.adapters.base import BaseToolAdapter
@@ -20,6 +19,7 @@ class LiteLLMAdapter(BaseToolAdapter):
         self.model = model
 
     def is_available(self) -> bool:
+        """Check if litellm library is installed."""
         try:
             import litellm
             return True
@@ -27,6 +27,7 @@ class LiteLLMAdapter(BaseToolAdapter):
             return False
 
     async def run(self, prompts: list) -> Tuple[List[BenchmarkResult], List[PromptLogEntry], Optional[ToolEvidence]]:
+        """Run benchmark against each prompt sequentially via litellm streaming."""
         if not self.is_available():
             result = BenchmarkResult(
                 timestamp=get_local_time(),
@@ -65,6 +66,7 @@ class LiteLLMAdapter(BaseToolAdapter):
         return results, prompt_logs, evidence
 
     async def _single_request(self, prompt: str, index: int) -> Tuple[BenchmarkResult, PromptLogEntry, dict]:
+        """Send a single streaming request via litellm and measure TTFT/TPS."""
         import litellm
 
         result = BenchmarkResult(

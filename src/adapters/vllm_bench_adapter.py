@@ -1,9 +1,10 @@
 """vLLM benchmark adapter - works with OpenAI-compatible API"""
 
 import asyncio
+import json
+import logging
 import time
 from src.time_utils import get_local_time
-from datetime import datetime
 from typing import List, Tuple, Optional
 
 import httpx
@@ -26,6 +27,7 @@ class VLLMBenchAdapter(BaseToolAdapter):
         self.concurrency = concurrency
 
     def is_available(self) -> bool:
+        """Always available — uses OpenAI-compatible HTTP API."""
         return True
 
     async def run(self, prompts: list) -> Tuple[List[BenchmarkResult], List[PromptLogEntry], Optional[ToolEvidence]]:
@@ -55,6 +57,7 @@ class VLLMBenchAdapter(BaseToolAdapter):
         limits = httpx.Limits(max_keepalive_connections=self.concurrency + 10, max_connections=self.concurrency + 10)
         async with httpx.AsyncClient(timeout=1200.0, limits=limits) as client:
             async def send_one(prompt_text: str, index: int):
+                """Send a single streaming request and collect metrics."""
                 nonlocal total_output_tokens, total_successes, total_failures
 
                 p_log = PromptLogEntry(
@@ -67,7 +70,6 @@ class VLLMBenchAdapter(BaseToolAdapter):
                 async with semaphore:
                     req_start = time.perf_counter()
                     try:
-                        import json
                         ttft = None
                         output_tokens = 0
                         
@@ -84,7 +86,6 @@ class VLLMBenchAdapter(BaseToolAdapter):
                         ) as resp:
                             if resp.status_code != 200:
                                 total_failures += 1
-                                import logging
                                 logging.getLogger(__name__).warning(
                                     "vLLM API returned HTTP %s", resp.status_code
                                 )
@@ -138,7 +139,6 @@ class VLLMBenchAdapter(BaseToolAdapter):
                         total_failures += 1
                         p_log.status = "error"
                         p_log.error_message = str(e)
-                        import logging
                         logging.getLogger(__name__).warning("vLLM request failed: %s", e)
                         
                     prompt_logs.append(p_log)
@@ -184,7 +184,7 @@ class VLLMBenchAdapter(BaseToolAdapter):
             tool_name=self.tool_name,
             tool_version="native",
             command_line="vLLM stream simulation API",
-            raw_output=__import__("json").dumps(raw_outputs, indent=2),
+            raw_output=json.dumps(raw_outputs, indent=2),
             output_format="json",
         )
 

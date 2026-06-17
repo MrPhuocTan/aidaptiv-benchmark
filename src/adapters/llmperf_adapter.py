@@ -2,11 +2,11 @@
 
 import asyncio
 import json
+import logging
 import os
 import sys
 import tempfile
 from src.time_utils import get_local_time
-from datetime import datetime
 from pathlib import Path
 from typing import List, Tuple, Optional
 
@@ -23,6 +23,7 @@ class LLMPerfAdapter(BaseToolAdapter):
         self.concurrency = concurrency
 
     def is_available(self) -> bool:
+        """Check if llmperf library is installed."""
         try:
             import importlib
             importlib.import_module("llmperf")
@@ -126,15 +127,13 @@ class LLMPerfAdapter(BaseToolAdapter):
                     return [result], [p_log], evidence
 
             except asyncio.TimeoutError as e:
-                import logging
-                logging.getLogger(__name__).error(f"llmperf timeout: {e}")
+                logging.getLogger(__name__).error("llmperf timeout: %s", e)
                 if 'proc' in locals():
                     proc.kill()
                     await proc.communicate()
                 raise RuntimeError("llmperf tool timed out")
             except Exception as e:
-                import logging
-                logging.getLogger(__name__).error(f"llmperf execution failed: {e}")
+                logging.getLogger(__name__).error("llmperf execution failed: %s", e)
                 raise RuntimeError(f"llmperf execution failed: {e}")
 
         raise RuntimeError("llmperf tool failed: No results generated")
