@@ -43,11 +43,18 @@ RUN pip install --no-cache-dir --upgrade pip \
 # ---- Giai đoạn 2: App final ----
 FROM base AS final
 
-# Cài runtime libraries
+# Cài runtime libraries + TeX Live cho PDF reports
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq5 \
     curl \
     sed \
+    # TeX Live cho xuất PDF báo cáo chất lượng cao (xelatex)
+    texlive-xetex \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-latex-extra \
+    texlive-lang-cjk \
+    lmodern \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy installed packages từ dependencies stage
