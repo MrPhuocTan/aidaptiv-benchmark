@@ -1,4 +1,4 @@
-\documentclass[a4paper,11pt]{article}
+\documentclass[a4paper,10pt]{article}
 
 % ── Packages ──────────────────────────────────────────────
 \usepackage{fontspec}
@@ -13,7 +13,9 @@
   \IfFontExistsTF{Songti SC}{\setCJKmainfont{Songti SC}}{%
     \IfFontExistsTF{SimSun}{\setCJKmainfont{SimSun}}{%
       \setCJKmainfont{Heiti SC}}}}
-\usepackage[margin=2cm,top=2.5cm,bottom=2.5cm]{geometry}
+\usepackage[margin=1.5cm,top=2.2cm,bottom=2cm]{geometry}
+\setlength{\headheight}{20pt}
+\addtolength{\topmargin}{-8pt}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{longtable}
@@ -29,23 +31,26 @@
 \usepackage{amsmath}
 \usepackage{lastpage}
 \usepackage{array}
+\usepackage{adjustbox}
 \usepackage{draftwatermark}
 \SetWatermarkText{\VAR{test_suite}}
 \SetWatermarkScale{0.4}
-\SetWatermarkColor{medgray!15}
-% ── Color Definitions (Bach Lap Kim Theme) ────────────────
-\definecolor{navy}{HTML}{0F172A}       % Slate 900 (Modern Charcoal)
-\definecolor{violet}{HTML}{D4AF37}     % Modern Gold
-\definecolor{darkbg}{HTML}{FFFFFF}     % Pure White
-\definecolor{lightgray}{HTML}{F8FAFC}  % Slate 50
-\definecolor{medgray}{HTML}{94A3B8}    % Slate 400 (Silver)
-\definecolor{textprimary}{HTML}{0F172A}% Slate 900
-\definecolor{textsecondary}{HTML}{475569}% Slate 600
-\definecolor{gridline}{HTML}{E2E8F0}   % Slate 200
+\SetWatermarkColor{medgray!10}
+
+% ── Color Definitions ─────────────────────────────────────
+\definecolor{navy}{HTML}{0F172A}
+\definecolor{violet}{HTML}{D4AF37}
+\definecolor{darkbg}{HTML}{FFFFFF}
+\definecolor{lightgray}{HTML}{F8FAFC}
+\definecolor{medgray}{HTML}{94A3B8}
+\definecolor{textprimary}{HTML}{0F172A}
+\definecolor{textsecondary}{HTML}{475569}
+\definecolor{gridline}{HTML}{E2E8F0}
 \definecolor{greenup}{HTML}{10B981}
 \definecolor{reddown}{HTML}{EF4444}
-\definecolor{accentblue}{HTML}{D4AF37} % Modern Gold
-\definecolor{covergold}{HTML}{D4AF37}  % Modern Gold
+\definecolor{accentblue}{HTML}{D4AF37}
+\definecolor{covergold}{HTML}{D4AF37}
+\definecolor{tableheader}{HTML}{F1F5F9}
 
 % ── Header & Footer ──────────────────────────────────────
 \pagestyle{fancy}
@@ -63,16 +68,17 @@
 % ── Section Styling ──────────────────────────────────────
 \titleformat{\section}
   {\Large\bfseries\color{navy}}
-  {\thesection}{1em}{}
-  [\vspace{-0.5em}{\color{gridline}\hrule height 0.5pt}]
-  
+  {\thesection}{0.8em}{}
+\titlespacing*{\section}{0pt}{1.5ex plus 0.5ex}{1ex plus 0.3ex}
+
 \titleformat{\subsection}
   {\large\bfseries\color{textprimary}}
-  {\thesubsection}{1em}{}
+  {\thesubsection}{0.8em}{}
+\titlespacing*{\subsection}{0pt}{1.2ex plus 0.3ex}{0.6ex plus 0.2ex}
 
 \titleformat{\subsubsection}
   {\normalsize\bfseries\color{textsecondary}}
-  {\thesubsubsection}{1em}{}
+  {\thesubsubsection}{0.8em}{}
 
 % ── Hyperlinks ───────────────────────────────────────────
 \hypersetup{
@@ -94,10 +100,16 @@
 }
 
 \newcommand{\sectiondivider}{%
-  \vspace{0.5em}
+  \vspace{0.3em}
   {\color{gridline}\hrule height 0.3pt}
-  \vspace{0.5em}
+  \vspace{0.3em}
 }
+
+% Allow line breaks in monospace text (long IPs, run IDs)
+\newcommand{\wraptexttt}[1]{\texttt{\seqsplit{#1}}}
+
+% Compact table defaults
+\renewcommand{\arraystretch}{1.15}
 
 \begin{document}
 
@@ -213,20 +225,22 @@ Lower values indicate faster initial response.
 \end{figure}
 
 \BLOCK{if chart_data}
-\begin{small}
-\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+\begin{footnotesize}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l\BLOCK{for c in chart_data.concurrencies}r\BLOCK{endfor}}
   \toprule
   \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
   \midrule
   \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
-  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  \rowcolor{tableheader} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
   p50 \BLOCK{for val in chart_data.ttft[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   p95 \BLOCK{for val in chart_data.ttft[srv_key]['p95']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   p99 \BLOCK{for val in chart_data.ttft[srv_key]['p99']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \bottomrule
-\end{tabularx}
-\end{small}
+\end{tabular}
+\end{adjustbox}
+\end{footnotesize}
 \BLOCK{endif}
 \BLOCK{endif}
 
@@ -242,18 +256,20 @@ Lower values indicate smoother streaming.
 \end{figure}
 
 \BLOCK{if chart_data}
-\begin{small}
-\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+\begin{footnotesize}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l\BLOCK{for c in chart_data.concurrencies}r\BLOCK{endfor}}
   \toprule
   \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
   \midrule
   \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
-  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  \rowcolor{tableheader} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
   p50 \BLOCK{for val in chart_data.itl[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \bottomrule
-\end{tabularx}
-\end{small}
+\end{tabular}
+\end{adjustbox}
+\end{footnotesize}
 \BLOCK{endif}
 \BLOCK{endif}
 
@@ -269,20 +285,22 @@ Higher values indicate better throughput efficiency.
 \end{figure}
 
 \BLOCK{if chart_data}
-\begin{small}
-\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+\begin{footnotesize}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l\BLOCK{for c in chart_data.concurrencies}r\BLOCK{endfor}}
   \toprule
   \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
   \midrule
   \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
-  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  \rowcolor{tableheader} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
   p50 \BLOCK{for val in chart_data.tps[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   p95 \BLOCK{for val in chart_data.tps[srv_key]['p95']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   p99 \BLOCK{for val in chart_data.tps[srv_key]['p99']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \bottomrule
-\end{tabularx}
-\end{small}
+\end{tabular}
+\end{adjustbox}
+\end{footnotesize}
 \BLOCK{endif}
 \BLOCK{endif}
 
@@ -297,20 +315,22 @@ End-to-end request latency from submission to completion.
 \end{figure}
 
 \BLOCK{if chart_data}
-\begin{small}
-\begin{tabularx}{\textwidth}{@{}l\BLOCK{for c in chart_data.concurrencies}X\BLOCK{endfor}@{}}
+\begin{footnotesize}
+\begin{adjustbox}{max width=\textwidth}
+\begin{tabular}{l\BLOCK{for c in chart_data.concurrencies}r\BLOCK{endfor}}
   \toprule
   \textbf{Concurrency} \BLOCK{for c in chart_data.concurrencies} & \textbf{\VAR{c}} \BLOCK{endfor} \\
   \midrule
   \BLOCK{for srv_key, srv_name in chart_data.server_labels.items()}
-  \rowcolor{lightgray} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
+  \rowcolor{tableheader} \multicolumn{\VAR{chart_data.concurrencies|length + 1}}{l}{\textbf{\VAR{srv_name}}} \\
   p50 \BLOCK{for val in chart_data.latency[srv_key]['p50']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   p95 \BLOCK{for val in chart_data.latency[srv_key]['p95']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   p99 \BLOCK{for val in chart_data.latency[srv_key]['p99']} & \VAR{"%.1f"|format(val) if val else "N/A"} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \bottomrule
-\end{tabularx}
-\end{small}
+\end{tabular}
+\end{adjustbox}
+\end{footnotesize}
 \BLOCK{endif}
 \BLOCK{endif}
 
@@ -347,8 +367,8 @@ test configuration. Green indicates improvement, red indicates degradation.
 \subsection{Detailed Comparison Table}
 
 \begin{scriptsize}
-\setlength{\tabcolsep}{3pt}
-\begin{longtable}{p{2.5cm}p{2cm}r|rrrr|rrrr|p{1.5cm}}
+\setlength{\tabcolsep}{2pt}
+\begin{longtable}{>{\raggedright}m{1.8cm} >{\raggedright}m{1.8cm} r | r r r r | r r r r | >{\raggedright\arraybackslash}m{1.2cm}}
   \toprule
   \textbf{Tool} & \textbf{Scenario} & \textbf{C} &
   \multicolumn{4}{c|}{\textbf{Server 1}} &
@@ -384,17 +404,17 @@ test configuration. Green indicates improvement, red indicates degradation.
   \toprule
   \textbf{Metric} \BLOCK{for s in hw_servers} & \textbf{\VAR{s}} \BLOCK{endfor} \\
   \midrule
-  \rowcolor{lightgray} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{GPU}} \\
+  \rowcolor{tableheader} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{GPU}} \\
   \BLOCK{for row in hardware_specs_table.gpu}
   \VAR{row.label} \BLOCK{for val in row['values']} & \VAR{val} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \midrule
-  \rowcolor{lightgray} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{CPU / RAM}} \\
+  \rowcolor{tableheader} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{CPU / RAM}} \\
   \BLOCK{for row in hardware_specs_table.cpu}
   \VAR{row.label} \BLOCK{for val in row['values']} & \VAR{val} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \midrule
-  \rowcolor{lightgray} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{Disk / Network}} \\
+  \rowcolor{tableheader} \multicolumn{\VAR{hw_servers|length + 1}}{l}{\textbf{Disk / Network}} \\
   \BLOCK{for row in hardware_specs_table.disk}
   \VAR{row.label} \BLOCK{for val in row['values']} & \VAR{val} \BLOCK{endfor} \\
   \BLOCK{endfor}
@@ -448,16 +468,16 @@ test configuration. Green indicates improvement, red indicates degradation.
 Performance metrics grouped by tool and test scenario.
 
 \begin{scriptsize}
-\setlength{\tabcolsep}{4pt}
-\begin{longtable}{p{2.5cm}p{2.5cm}\BLOCK{for s in hw_servers}|rrrr\BLOCK{endfor}}
+\setlength{\tabcolsep}{2pt}
+\begin{longtable}{>{\raggedright}m{2cm} >{\raggedright}m{1.8cm} \BLOCK{for s in hw_servers}| r r r r r r\BLOCK{endfor}}
   \toprule
   \textbf{Tool} & \textbf{Scenario}
-  \BLOCK{for s in hw_servers} & \multicolumn{4}{c\BLOCK{if not loop.last}|\BLOCK{endif}}{\textbf{\VAR{s}}} \BLOCK{endfor} \\
-  & \BLOCK{for s in hw_servers} & TPS & TTFT & P99 & Err\% \BLOCK{endfor} \\
+  \BLOCK{for s in hw_servers} & \multicolumn{6}{c\BLOCK{if not loop.last}|\BLOCK{endif}}{\textbf{\VAR{s}}} \BLOCK{endfor} \\
+  & \BLOCK{for s in hw_servers} & TPS & TTFT & TPOT & RPS & P99 & Err\% \BLOCK{endfor} \\
   \midrule
   \endhead
   \BLOCK{for row in breakdown_table}
-  \VAR{row.tool} & \VAR{row.scenario} \BLOCK{for cell in row.cells} & \VAR{cell.tps} & \VAR{cell.ttft} & \VAR{cell.p99} & \VAR{cell.error} \BLOCK{endfor} \\
+  \VAR{row.tool} & \VAR{row.scenario} \BLOCK{for cell in row.cells} & \VAR{cell.tps} & \VAR{cell.ttft} & \VAR{cell.tpot} & \VAR{cell.rps} & \VAR{cell.p99} & \VAR{cell.error} \BLOCK{endfor} \\
   \BLOCK{endfor}
   \bottomrule
 \end{longtable}
