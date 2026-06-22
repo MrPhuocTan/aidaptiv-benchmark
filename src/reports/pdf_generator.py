@@ -205,6 +205,8 @@ def _build_template_context(
                     cells.append({
                         "tps": _safe_fmt(s.get("tps")),
                         "ttft": _safe_fmt(s.get("ttft_ms")),
+                        "tpot": _safe_fmt(s.get("tpot_ms")),
+                        "rps": _safe_fmt(s.get("rps")),
                         "p99": _safe_fmt(s.get("latency_p99_ms")),
                         "error": _safe_fmt(s.get("error_rate"), ".0f", r"\%"),
                     })

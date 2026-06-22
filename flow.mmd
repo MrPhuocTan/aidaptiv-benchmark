@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant User
+    participant WebUI as Web Interface
+    participant Orch as Orchestrator
+    participant Servers as AI Servers
+    participant DB as PostgreSQL
+
+    User->>WebUI: Start Benchmark
+    WebUI->>Orch: POST /api/benchmark/start
+    
+    Note over Orch,Servers: Phase 1: Preflight & Warmup
+    Orch->>Servers: Verify Connectivity & Warmup
+    
+    Note over Orch,Servers: Phase 2: Benchmark Execution
+    loop During Scenario
+        par Hardware Telemetry
+            Orch->>Servers: Monitor CPU/GPU/RAM
+        and Inference Generation
+            Orch->>Servers: Generate Load (oha/locust/vllm-bench)
+        end
+        Orch->>DB: Save Results & Snapshots
+    end
+    
+    Note over Orch,DB: Phase 3: Finalize & Report
+    Orch->>DB: Compare performance & Identify Winner
+    Orch-->>WebUI: Mark Completed
+    WebUI-->>User: Display Report & Graphs

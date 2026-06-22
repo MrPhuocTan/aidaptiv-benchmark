@@ -235,7 +235,8 @@ class ServerComparison(Base):
     delta_rps_pct = Column(Float, nullable=True)
     delta_p99_pct = Column(Float, nullable=True)
 
-    overall_winner = Column(String(20), nullable=True)
+    overall_winner = Column(String(50), nullable=True)
+    metrics_json = Column(JSON, nullable=True)
 
     run = relationship("BenchmarkRun", back_populates="comparisons")
 

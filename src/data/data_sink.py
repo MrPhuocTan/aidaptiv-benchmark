@@ -20,12 +20,15 @@ class DataSink:
     - PostgreSQL (persistent, relational storage)
     """
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, database: Database = None):
         self.config = config
 
         # PostgreSQL
-        self.db = Database(config.postgres)
-        self.db.create_tables()
+        if database:
+            self.db = database
+        else:
+            self.db = Database(config.postgres)
+            self.db.create_tables()
 
     def close(self):
         pass
@@ -80,6 +83,54 @@ class DataSink:
             print(f"  PostgreSQL write error (benchmark): {e}")
         finally:
             session.close()
+
+    async def write_results_batch_async(self, results: list, run_id: str):
+        """Write multiple benchmark results to PostgreSQL asynchronously"""
+        if not results:
+            return
+            
+        async with self.db.AsyncSession() as session:
+            try:
+                db_results = []
+                for result in results:
+                    result = Normalizer.normalize(result)
+                    if not Normalizer.is_valid(result):
+                        continue
+                        
+                    db_results.append(BenchmarkResultRow(
+                        run_id=run_id,
+                        timestamp=result.timestamp,
+                        server=result.server,
+                        tool=result.tool,
+                        environment=result.environment,
+                        scenario=result.scenario,
+                        model=result.model,
+                        concurrency=result.concurrency,
+                        ttft_ms=result.ttft_ms,
+                        tpot_ms=result.tpot_ms,
+                        itl_ms=result.itl_ms,
+                        tps=result.tps,
+                        rps=result.rps,
+                        latency_p50_ms=result.latency_p50_ms,
+                        latency_p95_ms=result.latency_p95_ms,
+                        latency_p99_ms=result.latency_p99_ms,
+                        total_tokens=result.total_tokens,
+                        total_requests=result.total_requests,
+                        successful_requests=result.successful_requests,
+                        failed_requests=result.failed_requests,
+                        error_rate=result.error_rate,
+                        goodput=result.goodput,
+                        prompt_tokens=result.prompt_tokens,
+                        completion_tokens=result.completion_tokens,
+                        raw_output=result.to_dict(),
+                    ))
+                    
+                if db_results:
+                    session.add_all(db_results)
+                    await session.commit()
+            except Exception as e:
+                await session.rollback()
+                print(f"  PostgreSQL async batch write error (benchmark): {e}")
 
     def write_hardware_metrics(self, metrics: HardwareMetrics, run_id: str):
         """Write hardware metrics to PostgreSQL"""

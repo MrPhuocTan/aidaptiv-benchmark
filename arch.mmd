@@ -1,0 +1,21 @@
+graph TD
+    User([User Browser]) -->|Initiate Benchmark| App[Controller Node]
+    
+    subgraph Controller Node
+        direction TB
+        UI[Web Dashboard] --> Orch[Orchestrator]
+        Orch --> Adapters[Load Generators]
+        Orch --> Collectors[Hardware Monitors]
+    end
+    
+    Adapters -->|Inference Load| S1
+    Adapters -->|Inference Load| SN
+    
+    Collectors -->|Hardware Telemetry| S1
+    Collectors -->|Hardware Telemetry| SN
+
+    subgraph Target Servers
+        direction LR
+        S1[Server 1: Baseline]
+        SN[Server 2: Optimized]
+    end

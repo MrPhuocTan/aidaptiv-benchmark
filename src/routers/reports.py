@@ -399,6 +399,54 @@ async def export_excel(
                 width = 50
             ws_prompts.column_dimensions[ws_prompts.cell(1, col_idx).column_letter].width = width
 
+    # =============================================
+    # Sheet 6: Tool Summary (Server × Tool breakdown)
+    # =============================================
+    summary_stats = await repo.get_run_summary_stats(run_id)
+    if summary_stats:
+        ws_tools = wb.create_sheet("Tool Summary")
+        tool_headers = [
+            "#", "Server", "Tool",
+            "Avg TTFT (ms)", "Avg TPOT (ms)", "Avg TPS", "Avg RPS",
+            "Avg P50 (ms)", "Avg P95 (ms)", "Avg P99 (ms)",
+            "Total Tokens", "Total Requests", "Successful", "Failed",
+            "Error Rate (%)",
+        ]
+        ws_tools.append(tool_headers)
+        style_header_row(ws_tools, 1, len(tool_headers))
+
+        tool_row_idx = 0
+        for srv_key in sorted(summary_stats.keys()):
+            srv_data = summary_stats[srv_key]
+            by_tool = srv_data.get("by_tool", {})
+            server_name = srv_key  # e.g. "server1"
+
+            for tool_name in sorted(by_tool.keys()):
+                tool_data = by_tool[tool_name]
+                tool_row_idx += 1
+                ws_tools.append([
+                    tool_row_idx,
+                    server_name,
+                    tool_name,
+                    tool_data.get("avg_ttft_ms"),
+                    tool_data.get("avg_tpot_ms"),
+                    tool_data.get("avg_tps"),
+                    tool_data.get("avg_rps"),
+                    tool_data.get("avg_p50_ms"),
+                    tool_data.get("avg_p95_ms"),
+                    tool_data.get("avg_p99_ms"),
+                    tool_data.get("total_tokens", 0),
+                    tool_data.get("total_requests", 0),
+                    tool_data.get("successful_requests", 0),
+                    tool_data.get("failed_requests", 0),
+                    round(tool_data.get("error_rate", 0) * 100, 2) if tool_data.get("error_rate") is not None else None,
+                ])
+
+        for col_idx in range(1, len(tool_headers) + 1):
+            ws_tools.column_dimensions[ws_tools.cell(1, col_idx).column_letter].width = max(
+                len(str(tool_headers[col_idx - 1])) + 2, 14
+            )
+
     # --- Write to buffer and return ---
     output = io.BytesIO()
     wb.save(output)

@@ -265,44 +265,78 @@ class AsyncRepository:
             select(BenchmarkResultRow.server).filter_by(run_id=run_id).distinct()
         )
         run_servers = sorted([row[0] for row in servers_res.all() if row[0]])
-        
+
+        # Helper to build stats dict from a query row
+        def _row_to_stats(row):
+            return {
+                "avg_ttft_ms": round(float(row.avg_ttft), 2) if row.avg_ttft is not None else None,
+                "avg_tpot_ms": round(float(row.avg_tpot), 2) if row.avg_tpot is not None else None,
+                "avg_tps": round(float(row.avg_tps), 2) if row.avg_tps is not None else None,
+                "avg_rps": round(float(row.avg_rps), 2) if row.avg_rps is not None else None,
+                "avg_p50_ms": round(float(row.avg_p50), 2) if row.avg_p50 is not None else None,
+                "avg_p95_ms": round(float(row.avg_p95), 2) if row.avg_p95 is not None else None,
+                "avg_p99_ms": round(float(row.avg_p99), 2) if row.avg_p99 is not None else None,
+                "total_tokens": int(row.total_tokens or 0),
+                "total_requests": int(row.total_requests or 0),
+                "successful_requests": int(row.successful_requests or 0),
+                "failed_requests": int(row.failed_requests or 0),
+                "error_rate": round(float(row.avg_error_rate), 4) if row.avg_error_rate is not None else None,
+                "result_count": row.count,
+            }
+
+        # Common select columns for aggregation
+        agg_columns = [
+            func.avg(BenchmarkResultRow.ttft_ms).label("avg_ttft"),
+            func.avg(BenchmarkResultRow.tpot_ms).label("avg_tpot"),
+            func.avg(BenchmarkResultRow.tps).label("avg_tps"),
+            func.avg(BenchmarkResultRow.rps).label("avg_rps"),
+            func.avg(BenchmarkResultRow.latency_p50_ms).label("avg_p50"),
+            func.avg(BenchmarkResultRow.latency_p95_ms).label("avg_p95"),
+            func.avg(BenchmarkResultRow.latency_p99_ms).label("avg_p99"),
+            func.sum(BenchmarkResultRow.total_tokens).label("total_tokens"),
+            func.sum(BenchmarkResultRow.total_requests).label("total_requests"),
+            func.sum(BenchmarkResultRow.successful_requests).label("successful_requests"),
+            func.sum(BenchmarkResultRow.failed_requests).label("failed_requests"),
+            func.avg(BenchmarkResultRow.error_rate).label("avg_error_rate"),
+            func.count(BenchmarkResultRow.id).label("count"),
+        ]
+
         summary = {}
         for i, server in enumerate(run_servers):
             key = f"server{i+1}"
+
+            # Overall stats (all tools averaged)
             result = await self.session.execute(
-                select(
-                    func.avg(BenchmarkResultRow.ttft_ms).label("avg_ttft"),
-                    func.avg(BenchmarkResultRow.tpot_ms).label("avg_tpot"),
-                    func.avg(BenchmarkResultRow.tps).label("avg_tps"),
-                    func.avg(BenchmarkResultRow.rps).label("avg_rps"),
-                    func.avg(BenchmarkResultRow.latency_p50_ms).label("avg_p50"),
-                    func.avg(BenchmarkResultRow.latency_p95_ms).label("avg_p95"),
-                    func.avg(BenchmarkResultRow.latency_p99_ms).label("avg_p99"),
-                    func.sum(BenchmarkResultRow.total_tokens).label("total_tokens"),
-                    func.sum(BenchmarkResultRow.total_requests).label("total_requests"),
-                    func.sum(BenchmarkResultRow.successful_requests).label("successful_requests"),
-                    func.sum(BenchmarkResultRow.failed_requests).label("failed_requests"),
-                    func.avg(BenchmarkResultRow.error_rate).label("avg_error_rate"),
-                    func.count(BenchmarkResultRow.id).label("count"),
-                ).filter_by(run_id=run_id, server=server)
+                select(*agg_columns).filter_by(run_id=run_id, server=server)
             )
             row = result.first()
-            if row and row.count:
-                summary[key] = {
-                    "avg_ttft_ms": round(float(row.avg_ttft), 2) if row.avg_ttft is not None else None,
-                    "avg_tpot_ms": round(float(row.avg_tpot), 2) if row.avg_tpot is not None else None,
-                    "avg_tps": round(float(row.avg_tps), 2) if row.avg_tps is not None else None,
-                    "avg_rps": round(float(row.avg_rps), 2) if row.avg_rps is not None else None,
-                    "avg_p50_ms": round(float(row.avg_p50), 2) if row.avg_p50 is not None else None,
-                    "avg_p95_ms": round(float(row.avg_p95), 2) if row.avg_p95 is not None else None,
-                    "avg_p99_ms": round(float(row.avg_p99), 2) if row.avg_p99 is not None else None,
-                    "total_tokens": int(row.total_tokens or 0),
-                    "total_requests": int(row.total_requests or 0),
-                    "successful_requests": int(row.successful_requests or 0),
-                    "failed_requests": int(row.failed_requests or 0),
-                    "error_rate": round(float(row.avg_error_rate), 4) if row.avg_error_rate is not None else None,
-                    "result_count": row.count,
-                }
+            if not (row and row.count):
+                continue
+
+            server_stats = _row_to_stats(row)
+
+            # Per-tool breakdown
+            tools_res = await self.session.execute(
+                select(BenchmarkResultRow.tool)
+                .filter_by(run_id=run_id, server=server)
+                .distinct()
+            )
+            tools = sorted([t[0] for t in tools_res.all() if t[0]])
+
+            by_tool = {}
+            for tool in tools:
+                tool_result = await self.session.execute(
+                    select(*agg_columns).filter_by(
+                        run_id=run_id, server=server, tool=tool
+                    )
+                )
+                tool_row = tool_result.first()
+                if tool_row and tool_row.count:
+                    by_tool[tool] = _row_to_stats(tool_row)
+
+            server_stats["by_tool"] = by_tool
+            summary[key] = server_stats
+
         return summary
 
     async def get_detailed_report_stats(self, run_id: str) -> dict:
@@ -520,7 +554,57 @@ class AsyncRepository:
                 chart_data["latency"][mapped_key]["p50"].append(_get_val(rows, "latency_p50_ms"))
                 chart_data["latency"][mapped_key]["p95"].append(_get_val(rows, "latency_p95_ms"))
                 chart_data["latency"][mapped_key]["p99"].append(_get_val(rows, "latency_p99_ms"))
-                
+
+        # Per-tool breakdown: server × tool × concurrency
+        tool_agg = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+        tools_set = set()
+        for r in results:
+            if r.concurrency is not None and r.tool:
+                tool_agg[r.server][r.tool][r.concurrency].append(r)
+                tools_set.add(r.tool)
+
+        tools_list = sorted(tools_set)
+        tool_breakdown = {
+            "tools": tools_list,
+            "concurrencies": concurrencies,
+            "server_labels": chart_data["server_labels"],
+        }
+
+        for metric in ["ttft", "itl", "tps", "latency"]:
+            tool_breakdown[metric] = {}
+
+        for i, actual_server in enumerate(run_servers):
+            mapped_key = f"server{i+1}"
+            for tool in tools_list:
+                combo_key = f"{mapped_key}_{tool}"
+
+                for metric in ["ttft", "itl", "tps", "latency"]:
+                    tool_breakdown[metric][combo_key] = {"p50": [], "p95": [], "p99": []}
+
+                for c in concurrencies:
+                    rows = tool_agg.get(actual_server, {}).get(tool, {}).get(c, [])
+
+                    ttft_avg = _get_val(rows, "ttft_ms")
+                    tool_breakdown["ttft"][combo_key]["p50"].append(ttft_avg)
+                    tool_breakdown["ttft"][combo_key]["p95"].append(ttft_avg)
+                    tool_breakdown["ttft"][combo_key]["p99"].append(ttft_avg)
+
+                    itl_avg = _get_val(rows, "tpot_ms")
+                    tool_breakdown["itl"][combo_key]["p50"].append(itl_avg)
+                    tool_breakdown["itl"][combo_key]["p95"].append(itl_avg)
+                    tool_breakdown["itl"][combo_key]["p99"].append(itl_avg)
+
+                    tps_avg = _get_val(rows, "tps")
+                    tool_breakdown["tps"][combo_key]["p50"].append(tps_avg)
+                    tool_breakdown["tps"][combo_key]["p95"].append(tps_avg)
+                    tool_breakdown["tps"][combo_key]["p99"].append(tps_avg)
+
+                    tool_breakdown["latency"][combo_key]["p50"].append(_get_val(rows, "latency_p50_ms"))
+                    tool_breakdown["latency"][combo_key]["p95"].append(_get_val(rows, "latency_p95_ms"))
+                    tool_breakdown["latency"][combo_key]["p99"].append(_get_val(rows, "latency_p99_ms"))
+
+        chart_data["tool_breakdown"] = tool_breakdown
+
         return chart_data
 
     async def get_run_winner(self, run_id: str) -> Optional[str]:

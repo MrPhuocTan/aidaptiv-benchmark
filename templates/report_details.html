@@ -72,11 +72,88 @@
                     <div class="text-2xl font-bold text-[#1d1d1f]">{{ report_data.metadata.total_requests }}</div>
                 </div>
             </div>
+            <!-- Per-Tool Performance Summary -->
+            {% if report_data.breakdown and report_data.breakdown|length > 0 %}
+                <div class="card p-0 mt-6 mb-6 overflow-hidden border border-slate-200">
+                    <div class="p-4 border-b border-slate-200 bg-[#f5f5f7] flex justify-between items-center">
+                        <h4 class="font-semibold text-[#1d1d1f]">
+                            {{ t("report_details.tool_performance") if t("report_details.tool_performance") != "report_details.tool_performance" else "Performance by Tool" }}
+                        </h4>
+                        <span class="text-xs text-[#cccccc]">
+                            {{ t("report_details.metrics_per_tool") if t("report_details.metrics_per_tool") != "report_details.metrics_per_tool" else "Metrics measured by each benchmark tool" }}
+                        </span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="data-table w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-[#f5f5f7] border-b border-slate-200">
+                                    <th class="p-3 text-sm font-semibold text-apple-muted">{{ t("report_details.tool") }}</th>
+                                    <th class="p-3 text-sm font-semibold text-apple-muted border-r border-slate-200">Server</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">TTFT (ms)</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">TPOT (ms)</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">TPS</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">RPS</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">P99 (ms)</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">Tokens</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">Requests</th>
+                                    <th class="p-3 text-sm font-semibold text-center text-apple-muted">Error %</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm font-sans">
+                                {% for tool, scen_dict in report_data.breakdown.items() %}
+                                    {% for scenario, srv_dict in scen_dict.items() %}
+                                        {% for srv_key in server_labels %}
+                                            {% set s = srv_dict.get(srv_key, {}) %}
+                                            {% if s %}
+                                                <tr class="border-b border-slate-100 hover:bg-[#f5f5f7]">
+                                                    <td class="p-3 font-medium text-[#1d1d1f]">
+                                                        {{ tool }}
+                                                        <span class="text-xs text-[#cccccc] ml-1">({{ scenario }})</span>
+                                                    </td>
+                                                    <td class="p-3 text-[#7a7a7a] border-r border-slate-200">{{ server_labels[srv_key] }}</td>
+                                                    <td class="p-3 text-center font-mono">{{ s.get('ttft_ms', '--') if s.get('ttft_ms') is not none else '--' }}</td>
+                                                    <td class="p-3 text-center font-mono">{{ "%.2f"|format(s.get('tpot_ms')) if s.get('tpot_ms') is not none else '--' }}</td>
+                                                    <td class="p-3 text-center font-mono font-semibold text-[#0066cc]">{{ s.get('tps', '--') if s.get('tps') is not none else '--' }}</td>
+                                                    <td class="p-3 text-center font-mono">{{ s.get('rps', '--') if s.get('rps') is not none else '--' }}</td>
+                                                    <td class="p-3 text-center font-mono">{{ s.get('latency_p99_ms', '--') if s.get('latency_p99_ms') is not none else '--' }}</td>
+                                                    <td class="p-3 text-center font-mono">{{ s.get('total_requests', 0) }}</td>
+                                                    <td class="p-3 text-center font-mono">{{ s.get('total_requests', 0) }}</td>
+                                                    <td class="p-3 text-center font-mono {{ 'text-red-500 font-semibold' if s.get('error_rate', 0) > 0 else 'text-[#7a7a7a]' }}">
+                                                        {{ s.get('error_rate', '0') }}%
+                                                    </td>
+                                                </tr>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
             <!-- Dashboard Charts -->
             {% if chart_data and chart_data.concurrencies and chart_data.concurrencies|length > 0 %}
                 {# Color palette for N servers #}
                 {% set server_bg_colors = ["bg-apple-parchment", "bg-[#f5f5f7]", "bg-apple-parchment"] %}
                 {% set server_text_colors = ["text-[#1d1d1f]", "text-[#1d1d1f]", "text-[#1d1d1f]"] %}
+                <!-- Chart View Toggle -->
+                <div class="flex items-center justify-between mt-8 mb-4">
+                    <h4 class="text-lg font-semibold text-[#1d1d1f]">
+                        {{ t("report_details.performance_charts") if t("report_details.performance_charts") != "report_details.performance_charts" else "Performance Charts" }}
+                    </h4>
+                    {% if chart_data.tool_breakdown and chart_data.tool_breakdown.tools|length > 0 %}
+                        <div class="flex gap-1 bg-[#f5f5f7] rounded-lg p-1">
+                            <button id="btn-view-server" onclick="switchChartView('server')"
+                                class="px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-[#1d1d1f] shadow-sm transition-all">
+                                By Server
+                            </button>
+                            <button id="btn-view-tool" onclick="switchChartView('tool')"
+                                class="px-3 py-1.5 text-xs font-semibold rounded-md text-[#7a7a7a] hover:text-[#1d1d1f] transition-all">
+                                By Tool
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
                 {% macro render_chart_row(title, canvas_id, data_key, is_tps_per_user=false) %}
                     <div class="card p-0 mb-8 overflow-hidden border border-slate-200">
                         <div class="flex flex-col lg:flex-row">
@@ -159,7 +236,7 @@
                         </div>
                     </div>
                 {% endmacro %}
-                <div class="mt-8">
+                <div id="charts-container">
                     {{ render_chart_row(t("report_details.chart_ttft") , "chart-ttft", "ttft") }}
                     {{ render_chart_row(t("report_details.chart_itl") , "chart-itl", "itl") }}
                     {{ render_chart_row(t("report_details.chart_tps") , "chart-tps", "tps", true) }}
@@ -417,30 +494,35 @@ document.addEventListener("DOMContentLoaded", function() {
     const labels = chartData.concurrencies;
     const serverLabels = chartData.server_labels || {};
     const serverKeys = Object.keys(serverLabels);
+    const toolBreakdown = chartData.tool_breakdown || null;
     
-    // Bach Lap Kim color palette
+    // Extended color palette for server×tool combos
     const serverColors = ['#0066cc', '#1d1d1f', '#d2d2d7', '#A68B3C', '#6B6B6B'];
-    const percentileStyles = {
-        'p50': { dash: [], width: 2.5 },
-        'p95': { dash: [6, 3], width: 2 },
-        'p99': { dash: [2, 2], width: 1.5 },
-    };
+    const toolColors = [
+        '#0066cc', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6',
+        '#1abc9c', '#e67e22', '#3498db', '#e91e63', '#00bcd4',
+        '#8bc34a', '#ff5722', '#607d8b', '#795548', '#673ab7',
+    ];
     
-    function createDatasets(metricKey, divideByConcurrency = false) {
+    // Store chart instances for destruction on view switch
+    const chartInstances = {};
+    let currentView = 'server';
+    
+    function processArray(arr, divideByConcurrency) {
+        if (!arr) return [];
+        const result = [];
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] !== null) {
+                const yVal = divideByConcurrency && labels[i] > 0 ? arr[i] / labels[i] : arr[i];
+                result.push({ x: labels[i], y: yVal });
+            }
+        }
+        return result;
+    }
+    
+    function createServerDatasets(metricKey, divideByConcurrency = false) {
         const metricObj = chartData[metricKey];
         if (!metricObj) return [];
-        
-        function processArray(arr) {
-            if (!arr) return [];
-            const result = [];
-            for (let i = 0; i < arr.length; i++) {
-                if (arr[i] !== null) {
-                    const yVal = divideByConcurrency && labels[i] > 0 ? arr[i] / labels[i] : arr[i];
-                    result.push({ x: labels[i], y: yVal });
-                }
-            }
-            return result;
-        }
         
         const datasets = [];
         serverKeys.forEach((key, srvIdx) => {
@@ -449,16 +531,56 @@ document.addEventListener("DOMContentLoaded", function() {
             const color = serverColors[srvIdx % serverColors.length];
             const srvName = serverLabels[key] || key;
             
-            Object.entries(percentileStyles).forEach(([pKey, style]) => {
+            datasets.push({
+                label: srvName,
+                data: processArray(srvData['p50'], divideByConcurrency),
+                borderColor: color,
+                backgroundColor: 'transparent',
+                borderWidth: 2.5,
+                borderDash: [],
+                tension: 0.1,
+                pointRadius: 3,
+                pointHoverRadius: 5,
+            });
+        });
+        
+        return datasets;
+    }
+    
+    function createToolDatasets(metricKey, divideByConcurrency = false) {
+        if (!toolBreakdown) return createServerDatasets(metricKey, divideByConcurrency);
+        
+        const metricObj = toolBreakdown[metricKey];
+        if (!metricObj) return [];
+        
+        const tools = toolBreakdown.tools || [];
+        const datasets = [];
+        let colorIdx = 0;
+        
+        serverKeys.forEach((srvKey) => {
+            const srvName = serverLabels[srvKey] || srvKey;
+            tools.forEach((tool) => {
+                const comboKey = `${srvKey}_${tool}`;
+                const comboData = metricObj[comboKey];
+                if (!comboData) return;
+                
+                // Check if has any non-null data
+                const hasData = comboData['p50'] && comboData['p50'].some(v => v !== null);
+                if (!hasData) return;
+                
+                const color = toolColors[colorIdx % toolColors.length];
+                colorIdx++;
+                
                 datasets.push({
-                    label: `${srvName} ${pKey}`,
-                    data: processArray(srvData[pKey]),
+                    label: `${srvName} — ${tool}`,
+                    data: processArray(comboData['p50'], divideByConcurrency),
                     borderColor: color,
                     backgroundColor: 'transparent',
-                    borderWidth: style.width,
-                    borderDash: style.dash,
+                    borderWidth: 2,
+                    borderDash: [],
                     tension: 0.1,
-                    pointRadius: 0,
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
                 });
             });
         });
@@ -497,29 +619,51 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }
     
-    new Chart(document.getElementById('chart-ttft'), {
-        type: 'line',
-        data: { datasets: createDatasets('ttft') },
-        options: getOptions('TTFT (ms)', true)
-    });
+    function renderCharts(view) {
+        // Destroy existing charts
+        Object.values(chartInstances).forEach(c => c.destroy());
+        
+        const createFn = view === 'tool' ? createToolDatasets : createServerDatasets;
+        
+        const configs = [
+            { id: 'chart-ttft',    metric: 'ttft',    yTitle: 'TTFT (ms)',        log: true,  div: false },
+            { id: 'chart-itl',     metric: 'itl',     yTitle: 'Latency (ms)',     log: false, div: false },
+            { id: 'chart-tps',     metric: 'tps',     yTitle: 'Tokens/sec/user',  log: false, div: true },
+            { id: 'chart-latency', metric: 'latency', yTitle: 'Latency (ms)',     log: true,  div: false },
+        ];
+        
+        configs.forEach(cfg => {
+            const canvas = document.getElementById(cfg.id);
+            if (!canvas) return;
+            chartInstances[cfg.id] = new Chart(canvas, {
+                type: 'line',
+                data: { datasets: createFn(cfg.metric, cfg.div) },
+                options: getOptions(cfg.yTitle, cfg.log),
+            });
+        });
+    }
     
-    new Chart(document.getElementById('chart-itl'), {
-        type: 'line',
-        data: { datasets: createDatasets('itl') },
-        options: getOptions('Latency (ms)', false)
-    });
+    // Initial render
+    renderCharts('server');
     
-    new Chart(document.getElementById('chart-tps'), {
-        type: 'line',
-        data: { datasets: createDatasets('tps', true) },
-        options: getOptions('Tokens/sec/user', false)
-    });
-    
-    new Chart(document.getElementById('chart-latency'), {
-        type: 'line',
-        data: { datasets: createDatasets('latency') },
-        options: getOptions('Latency (ms)', true)
-    });
+    // Toggle function (exposed globally for onclick)
+    window.switchChartView = function(view) {
+        currentView = view;
+        renderCharts(view);
+        
+        // Update toggle button styles
+        const btnServer = document.getElementById('btn-view-server');
+        const btnTool = document.getElementById('btn-view-tool');
+        if (btnServer && btnTool) {
+            if (view === 'server') {
+                btnServer.className = 'px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-[#1d1d1f] shadow-sm transition-all';
+                btnTool.className = 'px-3 py-1.5 text-xs font-semibold rounded-md text-[#7a7a7a] hover:text-[#1d1d1f] transition-all';
+            } else {
+                btnTool.className = 'px-3 py-1.5 text-xs font-semibold rounded-md bg-white text-[#1d1d1f] shadow-sm transition-all';
+                btnServer.className = 'px-3 py-1.5 text-xs font-semibold rounded-md text-[#7a7a7a] hover:text-[#1d1d1f] transition-all';
+            }
+        }
+    };
 });
         </script>
     {% endif %}

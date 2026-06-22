@@ -38,7 +38,7 @@ database = Database(config.postgres)
 # --------------------------------------------------
 try:
     from src.data.data_sink import DataSink
-    data_sink = DataSink(config)
+    data_sink = DataSink(config, database)
 except Exception as e:
     print(f"  Warning: DataSink init error (will retry): {e}")
     data_sink = None
@@ -210,7 +210,6 @@ async def get_db():
 @app.on_event("startup")
 async def startup():
     try:
-        database.create_tables()
         from src.database.seed import run_seed
         run_seed(database)
         print("  Database tables created and seeded.")
@@ -220,12 +219,6 @@ async def startup():
             from sqlalchemy.future import select
             from src.database.tables import ServerProfile
             from src.config import ServerConfig
-            try:
-                await session.execute(text("ALTER TABLE server_profiles ADD COLUMN ip_address VARCHAR(50);"))
-                await session.execute(text("ALTER TABLE server_profiles ADD COLUMN status VARCHAR(50);"))
-                await session.commit()
-            except Exception:
-                await session.rollback()
                 
             result = await session.execute(select(ServerProfile))
             profiles = result.scalars().all()
@@ -632,11 +625,6 @@ async def api_benchmark_start(request: Request):
     run_name = body.get("run_name", "").strip() or None
 
     advanced_options = body.get("advanced_options")
-    if advanced_options:
-        if "warmup_requests" in advanced_options:
-            config.benchmark.warmup_requests = int(advanced_options["warmup_requests"])
-        if "cooldown_seconds" in advanced_options:
-            config.benchmark.cooldown_seconds = int(advanced_options["cooldown_seconds"])
 
     run_id = orchestrator.generate_run_id()
 
@@ -651,6 +639,7 @@ async def api_benchmark_start(request: Request):
             prompt_set_id=prompt_set_id,
             model=model,
             run_name=run_name,
+            advanced_options=advanced_options,
         )
     )
 
