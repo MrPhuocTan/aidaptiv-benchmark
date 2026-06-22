@@ -347,6 +347,7 @@ class AsyncRepository:
         scenarios_used = set()
         servers_used = set()
         models_used = set()
+        concurrencies_used = set()
         total_prompts_processed = 0
         
         for r in results:
@@ -354,6 +355,7 @@ class AsyncRepository:
             if r.scenario: scenarios_used.add(r.scenario)
             if r.server: servers_used.add(r.server)
             if r.model: models_used.add(r.model)
+            if r.concurrency is not None: concurrencies_used.add(r.concurrency)
             
         run_servers = sorted(list(servers_used))
         server_map = {srv: f"server{i+1}" for i, srv in enumerate(run_servers)}
@@ -376,8 +378,9 @@ class AsyncRepository:
                 "tps": round(r.tps, 2) if r.tps else None,
                 "rps": round(r.rps, 2) if r.rps else None,
                 "ttft_ms": round(r.ttft_ms, 2) if r.ttft_ms else None,
+                "tpot_ms": round(r.tpot_ms, 2) if r.tpot_ms else None,
                 "latency_p99_ms": round(r.latency_p99_ms, 2) if r.latency_p99_ms else None,
-                "error_rate": round(r.error_rate * 100, 2) if r.error_rate is not None else 0, # Percentage
+                "error_rate": round(r.error_rate * 100, 2) if r.error_rate is not None else 0,
                 "total_requests": r.total_requests or 0,
             }
         
@@ -430,6 +433,7 @@ class AsyncRepository:
                 "scenarios": sorted(list(scenarios_used)),
                 "servers": sorted(list(servers_used)),
                 "models": sorted(list(models_used)),
+                "concurrencies": sorted(list(concurrencies_used)),
                 "total_requests": total_prompts_processed,
                 "server_count": len(run_servers),
                 "server_labels": server_labels,
