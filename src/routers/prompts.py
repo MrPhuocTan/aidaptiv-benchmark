@@ -81,6 +81,21 @@ def delete_prompt_set(pset_id: int, repo: Repository = Depends(get_repo)):
     repo.delete_prompt_set(pset_id)
     return {"status": "success"}
 
+@router.get("/api/prompts/{pset_id}")
+def get_prompt_set_details(pset_id: int, repo: Repository = Depends(get_repo)):
+    pset = repo.get_prompt_set_by_id(pset_id)
+    if not pset:
+        raise HTTPException(status_code=404, detail="Prompt set not found")
+        
+    prompts = []
+    for p in pset.prompts:
+        prompts.append({
+            "id": p.id,
+            "scenario": p.scenario,
+            "prompt_text": p.prompt_text
+        })
+    return {"id": pset.id, "name": pset.name, "prompts": prompts}
+
 @router.get("/api/prompts/template")
 def download_template():
     wb = Workbook()
