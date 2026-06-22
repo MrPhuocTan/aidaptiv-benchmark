@@ -4,9 +4,15 @@
 \usepackage{fontspec}
 \usepackage{xeCJK}
 
-% Use Noto Serif and Noto Serif TC if available, fallback to system serif
-\setmainfont{Noto Serif}
-\setCJKmainfont{Noto Serif CJK TC}
+% Fonts: try Noto Serif → Times New Roman → Latin Modern (fallback chain)
+\IfFontExistsTF{Noto Serif}{\setmainfont{Noto Serif}}{%
+  \IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{%
+    \setmainfont{Latin Modern Roman}}}
+% CJK: try Noto Serif CJK TC → Songti SC (macOS) → SimSun (Windows)
+\IfFontExistsTF{Noto Serif CJK TC}{\setCJKmainfont{Noto Serif CJK TC}}{%
+  \IfFontExistsTF{Songti SC}{\setCJKmainfont{Songti SC}}{%
+    \IfFontExistsTF{SimSun}{\setCJKmainfont{SimSun}}{%
+      \setCJKmainfont{Heiti SC}}}}
 \usepackage[margin=2cm,top=2.5cm,bottom=2.5cm]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
