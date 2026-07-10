@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  deepseek-llm-67b-chat
 # Ollama: deepseek-llm:67b
 # Family: DeepSeek

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Phind-CodeLlama-34B-v1
 # Ollama: phind-codellama:34b
 # Family: Phind

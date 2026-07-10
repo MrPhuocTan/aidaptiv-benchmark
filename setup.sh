@@ -10,7 +10,7 @@ BOLD='\033[1m'
 
 echo ""
 echo -e "${PURPLE}================================================================${NC}"
-echo -e "${WHITE}${BOLD}  aiDaptive Benchmark Suite - Setup${NC}"
+echo -e "${WHITE}${BOLD}  aiDaptiv Benchmark Suite - Setup${NC}"
 echo -e "${PURPLE}================================================================${NC}"
 echo ""
 

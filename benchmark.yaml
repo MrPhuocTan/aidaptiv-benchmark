@@ -1,5 +1,5 @@
 app:
-  name: "aiDaptive Benchmark Suite"
+  name: "aiDaptiv Benchmark Suite"
   version: "1.0.0"
   host: "0.0.0.0"
   port: 8443
@@ -7,9 +7,9 @@ app:
 postgres:
   host: "localhost"
   port: 5432
-  database: "aidaptive_benchmark"
-  user: "aidaptive"
-  password: "aidaptive2024"
+  database: "aidaptiv_benchmark"
+  user: "aidaptiv"
+  password: "aidaptiv2024"
 
 
 
@@ -21,14 +21,6 @@ servers:
     agent_url: "http://34.21.144.84:9100"
     hardware_cost_usd: 50000
     monthly_power_usd: 500
-
-  server2:
-    name: "VM02 - Standard + aiDaptive"
-    description: "Mid-range GPU Server with aiDaptive Solution"
-    ollama_url: "http://34.142.222.133:11434"
-    agent_url: "http://34.142.222.133:9100"
-    hardware_cost_usd: 15000
-    monthly_power_usd: 200
 
 models:
   # ── Legacy Models ──────────────────────────

@@ -263,7 +263,7 @@ def generate_benchmark_pdf(
         return None
     
     # Create temp dir for build
-    tmpdir = tempfile.mkdtemp(prefix="aidaptive_report_")
+    tmpdir = tempfile.mkdtemp(prefix="aidaptiv_report_")
     
     try:
         metadata = report_data.get("metadata", {})

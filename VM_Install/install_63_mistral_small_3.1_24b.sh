@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Mistral-Small-3.1-24B-Instruct
 # Ollama: mistral-small:24b
 # Family: Mistral AI

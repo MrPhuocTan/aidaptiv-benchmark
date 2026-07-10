@@ -15,9 +15,9 @@ sudo chmod +x /usr/local/bin/oha
 
 
 echo "Cloning repository..."
-rm -rf aidaptive-benchmark
-git clone https://github.com/MrPhuocTan/aidaptive-benchmark.git
-cd aidaptive-benchmark
+rm -rf aidaptiv-benchmark
+git clone https://github.com/MrPhuocTan/aidaptiv-benchmark.git
+cd aidaptiv-benchmark
 
 echo "Starting Docker services..."
 sudo docker-compose up -d

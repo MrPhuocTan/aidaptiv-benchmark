@@ -2,17 +2,17 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: aidaptive-postgres
+    container_name: aidaptiv-postgres
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=aidaptive
-      - POSTGRES_PASSWORD=aidaptive2024
-      - POSTGRES_DB=aidaptive_benchmark
+      - POSTGRES_USER=aidaptiv
+      - POSTGRES_PASSWORD=aidaptiv2024
+      - POSTGRES_DB=aidaptiv_benchmark
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U aidaptive"]
+      test: ["CMD-SHELL", "pg_isready -U aidaptiv"]
       interval: 5s
       timeout: 5s
       retries: 5

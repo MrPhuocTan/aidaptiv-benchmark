@@ -99,6 +99,7 @@ class AgentClient:
                         "gpu_power_watts": raw.get("power_w"),
                         "gpu_temperature_c": raw.get("temperature_c"),
                         "gpu_name": raw.get("name", ""),
+                        "gpus": gpus,
                     }
         except Exception:
             pass
@@ -131,6 +132,7 @@ class AgentClient:
             metrics.gpu_power_watts = gpu.get("gpu_power_watts")
             metrics.gpu_temperature_c = gpu.get("gpu_temperature_c")
             metrics.gpu_name = gpu.get("gpu_name", "")
+            metrics.gpu_details = gpu.get("gpus", [])
 
         if sys_m:
             metrics.cpu_pct = sys_m.get("cpu_usage_pct")

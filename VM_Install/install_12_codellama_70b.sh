@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  CodeLlama-70b-hf
 # Ollama: codellama:70b
 # Family: Meta CodeLlama

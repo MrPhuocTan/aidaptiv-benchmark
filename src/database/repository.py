@@ -3,6 +3,7 @@
 from src.time_utils import get_local_time
 from datetime import datetime
 from typing import Optional
+import json
 
 from sqlalchemy import select, desc, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -478,21 +479,53 @@ class AsyncRepository:
             
             server = data.setdefault(server_id, {
                 "timestamps": [],
-                "gpu_util_pct": [],
                 "cpu_pct": [],
-                "vram_used_gb": [],
                 "ram_used_gb": [],
                 "disk_read_mbps": [],
                 "disk_write_mbps": [],
+                "gpus": [],
+                # Keep legacy keys for fallback
+                "gpu_util_pct": [],
+                "vram_used_gb": []
             })
             for snapshot in sampled:
                 server["timestamps"].append(snapshot.timestamp.isoformat() if snapshot.timestamp else None)
-                server["gpu_util_pct"].append(snapshot.gpu_util_pct)
                 server["cpu_pct"].append(snapshot.cpu_pct)
-                server["vram_used_gb"].append(snapshot.vram_used_gb)
                 server["ram_used_gb"].append(snapshot.ram_used_gb)
                 server["disk_read_mbps"].append(snapshot.disk_read_mbps)
                 server["disk_write_mbps"].append(snapshot.disk_write_mbps)
+                
+                # Fallback to scalar values
+                server["gpu_util_pct"].append(snapshot.gpu_util_pct)
+                server["vram_used_gb"].append(snapshot.vram_used_gb)
+
+                if hasattr(snapshot, "gpu_details_json") and snapshot.gpu_details_json:
+                    try:
+                        gpus_data = json.loads(snapshot.gpu_details_json)
+                        # Ensure server["gpus"] has enough slots
+                        while len(server["gpus"]) < len(gpus_data):
+                            server["gpus"].append({
+                                "name": "", "gpu_util_pct": [], "vram_used_gb": [], 
+                                "vram_total_gb": [], "gpu_power_watts": [], "gpu_temperature_c": []
+                            })
+                        
+                        for i, g in enumerate(gpus_data):
+                            server["gpus"][i]["name"] = g.get("name", f"GPU {i}")
+                            server["gpus"][i]["gpu_util_pct"].append(g.get("gpu_util_pct"))
+                            server["gpus"][i]["vram_used_gb"].append((g.get("memory_used_mb") or 0) / 1024)
+                            server["gpus"][i]["vram_total_gb"].append((g.get("memory_total_mb") or 0) / 1024)
+                            server["gpus"][i]["gpu_power_watts"].append(g.get("power_w"))
+                            server["gpus"][i]["gpu_temperature_c"].append(g.get("temperature_c"))
+                    except Exception:
+                        pass
+                else:
+                    # Pad gpus array if it exists but this snapshot doesn't have details
+                    for g in server["gpus"]:
+                        g["gpu_util_pct"].append(None)
+                        g["vram_used_gb"].append(None)
+                        g["vram_total_gb"].append(None)
+                        g["gpu_power_watts"].append(None)
+                        g["gpu_temperature_c"].append(None)
         
         result = {"timestamps": next(iter(data.values())).get("timestamps", []) if data else []}
         for server_id, server_data in data.items():

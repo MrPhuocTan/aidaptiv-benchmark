@@ -287,11 +287,11 @@ ensure_support_services() {
 open_log_terminal_tab() {
   if [[ "$(uname -s)" != "Darwin" ]]; then
     if has_command x-terminal-emulator; then
-      x-terminal-emulator -e "bash -lc 'printf \"\\n--- aiDaptive log tail ---\\n\"; tail -n 200 -f \"$APP_LOG_FILE\"'" >/dev/null 2>&1 &
+      x-terminal-emulator -e "bash -lc 'printf \"\\n--- aiDaptiv log tail ---\\n\"; tail -n 200 -f \"$APP_LOG_FILE\"'" >/dev/null 2>&1 &
     elif has_command gnome-terminal; then
-      gnome-terminal -- bash -lc "printf '\n--- aiDaptive log tail ---\n'; tail -n 200 -f \"$APP_LOG_FILE\"; exec bash" >/dev/null 2>&1 &
+      gnome-terminal -- bash -lc "printf '\n--- aiDaptiv log tail ---\n'; tail -n 200 -f \"$APP_LOG_FILE\"; exec bash" >/dev/null 2>&1 &
     elif has_command xterm; then
-      xterm -e "printf '\n--- aiDaptive log tail ---\n'; tail -n 200 -f \"$APP_LOG_FILE\"" >/dev/null 2>&1 &
+      xterm -e "printf '\n--- aiDaptiv log tail ---\n'; tail -n 200 -f \"$APP_LOG_FILE\"" >/dev/null 2>&1 &
     fi
     return 0
   fi
@@ -307,7 +307,7 @@ open_log_terminal_tab() {
   osascript >/dev/null 2>&1 <<EOF || true
 tell application "Terminal"
   activate
-  do script "cd \"$escaped_root\"; printf '\\n--- aiDaptive log tail ---\\n'; tail -n 200 -f \"$escaped_log\""
+  do script "cd \"$escaped_root\"; printf '\\n--- aiDaptiv log tail ---\\n'; tail -n 200 -f \"$escaped_log\""
 end tell
 EOF
 }
@@ -347,7 +347,7 @@ start_app_background() {
   echo "$app_port" >"$PORT_FILE"
   (
     cd "$PROJECT_ROOT"
-    AIDAPTIVE_APP_PORT="$app_port" nohup "$python_bin" -m src >"$APP_LOG_FILE" 2>&1 &
+    AIDAPTIV_APP_PORT="$app_port" nohup "$python_bin" -m src >"$APP_LOG_FILE" 2>&1 &
     echo $! >"$PID_FILE"
   )
 

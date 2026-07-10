@@ -130,7 +130,7 @@ async def page_report_download(
                     content=pdf_bytes,
                     media_type="application/pdf",
                     headers={
-                        "Content-Disposition": f'attachment; filename="aidaptive_report_{run_id}.pdf"'
+                        "Content-Disposition": f'attachment; filename="aidaptiv_report_{run_id}.pdf"'
                     },
                 )
             else:
@@ -151,7 +151,7 @@ async def page_report_download(
             "timeline_chart": timeline_chart if run else None,
         },
     )
-    response.headers["Content-Disposition"] = f'attachment; filename="aidaptive_report_{run_id}.html"'
+    response.headers["Content-Disposition"] = f'attachment; filename="aidaptiv_report_{run_id}.html"'
     return response
 
 
@@ -456,7 +456,7 @@ async def export_excel(
         output,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={
-            "Content-Disposition": f'attachment; filename="aidaptive_report_{run_id}.xlsx"'
+            "Content-Disposition": f'attachment; filename="aidaptiv_report_{run_id}.xlsx"'
         },
     )
 
@@ -494,7 +494,7 @@ async def export_evidence(
     manifest = {
         "benchmark_run_id": run.run_id,
         "generated_at": get_local_time().isoformat(),
-        "system_version": "aiDaptive Benchmark Suite v2.1",
+        "system_version": "aiDaptiv Benchmark Suite v2.1",
         "integrity_method": "SHA-256",
         "environment": {
             "controller_hostname": socket.gethostname(),
@@ -539,6 +539,6 @@ async def export_evidence(
         zip_buffer,
         media_type="application/zip",
         headers={
-            "Content-Disposition": f'attachment; filename="aidaptive_evidence_{run_id}.zip"'
+            "Content-Disposition": f'attachment; filename="aidaptiv_evidence_{run_id}.zip"'
         },
     )

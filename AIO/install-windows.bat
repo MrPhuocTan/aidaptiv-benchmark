@@ -3,7 +3,7 @@ chcp 65001 >nul 2>&1
 setlocal enabledelayedexpansion
 
 REM ============================================================================
-REM  aiDaptive Benchmark Suite - All In One Installer (Windows)
+REM  aiDaptiv Benchmark Suite - All In One Installer (Windows)
 REM
 REM  Script nay se:
 REM    1. Kiem tra va cai Docker Desktop neu chua co
@@ -40,7 +40,7 @@ REM  Banner
 REM ============================================================================
 echo.
 echo %PURPLE%======================================================================%NC%
-echo %WHITE%%BOLD%   aiDaptive Benchmark Suite - AIO Installer (Windows)%NC%
+echo %WHITE%%BOLD%   aiDaptiv Benchmark Suite - AIO Installer (Windows)%NC%
 echo %GRAY%   All In One - Docker - Auto Setup%NC%
 echo %PURPLE%======================================================================%NC%
 echo.
@@ -268,7 +268,7 @@ echo.
 cd /d "%PROJECT_ROOT%"
 
 REM Kiem tra container cu
-docker ps -a --format "{{.Names}}" 2>nul | findstr /C:"aidaptive-app" >nul 2>&1
+docker ps -a --format "{{.Names}}" 2>nul | findstr /C:"aidaptiv-app" >nul 2>&1
 if %errorlevel% equ 0 (
     echo.
     echo %YELLOW%======================================================================%NC%
@@ -309,7 +309,7 @@ echo %WHITE%  Dang doi ung dung khoi dong...%NC%
 
 REM Doc port tu .env
 set "APP_PORT=8443"
-for /f "tokens=2 delims==" %%a in ('findstr /C:"AIDAPTIVE_APP_PORT" "%SCRIPT_DIR%\.env" 2^>nul') do (
+for /f "tokens=2 delims==" %%a in ('findstr /C:"AIDAPTIV_APP_PORT" "%SCRIPT_DIR%\.env" 2^>nul') do (
     set "APP_PORT=%%a"
 )
 

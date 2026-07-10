@@ -1,5 +1,5 @@
 /**
- * aiDaptive Benchmark Suite - Frontend JavaScript
+ * aiDaptiv Benchmark Suite - Frontend JavaScript
  */
 
 let discoveredServerConfig = null;
@@ -320,17 +320,55 @@ async function onServerSelectChange(index) {
         const data = await resp.json();
         const specs = data.specs || {};
         
+        // Process CPU
+        const cpuRawLines = (specs.cpu_model || '').split('\n').map(s => s.trim()).filter(s => s);
+        const cpuModel = cpuRawLines.reduce((a, b) => a.length > b.length ? a : b, '').trim() || '--';
+        const cpuSockets = cpuRawLines.length > 0 ? cpuRawLines.length : 1;
+        const cpuFormatted = cpuSockets > 1 
+            ? `<span class="bg-slate-100 text-slate-600 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1 border border-slate-200">${cpuSockets}x</span><span class="font-semibold text-slate-800">${cpuModel}</span>`
+            : `<span class="font-semibold text-slate-800">${cpuModel}</span>`;
+        
+        // Process GPU
+        const gpuLines = (specs.gpu_name || '').split('\n').map(s => s.trim()).filter(s => s);
+        const gpuCounts = {};
+        gpuLines.forEach(l => gpuCounts[l] = (gpuCounts[l] || 0) + 1);
+        const gpuFormatted = Object.entries(gpuCounts).map(([k, v]) => 
+            v > 1 
+                ? `<div class="mb-1 last:mb-0"><span class="bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1 border border-emerald-200">${v}x</span><span class="font-semibold text-slate-800">${k}</span></div>` 
+                : `<div class="mb-1 last:mb-0 font-semibold text-slate-800">${k}</div>`
+        ).join('') || '<span class="text-slate-400 italic">None</span>';
+        
         card.innerHTML = `
-            <div class="grid grid-cols-2 gap-2">
-                <div class="text-slate-500">OS/Kernel:</div><div class="font-mono text-slate-800">${specs.kernel || '--'}</div>
-                <div class="text-slate-500">CPU:</div><div class="font-mono text-slate-800">${specs.cpu_model || '--'} (${specs.cpu_cores || '?'} cores)</div>
-                <div class="text-slate-500">RAM:</div><div class="font-mono text-slate-800">${specs.ram_gb || '--'} GB</div>
-                <div class="text-slate-500">SSD:</div><div class="font-mono text-slate-800">${specs.ssd_total || '--'}</div>
-                <div class="text-slate-500">GPU:</div><div class="font-mono text-slate-800">${specs.gpu_name || 'None'}</div>
-            </div>
+            <table class="w-full text-sm text-left">
+                <tbody>
+                    <tr class="border-b border-slate-100 last:border-0">
+                        <td class="py-2 text-slate-500 font-medium w-16 align-top">OS</td>
+                        <td class="py-2 text-slate-700">${specs.kernel || '--'}</td>
+                    </tr>
+                    <tr class="border-b border-slate-100 last:border-0">
+                        <td class="py-2 text-slate-500 font-medium align-top">CPU</td>
+                        <td class="py-2">
+                            <div>${cpuFormatted}</div>
+                            <div class="text-xs text-slate-400 font-medium mt-0.5">(${specs.cpu_cores || '?'} cores total)</div>
+                        </td>
+                    </tr>
+                    <tr class="border-b border-slate-100 last:border-0">
+                        <td class="py-2 text-slate-500 font-medium align-top">RAM</td>
+                        <td class="py-2 text-slate-700"><span class="font-semibold text-slate-800">${specs.ram_gb || '--'}</span> <span class="text-xs text-slate-400">GB</span></td>
+                    </tr>
+                    <tr class="border-b border-slate-100 last:border-0">
+                        <td class="py-2 text-slate-500 font-medium align-top">SSD</td>
+                        <td class="py-2 text-slate-700"><span class="font-semibold text-slate-800">${specs.ssd_total || '--'}</span></td>
+                    </tr>
+                    <tr class="border-b border-slate-100 last:border-0">
+                        <td class="py-2 text-slate-500 font-medium align-top">GPU</td>
+                        <td class="py-2 leading-tight">${gpuFormatted}</td>
+                    </tr>
+                </tbody>
+            </table>
         `;
     } catch (e) {
-        card.innerHTML = `<div class="text-red-400 italic">Could not fetch specs. Is the agent running?</div>`;
+        card.innerHTML = `<div class="text-red-400 italic text-sm py-2">Could not fetch specs. Is the agent running?</div>`;
     }
 }
 

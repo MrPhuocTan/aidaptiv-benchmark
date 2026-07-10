@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  deepseek-moe-16b-chat
 # Ollama: deepseek-v2:16b
 # Family: DeepSeek MoE

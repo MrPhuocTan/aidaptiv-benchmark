@@ -1,5 +1,6 @@
 """Unified data sink - writes to PostgreSQL"""
 
+import json
 from src.config import Config
 from src.data.normalizer import Normalizer
 from src.database.engine import Database
@@ -149,6 +150,7 @@ class DataSink:
                 gpu_power_watts=metrics.gpu_power_watts,
                 gpu_temperature_c=metrics.gpu_temperature_c,
                 gpu_memory_bandwidth_gbps=metrics.gpu_memory_bandwidth_gbps,
+                gpu_details_json=json.dumps(metrics.gpu_details) if metrics.gpu_details else None,
                 cpu_pct=metrics.cpu_pct,
                 ram_used_gb=metrics.ram_used_gb,
                 ram_total_gb=metrics.ram_total_gb,

@@ -158,7 +158,7 @@ def build_mock():
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("  aiDaptive Benchmark - PDF Report Generator")
+    print("  aiDaptiv Benchmark - PDF Report Generator")
     print("=" * 60)
     print(f"  xelatex: {XELATEX_PATH}")
     run, report_data, chart_data, timeline_data, comparisons, summary = build_mock()

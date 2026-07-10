@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Phi-4-14B
 # Ollama: phi4:latest
 # Family: Microsoft Phi-4

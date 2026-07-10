@@ -785,20 +785,36 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     // GPU Chart
-    renderStats('gpu-stats', 'gpu_util_pct', '%');
-    createLightChart('timeline-chart-gpu',
-        servers.map((srv, i) => {
-            const p = serverPalette[i % serverPalette.length];
-            return {
+    // renderStats('gpu-stats', 'gpu_util_pct', '%'); // Disable legacy stats or keep them
+    const gpuDatasets = [];
+    servers.forEach((srv, srvIdx) => {
+        const srvData = timelineData[srv];
+        if (srvData.gpus && srvData.gpus.length > 0) {
+            srvData.gpus.forEach((gpu, gpuIdx) => {
+                // Generate a distinct color index
+                const colorIdx = (srvIdx * 8 + gpuIdx) % serverPalette.length;
+                const p = serverPalette[colorIdx];
+                gpuDatasets.push({
+                    label: `${srv} - ${gpu.name}`,
+                    data: srvData.timestamps.map((ts, idx) => ({ x: ts, y: gpu.gpu_util_pct[idx] })),
+                    borderColor: p.line, backgroundColor: 'transparent',
+                    fill: false, tension: 0.3, borderWidth: 2, pointRadius: 0,
+                    pointHoverRadius: 5, pointHoverBackgroundColor: p.line,
+                });
+            });
+        } else {
+            // Fallback for old data
+            const p = serverPalette[srvIdx % serverPalette.length];
+            gpuDatasets.push({
                 label: srv,
-                data: timelineData[srv].timestamps.map((ts, idx) => ({ x: ts, y: timelineData[srv].gpu_util_pct[idx] })),
+                data: srvData.timestamps.map((ts, idx) => ({ x: ts, y: srvData.gpu_util_pct[idx] })),
                 borderColor: p.line, backgroundColor: p.fill,
                 fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0,
                 pointHoverRadius: 5, pointHoverBackgroundColor: p.line,
-            };
-        }),
-        lightChartOptions('GPU (%)', '%', 100)
-    );
+            });
+        }
+    });
+    createLightChart('timeline-chart-gpu', gpuDatasets, lightChartOptions('GPU (%)', '%', 100));
     
     // CPU Chart
     renderStats('cpu-stats', 'cpu_pct', '%');

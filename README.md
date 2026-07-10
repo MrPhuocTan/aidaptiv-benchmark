@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>aiDaptive Benchmark Suite</h1>
+  <h1>aiDaptiv Benchmark Suite</h1>
   <p><b>A professional, dynamic, and multi-server LLM inference benchmarking platform.</b></p>
   
   [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](#)
@@ -13,13 +13,13 @@
 
 ## Overview
 
-The **aiDaptive Benchmark Suite** is an advanced AI performance measurement tool designed to configure and compare LLM inference performance across multiple servers dynamically.
+The **aiDaptiv Benchmark Suite** is an advanced AI performance measurement tool designed to configure and compare LLM inference performance across multiple servers dynamically.
 
 ### Core Objectives
 - Flexible management of unlimited servers via a dynamic Data Table UI.
 - Concurrent benchmarking execution across 1, 2, or 3+ target environments.
 - **Hardware Telemetry & Analysis:** Real-time collection and visualization of GPU, CPU, Memory, Disk, and Network metrics alongside inference results.
-- **Hardware vs. Optimized Comparison:** Empirical performance validation comparing raw hardware configurations (Baseline) against optimized configurations (aiDaptive+ Enabled).
+- **Hardware vs. Optimized Comparison:** Empirical performance validation comparing raw hardware configurations (Baseline) against optimized configurations (aiDaptiv+ Enabled).
 
 ---
 
@@ -102,7 +102,7 @@ graph TD
     subgraph Target Servers
         direction LR
         S1[AI Server 1<br/>Baseline]
-        SN[AI Server N<br/>aiDaptive+ Enabled]
+        SN[AI Server N<br/>aiDaptiv+ Enabled]
     end
 ```
 
@@ -210,8 +210,8 @@ sequenceDiagram
 ### 2. Installation
 ```bash
 # Clone the repository
-git clone https://github.com/MrPhuocTan/aidaptive-benchmark.git
-cd aidaptive-benchmark
+git clone https://github.com/MrPhuocTan/aidaptiv-benchmark.git
+cd aidaptiv-benchmark
 
 # Start the application and database
 ./command/start_server.sh
@@ -219,9 +219,9 @@ cd aidaptive-benchmark
 *The Web UI will be accessible at `http://localhost:8443`*
 
 ### 3. Agent Setup (AI Servers)
-To collect hardware telemetry on target servers, install the aiDaptive Agent:
+To collect hardware telemetry on target servers, install the aiDaptiv Agent:
 ```bash
-curl -sSL https://raw.githubusercontent.com/MrPhuocTan/aidaptive-benchmark/main/install_ai_server.sh | bash
+curl -sSL https://raw.githubusercontent.com/MrPhuocTan/aidaptiv-benchmark/main/install_ai_server.sh | bash
 ```
 
 ---
@@ -232,4 +232,4 @@ For platform inquiries, infrastructure support, or architectural discussions, co
 **Author & Credits:**
 MrPhuocTan - phtan.working@gmail.com - 097.201.2901
 
-*aiDaptive Benchmark Suite - © 2026 MrPhuocTan. All rights reserved.*
+*aiDaptiv Benchmark Suite - © 2026 MrPhuocTan. All rights reserved.*

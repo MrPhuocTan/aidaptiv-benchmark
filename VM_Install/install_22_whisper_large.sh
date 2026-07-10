@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer #22
+# aiDaptiv Benchmark — Model Installer #22
 # Model:  whisper-large-v2
 # Family: OpenAI Whisper
 # Task:   Speech Recognition
@@ -16,7 +16,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/_base_setup.sh"
 
-print_header "aiDaptive Benchmark — Whisper Installer"
+print_header "aiDaptiv Benchmark — Whisper Installer"
 echo -e "Model: ${BOLD}whisper-large-v2${NC}"
 echo -e "Task:  Speech Recognition"
 echo ""

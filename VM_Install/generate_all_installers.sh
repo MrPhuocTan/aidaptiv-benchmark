@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Generate All Model Installers
+# aiDaptiv Benchmark — Generate All Model Installers
 # Run this script ONCE to generate all model-specific install scripts
 # ==============================================================================
 
@@ -110,7 +110,7 @@ for entry in "${MODELS[@]}"; do
             cat > "$FILEPATH" <<GPT_EOF
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  ${DISPLAY_NAME}
 # Family: ${FAMILY}
 # Task:   ${TASK}
@@ -126,7 +126,7 @@ set -e
 SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
 source "\${SCRIPT_DIR}/_base_setup.sh"
 
-print_header "aiDaptive Benchmark — GPT-OSS Installer"
+print_header "aiDaptiv Benchmark — GPT-OSS Installer"
 echo -e "Model: \${BOLD}${DISPLAY_NAME}\${NC}"
 echo -e "Task:  ${TASK}"
 echo ""
@@ -168,7 +168,7 @@ GPT_EOF
         cat > "$FILEPATH" <<WHISPER_EOF
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer #22
+# aiDaptiv Benchmark — Model Installer #22
 # Model:  ${DISPLAY_NAME}
 # Family: ${FAMILY}
 # Task:   ${TASK}
@@ -184,7 +184,7 @@ set -e
 SCRIPT_DIR="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
 source "\${SCRIPT_DIR}/_base_setup.sh"
 
-print_header "aiDaptive Benchmark — Whisper Installer"
+print_header "aiDaptiv Benchmark — Whisper Installer"
 echo -e "Model: \${BOLD}${DISPLAY_NAME}\${NC}"
 echo -e "Task:  ${TASK}"
 echo ""
@@ -241,7 +241,7 @@ WHISPER_EOF
     cat > "$FILEPATH" <<MODEL_EOF
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  ${DISPLAY_NAME}
 # Ollama: ${OLLAMA_TAG}
 # Family: ${FAMILY}

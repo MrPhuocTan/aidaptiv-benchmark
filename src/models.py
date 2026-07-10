@@ -84,6 +84,7 @@ class HardwareMetrics:
     gpu_temperature_c: Optional[float] = None
     gpu_memory_bandwidth_gbps: Optional[float] = None
     gpu_name: str = ""
+    gpu_details: list = field(default_factory=list)
 
     cpu_pct: Optional[float] = None
     ram_used_gb: Optional[float] = None

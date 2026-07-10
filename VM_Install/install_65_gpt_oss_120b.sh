@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  GPT-OSS-120B
 # Family: GPT OSS
 # Task:   Text Generation
@@ -16,7 +16,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${SCRIPT_DIR}/_base_setup.sh"
 
-print_header "aiDaptive Benchmark — GPT-OSS Installer"
+print_header "aiDaptiv Benchmark — GPT-OSS Installer"
 echo -e "Model: ${BOLD}GPT-OSS-120B${NC}"
 echo -e "Task:  Text Generation"
 echo ""

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Llama-4-Scout-17B-16E-Instruct
 # Ollama: llama4:scout
 # Family: Meta Llama 4

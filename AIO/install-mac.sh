@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-#  aiDaptive Benchmark Suite - All In One Installer (macOS)
+#  aiDaptiv Benchmark Suite - All In One Installer (macOS)
 #
 #  Script này sẽ:
 #    1. Kiểm tra và cài Docker Desktop nếu chưa có
@@ -45,7 +45,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # ============================================================================
 echo ""
 echo -e "${PURPLE}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${PURPLE}║${NC}  ${WHITE}${BOLD}aiDaptive Benchmark Suite - AIO Installer (macOS)${NC}     ${PURPLE}║${NC}"
+echo -e "${PURPLE}║${NC}  ${WHITE}${BOLD}aiDaptiv Benchmark Suite - AIO Installer (macOS)${NC}     ${PURPLE}║${NC}"
 echo -e "${PURPLE}║${NC}  ${GRAY}All In One • Docker • Auto Setup${NC}                       ${PURPLE}║${NC}"
 echo -e "${PURPLE}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
@@ -239,7 +239,7 @@ echo ""
 cd "$PROJECT_ROOT"
 
 # Kiểm tra container cũ
-if docker ps -a --format '{{.Names}}' | grep -q "aidaptive-app"; then
+if docker ps -a --format '{{.Names}}' | grep -q "aidaptiv-app"; then
     echo ""
     echo -e "${YELLOW}╔═══════════════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}║  ⚠  CONTAINERS CŨ ĐÃ TỒN TẠI                       ║${NC}"
@@ -268,7 +268,7 @@ step "Step 5/5 — Kiểm tra trạng thái"
 
 # Đợi app khởi động
 info "Đang đợi ứng dụng khởi động..."
-APP_PORT=$(grep -oP 'AIDAPTIVE_APP_PORT=\K[0-9]+' "$SCRIPT_DIR/.env" 2>/dev/null || echo "8443")
+APP_PORT=$(grep -oP 'AIDAPTIV_APP_PORT=\K[0-9]+' "$SCRIPT_DIR/.env" 2>/dev/null || echo "8443")
 MAX_WAIT=60
 WAITED=0
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-#  aiDaptive Benchmark Suite - All In One Installer (Linux)
+#  aiDaptiv Benchmark Suite - All In One Installer (Linux)
 #
 #  Hỗ trợ: Ubuntu, Debian, CentOS, RHEL, Fedora
 #
@@ -73,7 +73,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # ============================================================================
 echo ""
 echo -e "${PURPLE}╔══════════════════════════════════════════════════════════╗${NC}"
-echo -e "${PURPLE}║${NC}  ${WHITE}${BOLD}aiDaptive Benchmark Suite - AIO Installer (Linux)${NC}     ${PURPLE}║${NC}"
+echo -e "${PURPLE}║${NC}  ${WHITE}${BOLD}aiDaptiv Benchmark Suite - AIO Installer (Linux)${NC}     ${PURPLE}║${NC}"
 echo -e "${PURPLE}║${NC}  ${GRAY}All In One • Docker • Auto Setup${NC}                       ${PURPLE}║${NC}"
 echo -e "${PURPLE}╚══════════════════════════════════════════════════════════╝${NC}"
 echo ""
@@ -347,7 +347,7 @@ echo ""
 cd "$PROJECT_ROOT"
 
 # Kiểm tra container cũ
-if run_docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "aidaptive-app"; then
+if run_docker ps -a --format '{{.Names}}' 2>/dev/null | grep -q "aidaptiv-app"; then
     echo ""
     echo -e "${YELLOW}╔═══════════════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}║  ⚠  CONTAINERS CŨ ĐÃ TỒN TẠI                       ║${NC}"
@@ -376,7 +376,7 @@ step "Step 5/5 — Kiểm tra trạng thái"
 
 # Đợi app khởi động
 info "Đang đợi ứng dụng khởi động..."
-APP_PORT=$(grep -oP 'AIDAPTIVE_APP_PORT=\K[0-9]+' "$SCRIPT_DIR/.env" 2>/dev/null || echo "8443")
+APP_PORT=$(grep -oP 'AIDAPTIV_APP_PORT=\K[0-9]+' "$SCRIPT_DIR/.env" 2>/dev/null || echo "8443")
 MAX_WAIT=60
 WAITED=0
 

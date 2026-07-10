@@ -18,9 +18,9 @@ class AppConfig:
 class PostgresConfig:
     host: str = "localhost"
     port: int = 5432
-    database: str = "aidaptive_benchmark"
-    user: str = "aidaptive"
-    password: str = "aidaptive2024"
+    database: str = "aidaptiv_benchmark"
+    user: str = "aidaptiv"
+    password: str = "aidaptiv2024"
 
     @property
     def sync_url(self) -> str:

@@ -14,7 +14,7 @@ class ServerDiscovery:
     def __init__(
         self,
         timeout: float = 5.0,
-        agent_port: int = 9100,
+        agent_port: int = 9101,
         ollama_port: int = 11434,
         ssh_port: int = 22,
         use_ssh_fallback: bool = False,
@@ -171,11 +171,11 @@ class ServerDiscovery:
         if ssh_user:
             return [ssh_user]
 
-        env_users = os.getenv("AIDAPTIVE_DISCOVERY_SSH_USERS", "")
+        env_users = os.getenv("AIDAPTIV_DISCOVERY_SSH_USERS", "")
         candidates = [item.strip() for item in env_users.split(",") if item.strip()]
         candidates.extend(
             [
-                os.getenv("AIDAPTIVE_DISCOVERY_SSH_USER", "").strip(),
+                os.getenv("AIDAPTIV_DISCOVERY_SSH_USER", "").strip(),
                 getpass.getuser(),
                 "ubuntu",
                 "root",

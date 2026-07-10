@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Qwen2.5-7B-Instruct
 # Ollama: qwen2.5:7b
 # Family: Alibaba Qwen 2.5

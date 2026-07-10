@@ -185,6 +185,7 @@ class HardwareSnapshot(Base):
     gpu_power_watts = Column(Float, nullable=True)
     gpu_temperature_c = Column(Float, nullable=True)
     gpu_memory_bandwidth_gbps = Column(Float, nullable=True)
+    gpu_details_json = Column(Text, nullable=True)
 
     cpu_pct = Column(Float, nullable=True)
     ram_used_gb = Column(Float, nullable=True)
@@ -259,8 +260,8 @@ class ServerProfile(Base):
     status = Column(String(50), nullable=True)
     ollama_version = Column(String(50), nullable=True)
     models_available = Column(JSON, nullable=True)
-    aidaptive_version = Column(String(50), nullable=True)
-    aidaptive_firmware = Column(String(50), nullable=True)
+    aidaptiv_version = Column(String(50), nullable=True)
+    aidaptiv_firmware = Column(String(50), nullable=True)
 class PromptSet(Base):
     __tablename__ = "prompt_sets"
 

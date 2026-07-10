@@ -1,4 +1,4 @@
-# 📦 VM_Install — aiDaptive Benchmark Model Installers
+# 📦 VM_Install — aiDaptiv Benchmark Model Installers
 
 > One-command setup scripts for each Phison aiDAPTIV-supported model.
 > Each script installs **all benchmark tools + monitoring agent + model** on an Ubuntu AI server.

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Base Setup (Shared Library)
+# aiDaptiv Benchmark — Base Setup (Shared Library)
 # ==============================================================================
 # This script is sourced by each model-specific installer.
 # It installs all benchmark tools, the monitoring agent, and configures ports.
@@ -23,7 +23,7 @@ print_header()  { echo -e "\n${BOLD}${CYAN}════════════�
 OLLAMA_PORT=11434
 AGENT_PORT=9100
 BENCHMARK_PORT=8443
-AGENT_DIR="/opt/aidaptive-agent"
+AGENT_DIR="/opt/aidaptiv-agent"
 
 # ==============================================================================
 # 1. System Update & Dependencies
@@ -130,14 +130,14 @@ install_benchmark_tools() {
 
     # ── Python benchmark tools ────────────────────────────────────────────
     print_status "Installing Python benchmark tools..."
-    pip3 install --quiet --upgrade \
+    pip3 install --quiet --upgrade --break-system-packages \
         litellm \
         locust \
         llmperf \
         httpx \
         openai \
         vllm 2>/dev/null || \
-    pip3 install --quiet --user --upgrade \
+    pip3 install --quiet --user --upgrade --break-system-packages \
         litellm \
         locust \
         llmperf \
@@ -158,7 +158,7 @@ install_agent() {
     # Create agent script
     sudo tee ${AGENT_DIR}/agent.py > /dev/null <<'AGENT_EOF'
 #!/usr/bin/env python3
-"""aiDaptive Benchmark Agent — Collects GPU/CPU/Disk/Network metrics"""
+"""aiDaptiv Benchmark Agent — Collects GPU/CPU/Disk/Network metrics"""
 
 import subprocess, json, os, time
 from datetime import datetime
@@ -166,7 +166,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-app = FastAPI(title="aiDaptive Benchmark Agent", version="2.0.0")
+app = FastAPI(title="aiDaptiv Benchmark Agent", version="2.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -297,16 +297,16 @@ REQ_EOF
     print_success "Agent dependencies installed"
 
     # systemd service
-    sudo tee /etc/systemd/system/aidaptive-agent.service > /dev/null <<'SVC_EOF'
+    sudo tee /etc/systemd/system/aidaptiv-agent.service > /dev/null <<'SVC_EOF'
 [Unit]
-Description=aiDaptive Benchmark Agent
+Description=aiDaptiv Benchmark Agent
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/aidaptive-agent
-ExecStart=/opt/aidaptive-agent/venv/bin/python /opt/aidaptive-agent/agent.py
+WorkingDirectory=/opt/aidaptiv-agent
+ExecStart=/opt/aidaptiv-agent/venv/bin/python /opt/aidaptiv-agent/agent.py
 Restart=always
 RestartSec=5
 
@@ -315,8 +315,8 @@ WantedBy=multi-user.target
 SVC_EOF
 
     sudo systemctl daemon-reload
-    sudo systemctl enable aidaptive-agent
-    sudo systemctl restart aidaptive-agent
+    sudo systemctl enable aidaptiv-agent
+    sudo systemctl restart aidaptiv-agent
     print_success "Agent service started on port ${AGENT_PORT}"
 }
 
@@ -456,23 +456,23 @@ setup_env_mapping() {
     EXTERNAL_IP=$(curl -s ifconfig.me 2>/dev/null || echo "${SERVER_IP}")
 
     # Create /etc/profile.d script so all users inherit benchmark vars
-    sudo tee /etc/profile.d/aidaptive-benchmark.sh > /dev/null <<ENVEOF
-# aiDaptive Benchmark — Environment Variables
-export AIDAPTIVE_OLLAMA_URL="http://${SERVER_IP}:${OLLAMA_PORT}"
-export AIDAPTIVE_AGENT_URL="http://${SERVER_IP}:${AGENT_PORT}"
-export AIDAPTIVE_OLLAMA_PORT=${OLLAMA_PORT}
-export AIDAPTIVE_AGENT_PORT=${AGENT_PORT}
-export AIDAPTIVE_MODEL="${MODEL_TAG}"
-export AIDAPTIVE_SERVER_IP="${SERVER_IP}"
-export AIDAPTIVE_EXTERNAL_IP="${EXTERNAL_IP}"
+    sudo tee /etc/profile.d/aidaptiv-benchmark.sh > /dev/null <<ENVEOF
+# aiDaptiv Benchmark — Environment Variables
+export AIDAPTIV_OLLAMA_URL="http://${SERVER_IP}:${OLLAMA_PORT}"
+export AIDAPTIV_AGENT_URL="http://${SERVER_IP}:${AGENT_PORT}"
+export AIDAPTIV_OLLAMA_PORT=${OLLAMA_PORT}
+export AIDAPTIV_AGENT_PORT=${AGENT_PORT}
+export AIDAPTIV_MODEL="${MODEL_TAG}"
+export AIDAPTIV_SERVER_IP="${SERVER_IP}"
+export AIDAPTIV_EXTERNAL_IP="${EXTERNAL_IP}"
 export OLLAMA_HOST=0.0.0.0:${OLLAMA_PORT}
 export OLLAMA_ORIGINS="*"
 ENVEOF
-    sudo chmod +x /etc/profile.d/aidaptive-benchmark.sh
-    source /etc/profile.d/aidaptive-benchmark.sh
+    sudo chmod +x /etc/profile.d/aidaptiv-benchmark.sh
+    source /etc/profile.d/aidaptiv-benchmark.sh
 
     # Also write a connection info file for easy copy-paste
-    sudo tee /opt/aidaptive-agent/connection_info.json > /dev/null <<CONNEOF
+    sudo tee /opt/aidaptiv-agent/connection_info.json > /dev/null <<CONNEOF
 {
   "server_ip": "${SERVER_IP}",
   "external_ip": "${EXTERNAL_IP}",
@@ -488,8 +488,8 @@ ENVEOF
 }
 CONNEOF
 
-    print_success "Environment vars exported to /etc/profile.d/aidaptive-benchmark.sh"
-    print_success "Connection info saved to /opt/aidaptive-agent/connection_info.json"
+    print_success "Environment vars exported to /etc/profile.d/aidaptiv-benchmark.sh"
+    print_success "Connection info saved to /opt/aidaptiv-agent/connection_info.json"
     print_status "Internal IP: ${SERVER_IP}"
     print_status "External IP: ${EXTERNAL_IP}"
 }
@@ -586,7 +586,7 @@ run_troubleshooting() {
     # ── Fix: Agent not running ─────────────────────────────────────────────
     if ! curl -s --max-time 3 http://localhost:${AGENT_PORT}/health > /dev/null 2>&1; then
         print_warning "FIX: Agent is not responding. Attempting restart..."
-        sudo systemctl restart aidaptive-agent 2>/dev/null || true
+        sudo systemctl restart aidaptiv-agent 2>/dev/null || true
         sleep 2
         if curl -s --max-time 3 http://localhost:${AGENT_PORT}/health > /dev/null 2>&1; then
             print_success "FIXED: Agent restarted successfully"
@@ -594,14 +594,14 @@ run_troubleshooting() {
         else
             print_error "FAILED: Agent still not responding"
             echo "  Manual fix commands:"
-            echo "    sudo systemctl status aidaptive-agent"
-            echo "    sudo journalctl -u aidaptive-agent --no-pager -n 50"
+            echo "    sudo systemctl status aidaptiv-agent"
+            echo "    sudo journalctl -u aidaptiv-agent --no-pager -n 50"
             echo "    # Reinstall agent deps:"
-            echo "    cd /opt/aidaptive-agent && sudo venv/bin/pip install -r requirements.txt"
+            echo "    cd /opt/aidaptiv-agent && sudo venv/bin/pip install -r requirements.txt"
             echo "    # If port conflict:"
             echo "    sudo lsof -i :${AGENT_PORT}"
             echo "    sudo kill -9 \$(sudo lsof -t -i:${AGENT_PORT})"
-            echo "    sudo systemctl restart aidaptive-agent"
+            echo "    sudo systemctl restart aidaptiv-agent"
         fi
     fi
 
@@ -637,12 +637,12 @@ FIXEOF
     done
 
     # ── Fix: Model not loaded ──────────────────────────────────────────────
-    if [ -n "${AIDAPTIVE_MODEL:-}" ]; then
-        if ! ollama list 2>/dev/null | grep -q "${AIDAPTIVE_MODEL}"; then
-            print_warning "FIX: Model ${AIDAPTIVE_MODEL} not found. Attempting pull..."
-            ollama pull "${AIDAPTIVE_MODEL}" 2>/dev/null && \
-                print_success "FIXED: Model ${AIDAPTIVE_MODEL} pulled" || \
-                print_error "FAILED: Could not pull model. Run manually: ollama pull ${AIDAPTIVE_MODEL}"
+    if [ -n "${AIDAPTIV_MODEL:-}" ]; then
+        if ! ollama list 2>/dev/null | grep -q "${AIDAPTIV_MODEL}"; then
+            print_warning "FIX: Model ${AIDAPTIV_MODEL} not found. Attempting pull..."
+            ollama pull "${AIDAPTIV_MODEL}" 2>/dev/null && \
+                print_success "FIXED: Model ${AIDAPTIV_MODEL} pulled" || \
+                print_error "FAILED: Could not pull model. Run manually: ollama pull ${AIDAPTIV_MODEL}"
         fi
     fi
 
@@ -657,11 +657,11 @@ FIXEOF
     echo -e "${BOLD}Common manual troubleshooting:${NC}"
     echo "  # View service logs"
     echo "  sudo journalctl -u ollama --no-pager -n 30"
-    echo "  sudo journalctl -u aidaptive-agent --no-pager -n 30"
+    echo "  sudo journalctl -u aidaptiv-agent --no-pager -n 30"
     echo ""
     echo "  # Restart services"
     echo "  sudo systemctl restart ollama"
-    echo "  sudo systemctl restart aidaptive-agent"
+    echo "  sudo systemctl restart aidaptiv-agent"
     echo ""
     echo "  # Kill process on port"
     echo "  sudo lsof -i :11434 && sudo kill -9 \$(sudo lsof -t -i:11434)"
@@ -710,9 +710,9 @@ print_final_summary() {
     echo "  └────────────────────────┴───────┴──────────────────────────────────────┘"
     echo ""
     echo -e "${BOLD}Environment Variables (auto-loaded on login):${NC}"
-    echo "  AIDAPTIVE_OLLAMA_URL=http://${SERVER_IP}:${OLLAMA_PORT}"
-    echo "  AIDAPTIVE_AGENT_URL=http://${SERVER_IP}:${AGENT_PORT}"
-    echo "  AIDAPTIVE_MODEL=${MODEL_TAG}"
+    echo "  AIDAPTIV_OLLAMA_URL=http://${SERVER_IP}:${OLLAMA_PORT}"
+    echo "  AIDAPTIV_AGENT_URL=http://${SERVER_IP}:${AGENT_PORT}"
+    echo "  AIDAPTIV_MODEL=${MODEL_TAG}"
     echo ""
     echo -e "${BOLD}Add to benchmark.yaml on your Mac:${NC}"
     echo "  servers:"
@@ -729,7 +729,7 @@ print_final_summary() {
     echo "  curl http://${EXTERNAL_IP}:${OLLAMA_PORT}/api/generate -d '{\"model\":\"${MODEL_TAG}\",\"prompt\":\"Hello\",\"stream\":false}'"
     echo ""
     echo -e "${BOLD}Connection info file:${NC}"
-    echo "  cat /opt/aidaptive-agent/connection_info.json"
+    echo "  cat /opt/aidaptiv-agent/connection_info.json"
     echo ""
 }
 
@@ -744,7 +744,7 @@ run_full_install() {
     local MODEL_TASK="$5"
     local DET_MODEL="${6:-}"
 
-    print_header "aiDaptive Benchmark — VM Installer"
+    print_header "aiDaptiv Benchmark — VM Installer"
     echo -e "Model: ${BOLD}${MODEL_DISPLAY}${NC}"
     echo -e "Tag:   ${MODEL_TAG}"
     echo ""

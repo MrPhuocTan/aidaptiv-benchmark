@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Yi-1.5-34B-Chat
 # Ollama: yi:34b
 # Family: 01.AI Yi

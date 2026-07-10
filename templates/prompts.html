@@ -13,11 +13,11 @@
                     <div class="text-caption-strong"
                          style="color:var(--primary);
                                 text-transform:uppercase;
-                                letter-spacing:0.06em">Configuration</div>
-                    <h2 style="margin-top:var(--sp-xs);">Prompt Management</h2>
+                                letter-spacing:0.06em">{{ t("prompts.config_label") }}</div>
+                    <h2 style="margin-top:var(--sp-xs);">{{ t("prompts.title") }}</h2>
                 </div>
                 <p class="text-caption" style="max-width:360px;">
-                    Upload and manage prompt sets for benchmarks. Download the template to see the required Excel format.
+                    {{ t("prompts.desc") }}
                 </p>
             </div>
         </div>
@@ -27,8 +27,8 @@
                         justify-content:space-between;
                         align-items:center;
                         margin-bottom:var(--sp-md)">
-                <h3>Upload New Prompt Set</h3>
-                <a href="/api/prompts/template" class="btn btn-secondary btn-sm">Download Template</a>
+                <h3>{{ t("prompts.upload_title") }}</h3>
+                <a href="/api/prompts/template" class="btn btn-secondary btn-sm">{{ t("prompts.btn_template") }}</a>
             </div>
             <form id="uploadForm"
                   style="display:grid;
@@ -36,15 +36,15 @@
                          gap:var(--sp-sm);
                          align-items:end">
                 <div>
-                    <label>Set Name *</label>
-                    <input type="text" id="setName" required placeholder="e.g. Code Gen V2">
+                    <label>{{ t("prompts.lbl_name") }}</label>
+                    <input type="text" id="setName" required placeholder="{{ t("prompts.ph_name") }}">
                 </div>
                 <div>
-                    <label>Description</label>
-                    <input type="text" id="setDescription" placeholder="Optional notes">
+                    <label>{{ t("prompts.lbl_desc") }}</label>
+                    <input type="text" id="setDescription" placeholder="{{ t("prompts.ph_desc") }}">
                 </div>
                 <div>
-                    <label>Excel File *</label>
+                    <label>{{ t("prompts.lbl_file") }}</label>
                     <input type="file"
                            id="setFile"
                            required
@@ -56,7 +56,7 @@
                                   background:var(--canvas)">
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <button type="submit" class="btn btn-primary">{{ t("prompts.btn_upload") }}</button>
                 </div>
             </form>
             <div id="uploadResult"
@@ -67,18 +67,18 @@
         <!-- Prompt Sets List -->
         <div class="card" style="padding:0;overflow:hidden;">
             <div style="padding:var(--sp-lg);border-bottom:1px solid var(--hairline);">
-                <h3>Available Prompt Sets</h3>
+                <h3>{{ t("prompts.list_title") }}</h3>
             </div>
             <div class="overflow-x-auto">
                 <table id="promptsTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Prompt Count</th>
-                            <th>Created At</th>
-                            <th style="text-align:right;">Actions</th>
+                            <th>{{ t("prompts.col_id") }}</th>
+                            <th>{{ t("prompts.col_name") }}</th>
+                            <th>{{ t("prompts.col_desc") }}</th>
+                            <th>{{ t("prompts.col_count") }}</th>
+                            <th>{{ t("prompts.col_created") }}</th>
+                            <th style="text-align:right;">{{ t("prompts.col_actions") }}</th>
                         </tr>
                     </thead>
                     <tbody id="promptsList">
@@ -91,14 +91,14 @@
     <script>
 async function loadPromptSets() {
     const tbody = document.getElementById("promptsList");
-    tbody.innerHTML = '<tr><td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-lg);">Loading...</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-lg);">${window.APP_I18N['prompts.msg_loading'] || 'Loading...'}</td></tr>`;
 
     try {
         const res = await fetch("/api/prompts");
         const data = await res.json();
 
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-xxl);">No prompt sets found. Upload one above.</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="6" class="text-caption" style="text-align:center;padding:var(--sp-xxl);">${window.APP_I18N['prompts.msg_empty'] || 'No prompt sets found. Upload one above.'}</td></tr>`;
             return;
         }
 
@@ -112,8 +112,8 @@ async function loadPromptSets() {
                 <td class="text-body-strong" style="font-size:13px;">${set.prompt_count}</td>
                 <td class="text-caption">${new Date(set.created_at).toLocaleString()}</td>
                 <td style="text-align:right;">
-                    <button onclick="viewPromptSet(${set.id})" class="btn btn-secondary btn-sm" style="margin-right:var(--sp-xs);">View</button>
-                    <button onclick="deletePromptSet(${set.id})" class="btn btn-danger btn-sm">Delete</button>
+                    <button onclick="viewPromptSet(${set.id})" class="btn btn-secondary btn-sm" style="margin-right:var(--sp-xs);">${window.APP_I18N['prompts.btn_view'] || 'View'}</button>
+                    <button onclick="deletePromptSet(${set.id})" class="btn btn-danger btn-sm">${window.APP_I18N['common.delete'] || 'Delete'}</button>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -135,9 +135,9 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
     if (!fileInput.files.length) return;
 
     btn.disabled = true;
-    btn.textContent = "Uploading...";
+    btn.textContent = window.APP_I18N['prompts.msg_uploading'] || "Uploading...";
     resultDiv.className = "alert alert-info";
-    resultDiv.textContent = "Processing Excel file...";
+    resultDiv.textContent = window.APP_I18N['prompts.msg_processing'] || "Processing Excel file...";
     resultDiv.style.marginTop = 'var(--sp-md)';
 
     const formData = new FormData();
@@ -151,7 +151,8 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
         if (!res.ok) throw new Error(data.detail || "Upload failed");
 
         resultDiv.className = "alert alert-info";
-        resultDiv.innerHTML = `<strong>Success!</strong> Loaded ${data.prompts_loaded} prompts.`;
+        let successMsg = window.APP_I18N['prompts.msg_success_loaded'] || "<strong>Success!</strong> Loaded {count} prompts.";
+        resultDiv.innerHTML = successMsg.replace('{count}', data.prompts_loaded);
         e.target.reset();
         loadPromptSets();
     } catch (err) {
@@ -159,12 +160,13 @@ document.getElementById("uploadForm").addEventListener("submit", async (e) => {
         resultDiv.textContent = `Error: ${err.message}`;
     } finally {
         btn.disabled = false;
-        btn.textContent = "Upload";
+        btn.textContent = window.APP_I18N['prompts.btn_upload'] || "Upload";
     }
 });
 
 async function deletePromptSet(id) {
-    if (!confirm(`Are you sure you want to delete Prompt Set #${id}?`)) return;
+    const confirmMsg = window.APP_I18N['prompts.msg_delete_confirm'] || "Are you sure you want to delete Prompt Set #{id}?";
+    if (!confirm(confirmMsg.replace('{id}', id))) return;
     try {
         const res = await fetch(`/api/prompts/${id}`, { method: "DELETE" });
         if (!res.ok) throw new Error("Delete failed");
@@ -177,8 +179,8 @@ async function viewPromptSet(id) {
     const title = document.getElementById('viewModalTitle');
     const content = document.getElementById('viewModalContent');
     
-    title.textContent = `Prompt Set #${id} - Loading...`;
-    content.innerHTML = '<p class="text-caption">Loading prompts...</p>';
+    title.textContent = `Prompt Set #${id} - ${window.APP_I18N['prompts.msg_loading'] || 'Loading...'}`;
+    content.innerHTML = `<p class="text-caption">${window.APP_I18N['prompts.modal_loading'] || 'Loading prompts...'}</p>`;
     modal.style.display = 'flex';
     
     try {
@@ -189,7 +191,7 @@ async function viewPromptSet(id) {
         title.textContent = `Prompt Set: ${data.name} (ID: ${data.id})`;
         
         if (!data.prompts || data.prompts.length === 0) {
-            content.innerHTML = '<p class="text-caption">No prompts found in this set.</p>';
+            content.innerHTML = `<p class="text-caption">${window.APP_I18N['prompts.modal_empty'] || 'No prompts found in this set.'}</p>`;
             return;
         }
         
@@ -205,7 +207,7 @@ async function viewPromptSet(id) {
             html += `
                 <details style="margin-bottom: var(--sp-md); border: 1px solid var(--hairline); border-radius: var(--r-md); overflow: hidden;">
                     <summary style="background: var(--surface); padding: var(--sp-md); font-weight: bold; cursor: pointer; user-select: none;">
-                        Scenario: <span style="color: var(--primary);">${scenario}</span> (${prompts.length} prompts)
+                        ${window.APP_I18N['prompts.scenario_label'] || 'Scenario'}: <span style="color: var(--primary);">${scenario}</span> (${prompts.length})
                     </summary>
                     <div style="padding: var(--sp-md);">
             `;
@@ -250,8 +252,8 @@ document.addEventListener("DOMContentLoaded", loadPromptSets);
     <div id="viewModal" style="display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
         <div class="card" style="width: 80%; max-width: 900px; max-height: 80vh; display: flex; flex-direction: column;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--hairline); padding-bottom: var(--sp-sm); margin-bottom: var(--sp-sm);">
-                <h3 id="viewModalTitle">Prompt Set View</h3>
-                <button onclick="closeViewModal()" class="btn btn-secondary btn-sm">&times; Close</button>
+                <h3 id="viewModalTitle">{{ t("prompts.modal_title") }}</h3>
+                <button onclick="closeViewModal()" class="btn btn-secondary btn-sm">&times; {{ t("prompts.btn_close") }}</button>
             </div>
             <div id="viewModalContent" style="overflow-y: auto; flex-grow: 1; padding-right: var(--sp-xs);">
                 <!-- Prompts injected here -->

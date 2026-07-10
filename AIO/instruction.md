@@ -1,6 +1,6 @@
 # 📋 Hướng dẫn sử dụng AIO (All In One) Installer
 
-> Tài liệu này hướng dẫn chi tiết từng bước cài đặt aiDaptive Benchmark Suite trên máy mới **từ con số 0** — không cần cài sẵn bất kỳ phần mềm nào ngoài hệ điều hành.
+> Tài liệu này hướng dẫn chi tiết từng bước cài đặt aiDaptiv Benchmark Suite trên máy mới **từ con số 0** — không cần cài sẵn bất kỳ phần mềm nào ngoài hệ điều hành.
 
 ---
 
@@ -10,7 +10,7 @@ AIO đóng gói toàn bộ hệ thống vào Docker:
 
 | Thành phần | Mô tả |
 |------------|--------|
-| **App** (`aidaptive-benchmark`) | Ứng dụng Python (FastAPI + Uvicorn) — benchmark AI servers |
+| **App** (`aidaptiv-benchmark`) | Ứng dụng Python (FastAPI + Uvicorn) — benchmark AI servers |
 | **PostgreSQL** (`postgres:16-alpine`) | Database lưu trữ kết quả benchmark |
 
 Chỉ cần **1 lệnh duy nhất**, script sẽ tự:
@@ -34,7 +34,7 @@ Chỉ cần **1 lệnh duy nhất**, script sẽ tự:
 # 1. Mở Terminal
 
 # 2. Di chuyển vào thư mục project
-cd /đường/dẫn/tới/aidaptive-benchmark
+cd /đường/dẫn/tới/aidaptiv-benchmark
 
 # 3. Cấp quyền chạy script
 chmod +x AIO/install-mac.sh
@@ -60,7 +60,7 @@ Step 3/5 — Chuẩn bị môi trường
 └── Tạo file .env từ .env.example
 
 Step 4/5 — Build Docker Image & Khởi động
-├── Build image aidaptive-benchmark (lần đầu ~3-5 phút)
+├── Build image aidaptiv-benchmark (lần đầu ~3-5 phút)
 └── docker compose up (PostgreSQL + App)
 
 Step 5/5 — Kiểm tra trạng thái
@@ -88,7 +88,7 @@ Step 5/5 — Kiểm tra trạng thái
 
 ```bash
 # 1. Di chuyển vào thư mục project
-cd /đường/dẫn/tới/aidaptive-benchmark
+cd /đường/dẫn/tới/aidaptiv-benchmark
 
 # 2. Cấp quyền chạy script
 chmod +x AIO/install-linux.sh
@@ -124,7 +124,7 @@ Cách 1: Click chuột phải vào AIO\install-windows.bat → "Run as Administr
 
 Cách 2:
   1. Mở CMD với quyền Admin (Start → gõ "cmd" → Run as Administrator)
-  2. cd C:\đường\dẫn\tới\aidaptive-benchmark
+  2. cd C:\đường\dẫn\tới\aidaptiv-benchmark
   3. AIO\install-windows.bat
 ```
 
@@ -146,7 +146,7 @@ Truy cập ứng dụng:
 
 ```
 🌐 Web UI:      http://localhost:8443
-🐘 PostgreSQL:  localhost:5432 (user: aidaptive / pass: aidaptive2024)
+🐘 PostgreSQL:  localhost:5432 (user: aidaptiv / pass: aidaptiv2024)
 ```
 
 ---
@@ -187,7 +187,7 @@ docker compose -f AIO/docker-compose.yaml down -v
 Chỉnh file `AIO/.env`:
 
 ```env
-AIDAPTIVE_APP_PORT=9999
+AIDAPTIV_APP_PORT=9999
 ```
 
 Rồi restart:
@@ -208,7 +208,7 @@ docker compose -f AIO/docker-compose.yaml up -d
 **A:** Script sẽ hỏi "Rebuild và khởi động lại? (y/n)" — chọn `y` để rebuild hoặc `n` để giữ nguyên.
 
 ### Q: Port 8443 đã bị chiếm?
-**A:** Đổi `AIDAPTIVE_APP_PORT` trong `AIO/.env` thành port khác (VD: 9443).
+**A:** Đổi `AIDAPTIV_APP_PORT` trong `AIO/.env` thành port khác (VD: 9443).
 
 ### Q: Build thất bại?
 **A:** Kiểm tra logs: `docker compose -f AIO/docker-compose.yaml logs`. Nguyên nhân thường gặp:

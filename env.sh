@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-#  aiDaptive Benchmark Suite - Environment Setup Script
+#  aiDaptiv Benchmark Suite - Environment Setup Script
 #  Chuẩn bị môi trường cho máy chủ Controller (chạy app benchmark)
 #  và máy chủ Target (máy chủ AI đang được đánh giá).
 #
@@ -57,7 +57,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ============================================================================
 # SECTION 1: Controller Machine Setup
-# Cài đặt các công cụ benchmark trên máy chạy app aiDaptive
+# Cài đặt các công cụ benchmark trên máy chạy app aiDaptiv
 # ============================================================================
 setup_controller() {
     step "Setting up CONTROLLER environment"
@@ -304,10 +304,10 @@ sys.exit(0 if any('llama3.2' in m for m in models) else 1)
     info "To start the agent on this server, copy and run:"
     echo ""
     echo "  # From the controller machine, copy the agent:"
-    echo "  scp -r src/collectors/agent_server.py user@THIS_SERVER:/opt/aidaptive-agent/"
+    echo "  scp -r src/collectors/agent_server.py user@THIS_SERVER:/opt/aidaptiv-agent/"
     echo ""
     echo "  # On this server, start the agent:"
-    echo "  python3 /opt/aidaptive-agent/agent_server.py --port 9100"
+    echo "  python3 /opt/aidaptiv-agent/agent_server.py --port 9100"
     echo ""
 
     # ---- 6. Firewall Check ----

@@ -1,6 +1,6 @@
 # ============================================================================
-#  aiDaptive Benchmark Suite - Dockerfile
-#  Build: docker build -f AIO/Dockerfile -t aidaptive-benchmark .
+#  aiDaptiv Benchmark Suite - Dockerfile
+#  Build: docker build -f AIO/Dockerfile -t aidaptiv-benchmark .
 #  (Chạy từ thư mục gốc project)
 #
 #  KHÔNG sửa source code gốc - dùng entrypoint để config runtime
@@ -10,7 +10,7 @@ FROM python:3.11-slim AS base
 
 # Metadata
 LABEL maintainer="MrPhuocTan <Ted.trinh@tpisoftware.com>"
-LABEL description="aiDaptive Benchmark Suite - All In One"
+LABEL description="aiDaptiv Benchmark Suite - All In One"
 LABEL version="1.0.0"
 
 # Tránh Python buffer output
@@ -54,6 +54,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     texlive-fonts-extra \
     texlive-latex-extra \
     texlive-lang-cjk \
+    texlive-lang-chinese \
     lmodern \
     && rm -rf /var/lib/apt/lists/*
 

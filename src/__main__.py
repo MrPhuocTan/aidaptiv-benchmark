@@ -1,5 +1,5 @@
 """
-aiDaptive Benchmark Suite - Entry Point
+aiDaptiv Benchmark Suite - Entry Point
 
 Usage:
     python -m src                         Start Web UI
@@ -27,7 +27,7 @@ def print_banner():
     banner = (
         "\n"
         "    +--------------------------------------------------------------+\n"
-        "    |               aiDaptive Benchmark Suite v1.0.0               |\n"
+        "    |               aiDaptiv Benchmark Suite v1.0.0               |\n"
         "    |   By MrPhuocTan - Ted.trinh@tpisoftware.com - 097.201.2901   |\n"
         "    +--------------------------------------------------------------+\n"
     )
@@ -38,15 +38,15 @@ def print_banner():
 @click.pass_context
 @click.option("--config", "-c", default="benchmark.yaml", help="Config file path")
 def cli(ctx, config):
-    """aiDaptive Benchmark Suite"""
+    """aiDaptiv Benchmark Suite"""
     ctx.ensure_object(dict)
     ctx.obj["config_path"] = config
 
     if ctx.invoked_subcommand is None:
         print_banner()
         cfg = load_config(config)
-        host = os.getenv("AIDAPTIVE_APP_HOST", cfg.app.host)
-        port = int(os.getenv("AIDAPTIVE_APP_PORT", str(cfg.app.port)))
+        host = os.getenv("AIDAPTIV_APP_HOST", cfg.app.host)
+        port = int(os.getenv("AIDAPTIV_APP_PORT", str(cfg.app.port)))
         console.print(f"  Web UI:  http://localhost:{port}", style="white")
         console.print("")
         uvicorn.run(

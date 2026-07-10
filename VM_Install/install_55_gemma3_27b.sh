@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Gemma-3-27B-IT
 # Ollama: gemma3:27b
 # Family: Google Gemma 3

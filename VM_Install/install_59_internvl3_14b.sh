@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  InternVL3-14B
 # Ollama: blaifa/InternVL3:14b
 # Family: OpenGVLab InternVL3

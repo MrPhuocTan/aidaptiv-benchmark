@@ -73,16 +73,37 @@
                                 <td class="font-mono text-caption server-ip-cell">{{ profile.ip_address or profile.server_id }}</td>
                                 <td>
                                     <div class="text-caption leading-relaxed">
-                                        {% if profile.cpu_model %}
-                                            CPU: {{ profile.cpu_model }}
-                                            <br>
+                                        {% if item.cpu_model %}
+                                            <div class="mb-1">
+                                                <span class="font-medium text-slate-500 mr-1">CPU:</span>
+                                                {% if item.cpu_sockets > 1 %}
+                                                    <span class="bg-slate-100 text-slate-600 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1 border border-slate-200">{{ item.cpu_sockets }}x</span>
+                                                {% endif %}
+                                                <span class="font-semibold text-slate-700">{{ item.cpu_model }}</span>
+                                            </div>
                                         {% endif %}
-                                        {% if status.gpu_name %}
-                                            GPU: {{ status.gpu_name }}
-                                            <br>
+                                        
+                                        {% if item.gpus %}
+                                            <div class="mb-1 flex">
+                                                <span class="font-medium text-slate-500 mr-1 mt-0.5">GPU:</span>
+                                                <div class="flex-1">
+                                                    {% for gpu in item.gpus %}
+                                                        <div class="mb-0.5 last:mb-0">
+                                                            {% if gpu.count > 1 %}
+                                                                <span class="bg-emerald-100 text-emerald-700 font-bold px-1.5 py-0.5 rounded text-[10px] mr-1 border border-emerald-200">{{ gpu.count }}x</span>
+                                                            {% endif %}
+                                                            <span class="font-semibold text-slate-700">{{ gpu.name }}</span>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
                                         {% endif %}
+                                        
                                         {% if profile.ram_total_gb %}
-                                            RAM: {{ "%.0f"|format(profile.ram_total_gb) }}GB
+                                            <div>
+                                                <span class="font-medium text-slate-500 mr-1">RAM:</span>
+                                                <span class="font-semibold text-slate-700">{{ "%.0f"|format(profile.ram_total_gb) }}</span> <span class="text-xs text-slate-400">GB</span>
+                                            </div>
                                         {% endif %}
                                     </div>
                                 </td>

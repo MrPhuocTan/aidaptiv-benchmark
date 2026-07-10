@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==============================================
-# aiDaptive Benchmark - AI Server Setup Script
+# aiDaptiv Benchmark - AI Server Setup Script
 # Chạy script này trên mỗi AI Server (Ubuntu/Debian)
 # ==============================================
 
@@ -21,7 +21,7 @@ print_error() { echo -e "${RED}[✗]${NC} \$1"; }
 
 echo ""
 echo "=============================================="
-echo "   aiDaptive Benchmark - AI Server Setup"
+echo "   aiDaptiv Benchmark - AI Server Setup"
 echo "=============================================="
 echo ""
 
@@ -121,13 +121,13 @@ fi
 # ----------------------------------------------
 print_status "Setting up Benchmark Agent..."
 
-AGENT_DIR="/opt/aidaptive-agent"
+AGENT_DIR="/opt/aidaptiv-agent"
 sudo mkdir -p $AGENT_DIR
 
 # Create agent script
 sudo tee $AGENT_DIR/agent.py > /dev/null << 'AGENT_EOF'
 #!/usr/bin/env python3
-"""aiDaptive Benchmark Agent - Thu thập metrics từ AI Server"""
+"""aiDaptiv Benchmark Agent - Thu thập metrics từ AI Server"""
 
 import subprocess
 import json
@@ -137,7 +137,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-app = FastAPI(title="aiDaptive Benchmark Agent", version="1.0.0")
+app = FastAPI(title="aiDaptiv Benchmark Agent", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -360,16 +360,16 @@ print_success "Agent dependencies installed"
 # ----------------------------------------------
 print_status "Creating systemd service for agent..."
 
-sudo tee /etc/systemd/system/aidaptive-agent.service > /dev/null << 'SERVICE_EOF'
+sudo tee /etc/systemd/system/aidaptiv-agent.service > /dev/null << 'SERVICE_EOF'
 [Unit]
-Description=aiDaptive Benchmark Agent
+Description=aiDaptiv Benchmark Agent
 After=network.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/aidaptive-agent
-ExecStart=/opt/aidaptive-agent/venv/bin/python /opt/aidaptive-agent/agent.py
+WorkingDirectory=/opt/aidaptiv-agent
+ExecStart=/opt/aidaptiv-agent/venv/bin/python /opt/aidaptiv-agent/agent.py
 Restart=always
 RestartSec=5
 
@@ -378,8 +378,8 @@ WantedBy=multi-user.target
 SERVICE_EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable aidaptive-agent
-sudo systemctl restart aidaptive-agent
+sudo systemctl enable aidaptiv-agent
+sudo systemctl restart aidaptiv-agent
 print_success "Agent service created and started"
 
 # ----------------------------------------------

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-#  aiDaptive Benchmark Suite - Docker Entrypoint
+#  aiDaptiv Benchmark Suite - Docker Entrypoint
 #  Tự động sửa benchmark.yaml để trỏ postgres host về container name
 #  KHÔNG sửa source code gốc
 # ============================================================================

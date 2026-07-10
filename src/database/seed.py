@@ -50,7 +50,7 @@ async def update_server_profile_from_agent(
             for key in ["name", "description", "gpu_name", "gpu_count", "vram_total_gb", 
                         "cpu_model", "cpu_cores", "ram_total_gb", 
                         "ollama_version", "models_available", 
-                        "aidaptive_version", "aidaptive_firmware", "ip_address", "status"]:
+                        "aidaptiv_version", "aidaptiv_firmware", "ip_address", "status"]:
                 if key in agent_data:
                     setattr(profile, key, agent_data.get(key))
             

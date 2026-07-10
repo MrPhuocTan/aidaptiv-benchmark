@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  Llama-3.3-70B-Instruct
 # Ollama: llama3.3:70b
 # Family: Meta Llama 3.3

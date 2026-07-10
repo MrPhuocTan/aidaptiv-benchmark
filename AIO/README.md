@@ -1,6 +1,6 @@
-# 🚀 aiDaptive Benchmark Suite — AIO (All In One) Installer
+# 🚀 aiDaptiv Benchmark Suite — AIO (All In One) Installer
 
-Bộ cài đặt **một lệnh duy nhất** để triển khai toàn bộ hệ thống aiDaptive Benchmark trên bất kỳ máy mới nào.
+Bộ cài đặt **một lệnh duy nhất** để triển khai toàn bộ hệ thống aiDaptiv Benchmark trên bất kỳ máy mới nào.
 
 ---
 
@@ -22,7 +22,7 @@ Bộ cài đặt **một lệnh duy nhất** để triển khai toàn bộ hệ 
 ### 🍎 macOS
 
 ```bash
-cd aidaptive-benchmark
+cd aidaptiv-benchmark
 chmod +x AIO/install-mac.sh
 ./AIO/install-mac.sh
 ```
@@ -30,7 +30,7 @@ chmod +x AIO/install-mac.sh
 ### 🐧 Linux (Ubuntu/Debian/CentOS/RHEL/Fedora)
 
 ```bash
-cd aidaptive-benchmark
+cd aidaptiv-benchmark
 chmod +x AIO/install-linux.sh
 ./AIO/install-linux.sh
 ```
@@ -39,7 +39,7 @@ chmod +x AIO/install-linux.sh
 
 ```
 Cách 1: Click chuột phải vào install-windows.bat → "Run as Administrator"
-Cách 2: Mở CMD (Admin) → cd aidaptive-benchmark → AIO\install-windows.bat
+Cách 2: Mở CMD (Admin) → cd aidaptiv-benchmark → AIO\install-windows.bat
 ```
 
 ---
@@ -85,7 +85,7 @@ Mỗi install script thực hiện **5 bước** tự động:
 
 Truy cập ứng dụng tại: **http://localhost:8443**
 
-PostgreSQL: `localhost:5432` (user: `aidaptive`, password: `aidaptive2024`)
+PostgreSQL: `localhost:5432` (user: `aidaptiv`, password: `aidaptiv2024`)
 
 ---
 
@@ -119,12 +119,12 @@ Chỉnh sửa file `AIO/.env` để thay đổi cấu hình:
 
 ```env
 # Port ứng dụng (mặc định: 8443)
-AIDAPTIVE_APP_PORT=8443
+AIDAPTIV_APP_PORT=8443
 
 # PostgreSQL credentials
-POSTGRES_USER=aidaptive
-POSTGRES_PASSWORD=aidaptive2024
-POSTGRES_DB=aidaptive_benchmark
+POSTGRES_USER=aidaptiv
+POSTGRES_PASSWORD=aidaptiv2024
+POSTGRES_DB=aidaptiv_benchmark
 ```
 
 ---
@@ -134,7 +134,7 @@ POSTGRES_DB=aidaptive_benchmark
 | Lỗi | Giải pháp |
 |-----|-----------|
 | Docker daemon not running | Mở Docker Desktop thủ công |
-| Port 8443 đã bị chiếm | Đổi `AIDAPTIVE_APP_PORT` trong `.env` |
+| Port 8443 đã bị chiếm | Đổi `AIDAPTIV_APP_PORT` trong `.env` |
 | Permission denied (Linux) | Chạy lại script hoặc `sudo ./AIO/install-linux.sh` |
 | WSL2 chưa bật (Windows) | PowerShell Admin: `wsl --install` → restart máy |
 | Build thất bại | Kiểm tra `docker compose -f AIO/docker-compose.yaml logs` |

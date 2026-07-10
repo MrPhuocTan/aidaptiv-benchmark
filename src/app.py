@@ -87,10 +87,10 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 templates.env.globals["static_version"] = STATIC_VERSION
 
 
-def _derive_aidaptive_enabled(server_id: str, server_cfg) -> bool:
+def _derive_aidaptiv_enabled(server_id: str, server_cfg) -> bool:
     name = (getattr(server_cfg, "name", "") or "").lower()
     description = (getattr(server_cfg, "description", "") or "").lower()
-    return server_id == "server2" or "aidaptive" in name or "aidaptive" in description
+    return server_id == "server2" or "aidaptiv" in name or "aidaptiv" in description
 
 
 async def _build_server_payload(server_id: str, server_cfg) -> dict:
@@ -105,7 +105,7 @@ async def _build_server_payload(server_id: str, server_cfg) -> dict:
         "server_id": status.server_id,
         "name": status.server_name or server_cfg.name,
         "description": server_cfg.description,
-        "aidaptive_enabled": _derive_aidaptive_enabled(server_id, server_cfg),
+        "aidaptiv_enabled": _derive_aidaptiv_enabled(server_id, server_cfg),
         "ollama_online": status.ollama_online,
         "agent_online": status.agent_online,
         "models_loaded": status.models_loaded,
@@ -125,7 +125,7 @@ def _resolve_lang(request: Request) -> str:
     query_lang = request.query_params.get("lang")
     if query_lang:
         return normalize_lang(query_lang)
-    cookie_lang = request.cookies.get("aidaptive_lang")
+    cookie_lang = request.cookies.get("aidaptiv_lang")
     if cookie_lang:
         return normalize_lang(cookie_lang)
     accept_language = request.headers.get("accept-language", "")
@@ -158,7 +158,7 @@ def _render(request: Request, name: str, context: dict):
     )
     if request.query_params.get("lang"):
         response.set_cookie(
-            "aidaptive_lang",
+            "aidaptiv_lang",
             lang,
             max_age=60 * 60 * 24 * 365,
             samesite="lax",
@@ -223,22 +223,39 @@ async def startup():
             result = await session.execute(select(ServerProfile))
             profiles = result.scalars().all()
             config.servers.clear()
+            if orchestrator:
+                orchestrator.agent_clients.clear()
+                
             for p in profiles:
                 if p.ip_address:
-                    config.servers[p.server_id] = ServerConfig(
+                    cfg = ServerConfig(
                         name=p.name or p.server_id,
                         description=p.description or "",
                         ollama_url=f"http://{p.ip_address}:11434",
-                        agent_url=f"http://{p.ip_address}:9100",
+                        agent_url=f"http://{p.ip_address}:9101",
                     )
+                    config.servers[p.server_id] = cfg
+                    if orchestrator:
+                        orchestrator.agent_clients[p.server_id] = AgentClient(
+                            agent_url=cfg.agent_url,
+                            ollama_url=cfg.ollama_url,
+                            server_id=p.server_id,
+                        )
                 else:
                     # Fallback for old records without ip_address
-                    config.servers[p.server_id] = ServerConfig(
+                    cfg = ServerConfig(
                         name=p.name or p.server_id,
                         description=p.description or "",
                         ollama_url="",
                         agent_url="",
                     )
+                    config.servers[p.server_id] = cfg
+                    if orchestrator:
+                        orchestrator.agent_clients[p.server_id] = AgentClient(
+                            agent_url=cfg.agent_url,
+                            ollama_url=cfg.ollama_url,
+                            server_id=p.server_id,
+                        )
         
         from src.background import sync_server_profiles_loop
         asyncio.create_task(sync_server_profiles_loop(config, database))
@@ -352,15 +369,32 @@ async def page_servers(request: Request, session: AsyncSession = Depends(get_db)
     
     async def fetch_status(p):
         client = AgentClient(
-            agent_url=f"http://{p.ip_address}:9100",
+            agent_url=f"http://{p.ip_address}:9101",
             ollama_url=f"http://{p.ip_address}:11434",
             server_id=p.server_id,
             timeout=1.0,
         )
         status = await client.get_server_status(p.name)
+        
+        # Format CPU
+        cpu_raw = (p.cpu_model or "").strip().split("\n")
+        cpu_lines = [c.strip() for c in cpu_raw if c.strip()]
+        cpu_model = max(cpu_lines, key=len) if cpu_lines else ""
+        cpu_sockets = len(cpu_lines) if cpu_lines else 1
+        
+        # Format GPU
+        gpu_raw = (getattr(status, "gpu_name", "") or "").strip().split("\n")
+        gpu_lines = [g.strip() for g in gpu_raw if g.strip()]
+        import collections
+        gpu_counts = collections.Counter(gpu_lines)
+        gpus = [{"name": k, "count": v} for k, v in gpu_counts.items()]
+        
         return {
             "profile": p,
             "status": status,
+            "cpu_model": cpu_model,
+            "cpu_sockets": cpu_sockets,
+            "gpus": gpus,
         }
 
     tasks = [fetch_status(p) for p in profiles]
@@ -400,18 +434,17 @@ async def page_benchmark(request: Request):
     repo = Repository(session)
     try:
         prompt_sets = repo.get_prompt_sets()
+        return _render(
+            request,
+            "benchmark.html",
+            {
+                "page": "benchmark",
+                "config": config,
+                "prompt_sets": prompt_sets,
+            },
+        )
     finally:
         session.close()
-        
-    return _render(
-        request,
-        "benchmark.html",
-        {
-            "page": "benchmark",
-            "config": config,
-            "prompt_sets": prompt_sets,
-        },
-    )
 
 
 # --------------------------------------------------
@@ -819,7 +852,7 @@ async def api_verify_server(req: VerifyServerRequest):
         return JSONResponse({"error": "Invalid IP address"}, status_code=400)
     
     client = AgentClient(
-        agent_url=f"http://{ip}:9100",
+        agent_url=f"http://{ip}:9101",
         ollama_url=f"http://{ip}:11434",
         server_id=ip,
     )
@@ -871,7 +904,7 @@ async def api_add_server(req: AddServerRequest, session: AsyncSession = Depends(
     # Update memory
     existing = config.servers.get(ip)
     ollama_url = existing.ollama_url if existing else f"http://{ip}:11434"
-    agent_url = existing.agent_url if existing else f"http://{ip}:9100"
+    agent_url = existing.agent_url if existing else f"http://{ip}:9101"
     
     config.servers[ip] = ServerConfig(
         name=name,
@@ -879,6 +912,13 @@ async def api_add_server(req: AddServerRequest, session: AsyncSession = Depends(
         ollama_url=ollama_url,
         agent_url=agent_url,
     )
+    
+    if orchestrator:
+        orchestrator.agent_clients[ip] = AgentClient(
+            agent_url=agent_url,
+            ollama_url=ollama_url,
+            server_id=ip,
+        )
     
     return {"status": "ok", "server": await _build_server_payload(ip, config.servers[ip])}
 
@@ -896,6 +936,9 @@ async def api_delete_server(ip: str, session: AsyncSession = Depends(get_db)):
         
     if ip in config.servers:
         del config.servers[ip]
+        
+    if orchestrator and ip in orchestrator.agent_clients:
+        del orchestrator.agent_clients[ip]
         
     return {"status": "ok"}
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# aiDaptive Benchmark — Model Installer
+# aiDaptiv Benchmark — Model Installer
 # Model:  DeepSeek-R1-Distill-Qwen-32B
 # Ollama: deepseek-r1:32b
 # Family: DeepSeek R1
